@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<requiredFields>
+	<validateAbstractRequest>
+		<rule>user != null</rule>
+		<errorCode>USER</errorCode>
+		<errorMessage>User required!</errorMessage>
+	</validateAbstractRequest>
+	<validateAbstractRequest>
+		<rule>user != null &amp;&amp; user.userId != null &amp;&amp;
+			!(user.userId.isEmpty())
+		</rule>
+		<errorCode>USER_ID</errorCode>
+		<errorMessage>User ID required!</errorMessage>
+	</validateAbstractRequest>
+	<!-- REQUEST SPECIFIC VALIDATIONS -->
+	<default>
+		<requests>
+			<validateNumber>
+				<rule>
+					<path>Basic/notNullGreaterThanZero</path>
+					<context>entity</context>
+				</rule>
+			</validateNumber>
+			<validateString>
+				<rule>
+					<path>Basic/stringNotNullAndNotEmpty</path>
+					<context>entity</context>
+				</rule>
+			</validateString>
+			<!-- Request Validation rules -->
+		
+			<!-- Request Validation rules -->
+		</requests>
+		<!-- VALIDATIONS -->
+		<dtos>
+		<!-- Class Validation rules -->
+		
+		<!-- Class Validation rules -->
+			<Basic>
+				<notNull>
+					<basicNotNull />
+				</notNull>
+				<greaterThanZero>
+					<basicGreaterThanZero />
+				</greaterThanZero>
+				<stringNotNullAndNotEmpty>
+					<basicStringNotNullAndNotEmpty />
+				</stringNotNullAndNotEmpty>
+				<isNumber>
+					<basicIsNumber />
+				</isNumber>
+				<notNullGreaterThanZero>
+					<basicNotNullGreaterThanZero />
+				</notNullGreaterThanZero>
+			</Basic>
+		</dtos>
+		<rules>
+			<!-- Basic Rules -->
+			<basicNotNull>
+				<spel>#{} != null</spel>
+				<errorCode>VALUE_NULL</errorCode>
+				<errorMessage>#{} Value is null!</errorMessage>
+			</basicNotNull>
+			<basicGreaterThanZero>
+				<spel>#{} > 0</spel>
+				<errorCode>NOT_GREATER_THAN_ZERO</errorCode>
+				<errorMessage>#{} Must be greater than zero!</errorMessage>
+			</basicGreaterThanZero>
+			<basicStringNotNullAndNotEmpty>
+				<spel>#{} != null &amp;&amp; !(#{}.isEmpty())</spel>
+				<errorCode>VALUE_NULL_OR_EMPTY</errorCode>
+				<errorMessage>#{} Value is null or empty!</errorMessage>
+			</basicStringNotNullAndNotEmpty>
+			<basicIsNumber>
+				<spel>#{}.matches("^[0-9]$")</spel>
+				<errorCode>NOT_A_NUMBER</errorCode>
+				<errorMessage>#{} Must be a number!</errorMessage>
+			</basicIsNumber>
+			<basicNotNullGreaterThanZero>
+				<spel>#{} != null &amp;&amp; #{} > 0</spel>
+				<errorCode>NOT_GREATER_THAN_ZERO</errorCode>
+				<errorMessage>#{} Must be greater than zero!</errorMessage>
+			</basicNotNullGreaterThanZero>
+		</rules>
+	</default>
+</requiredFields>
