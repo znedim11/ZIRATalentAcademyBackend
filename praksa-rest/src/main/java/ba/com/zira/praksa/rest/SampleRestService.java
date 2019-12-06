@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ba.com.zira.commons.exception.ApiException;
@@ -32,8 +33,11 @@ public class SampleRestService {
     private SampleService sampleService;
 
     @ApiOperation(value = "Find Samples", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PostMapping(value = "/find")
-    public PagedPayloadResponse<SampleResponse> find(@RequestBody final Request request) throws ApiException {
+    @GetMapping(value = "/find")
+    public PagedPayloadResponse<SampleResponse> find(@RequestParam(required = false) final String pagination) throws ApiException {
+
+        Request request = new Request();
+        request.setPagination(pagination);
         return sampleService.find(request);
     }
     
