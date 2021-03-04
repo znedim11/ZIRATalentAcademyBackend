@@ -6,3 +6,12 @@
 */.apt_generated/
 .project
 .settings/
+praksa-service/.flattened-pom.xml
+
+praksa-rest/.flattened-pom.xml
+
+praksa-rpm/.flattened-pom.xml
+
+praksa-api/.flattened-pom.xml
+
+.flattened-pom.xml

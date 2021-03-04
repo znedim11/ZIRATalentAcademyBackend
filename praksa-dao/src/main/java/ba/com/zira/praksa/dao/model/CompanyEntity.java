@@ -34,7 +34,7 @@ public class CompanyEntity implements Serializable {
     @Id
     @SequenceGenerator(name = "HUT_COMPANY_ID_GENERATOR", sequenceName = "HUT_COMPANY_SEQ")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_COMPANY_ID_GENERATOR")
-    private double id;
+    private Long id;
 
     private String address;
 
@@ -73,11 +73,11 @@ public class CompanyEntity implements Serializable {
     private String website;
 
     // bi-directional many-to-one association to ReleaseEntity
-    @OneToMany(mappedBy = "hutCompany1")
-    private List<ReleaseEntity> hutReleases1;
+    @OneToMany(mappedBy = "publisher")
+    private List<ReleaseEntity> publisherReleases;
 
     // bi-directional many-to-one association to ReleaseEntity
-    @OneToMany(mappedBy = "hutCompany2")
-    private List<ReleaseEntity> hutReleases2;
+    @OneToMany(mappedBy = "developer")
+    private List<ReleaseEntity> developerReleases;
 
 }

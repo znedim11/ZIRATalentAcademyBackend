@@ -1,165 +1,83 @@
 package ba.com.zira.praksa.dao.model;
 
 import java.io.Serializable;
-import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * The persistent class for the hut_link_map database table.
- * 
+ *
  */
 @Entity
-@Table(name="hut_link_map")
-@NamedQuery(name="LinkMapEntity.findAll", query="SELECT l FROM LinkMapEntity l")
+@Getter
+@Setter
+@NoArgsConstructor
+@Table(name = "hut_link_map")
+@NamedQuery(name = "LinkMapEntity.findAll", query = "SELECT l FROM LinkMapEntity l")
 public class LinkMapEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Id
-	@SequenceGenerator(name="HUT_LINK_MAP_UUID_GENERATOR", sequenceName="HUT_LINK_MAP_SEQ")
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="HUT_LINK_MAP_UUID_GENERATOR")
-	private String uuid;
+    @Id
+    @GenericGenerator(name = "hibernate-uuid", strategy = "uuid2")
+    @GeneratedValue(generator = "hibernate-uuid")
+    @Column(name = "UUID", unique = true)
+    private String uuid;
 
-	private Timestamp created;
+    private LocalDateTime created;
 
-	@Column(name="created_by")
-	private String createdBy;
+    @Column(name = "created_by")
+    private String createdBy;
 
-	private Timestamp modified;
+    private LocalDateTime modified;
 
-	@Column(name="modified_by")
-	private String modifiedBy;
+    @Column(name = "modified_by")
+    private String modifiedBy;
 
-	@Column(name="person_id")
-	private double personId;
+    @Column(name = "person_id")
+    private Long personId;
 
-	//bi-directional many-to-one association to CharacterEntity
-	@ManyToOne
-	@JoinColumn(name="character_id")
-	private CharacterEntity hutCharacter;
+    // bi-directional many-to-one association to CharacterEntity
+    @ManyToOne
+    @JoinColumn(name = "character_id")
+    private CharacterEntity character;
 
-	//bi-directional many-to-one association to ConceptEntity
-	@ManyToOne
-	@JoinColumn(name="concept_id")
-	private ConceptEntity hutConcept;
+    // bi-directional many-to-one association to ConceptEntity
+    @ManyToOne
+    @JoinColumn(name = "concept_id")
+    private ConceptEntity concept;
 
-	//bi-directional many-to-one association to GameEntity
-	@ManyToOne
-	@JoinColumn(name="game_id")
-	private GameEntity hutGame;
+    // bi-directional many-to-one association to GameEntity
+    @ManyToOne
+    @JoinColumn(name = "game_id")
+    private GameEntity game;
 
-	//bi-directional many-to-one association to LocationEntity
-	@ManyToOne
-	@JoinColumn(name="location_id")
-	private LocationEntity hutLocation;
+    // bi-directional many-to-one association to LocationEntity
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private LocationEntity location;
 
-	//bi-directional many-to-one association to ObjectEntity
-	@ManyToOne
-	@JoinColumn(name="object_id")
-	private ObjectEntity hutObject;
+    // bi-directional many-to-one association to ObjectEntity
+    @ManyToOne
+    @JoinColumn(name = "object_id")
+    private ObjectEntity object;
 
-	//bi-directional many-to-one association to PersonEntity
-	@ManyToOne
-	@JoinColumn(name="character_id")
-	private PersonEntity hutPerson;
-
-	public LinkMapEntity() {
-	}
-
-	public String getUuid() {
-		return this.uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	public Timestamp getCreated() {
-		return this.created;
-	}
-
-	public void setCreated(Timestamp created) {
-		this.created = created;
-	}
-
-	public String getCreatedBy() {
-		return this.createdBy;
-	}
-
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
-
-	public Timestamp getModified() {
-		return this.modified;
-	}
-
-	public void setModified(Timestamp modified) {
-		this.modified = modified;
-	}
-
-	public String getModifiedBy() {
-		return this.modifiedBy;
-	}
-
-	public void setModifiedBy(String modifiedBy) {
-		this.modifiedBy = modifiedBy;
-	}
-
-	public double getPersonId() {
-		return this.personId;
-	}
-
-	public void setPersonId(double personId) {
-		this.personId = personId;
-	}
-
-	public CharacterEntity getHutCharacter() {
-		return this.hutCharacter;
-	}
-
-	public void setHutCharacter(CharacterEntity hutCharacter) {
-		this.hutCharacter = hutCharacter;
-	}
-
-	public ConceptEntity getHutConcept() {
-		return this.hutConcept;
-	}
-
-	public void setHutConcept(ConceptEntity hutConcept) {
-		this.hutConcept = hutConcept;
-	}
-
-	public GameEntity getHutGame() {
-		return this.hutGame;
-	}
-
-	public void setHutGame(GameEntity hutGame) {
-		this.hutGame = hutGame;
-	}
-
-	public LocationEntity getHutLocation() {
-		return this.hutLocation;
-	}
-
-	public void setHutLocation(LocationEntity hutLocation) {
-		this.hutLocation = hutLocation;
-	}
-
-	public ObjectEntity getHutObject() {
-		return this.hutObject;
-	}
-
-	public void setHutObject(ObjectEntity hutObject) {
-		this.hutObject = hutObject;
-	}
-
-	public PersonEntity getHutPerson() {
-		return this.hutPerson;
-	}
-
-	public void setHutPerson(PersonEntity hutPerson) {
-		this.hutPerson = hutPerson;
-	}
+    // bi-directional many-to-one association to PersonEntity
+    @ManyToOne
+    @JoinColumn(name = "character_id")
+    private PersonEntity person;
 
 }

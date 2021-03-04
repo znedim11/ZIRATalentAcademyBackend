@@ -6,27 +6,35 @@ import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * The persistent class for the hut_release database table.
  *
  */
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "hut_release")
 @NamedQuery(name = "ReleaseEntity.findAll", query = "SELECT r FROM ReleaseEntity r")
 public class ReleaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "HUT_RELEASE_UUID_GENERATOR", sequenceName = "HUT_RELEASE_SEQ")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_RELEASE_UUID_GENERATOR")
+    @GenericGenerator(name = "hibernate-uuid", strategy = "uuid2")
+    @GeneratedValue(generator = "hibernate-uuid")
+    @Column(name = "UUID", unique = true)
     private String uuid;
 
     private LocalDateTime created;

@@ -34,7 +34,7 @@ public class CharacterEntity implements Serializable {
     @Id
     @SequenceGenerator(name = "HUT_CHARACTER_ID_GENERATOR", sequenceName = "HUT_CHARACTER_SEQ")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_CHARACTER_ID_GENERATOR")
-    private double id;
+    private Long id;
 
     private String aliases;
 
@@ -62,7 +62,7 @@ public class CharacterEntity implements Serializable {
     private String realName;
 
     // bi-directional many-to-one association to LinkMapEntity
-    @OneToMany(mappedBy = "hutCharacter")
-    private List<LinkMapEntity> hutLinkMaps;
+    @OneToMany(mappedBy = "character")
+    private List<LinkMapEntity> linkMaps;
 
 }

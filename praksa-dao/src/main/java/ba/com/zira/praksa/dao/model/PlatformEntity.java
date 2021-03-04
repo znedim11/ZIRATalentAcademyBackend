@@ -14,11 +14,18 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
  * The persistent class for the hut_platform database table.
  *
  */
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "hut_platform")
 @NamedQuery(name = "PlatformEntity.findAll", query = "SELECT p FROM PlatformEntity p")
 public class PlatformEntity implements Serializable {
@@ -27,7 +34,7 @@ public class PlatformEntity implements Serializable {
     @Id
     @SequenceGenerator(name = "HUT_PLATFORM_ID_GENERATOR", sequenceName = "HUT_PLATFORM_SEQ")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_PLATFORM_ID_GENERATOR")
-    private double id;
+    private Long id;
 
     private String abbriviation;
 
@@ -52,7 +59,7 @@ public class PlatformEntity implements Serializable {
     private String outlineText;
 
     // bi-directional many-to-one association to ReleaseEntity
-    @OneToMany(mappedBy = "hutPlatform")
-    private List<ReleaseEntity> hutReleases;
+    @OneToMany(mappedBy = "platform")
+    private List<ReleaseEntity> releases;
 
 }

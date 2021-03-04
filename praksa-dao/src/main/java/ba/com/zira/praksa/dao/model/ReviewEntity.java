@@ -1,149 +1,69 @@
 package ba.com.zira.praksa.dao.model;
 
 import java.io.Serializable;
-import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * The persistent class for the hut_review database table.
- * 
+ *
  */
 @Entity
-@Table(name="hut_review")
-@NamedQuery(name="ReviewEntity.findAll", query="SELECT r FROM ReviewEntity r")
+@Getter
+@Setter
+@NoArgsConstructor
+@Table(name = "hut_review")
+@NamedQuery(name = "ReviewEntity.findAll", query = "SELECT r FROM ReviewEntity r")
 public class ReviewEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Id
-	@SequenceGenerator(name="HUT_REVIEW_ID_GENERATOR", sequenceName="HUT_REVIEW_SEQ")
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="HUT_REVIEW_ID_GENERATOR")
-	private double id;
+    @Id
+    @SequenceGenerator(name = "HUT_REVIEW_ID_GENERATOR", sequenceName = "HUT_REVIEW_SEQ")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_REVIEW_ID_GENERATOR")
+    private Long id;
 
-	private Timestamp created;
+    private LocalDateTime created;
 
-	@Column(name="created_by")
-	private String createdBy;
+    @Column(name = "created_by")
+    private String createdBy;
 
-	private Timestamp modified;
+    private LocalDateTime modified;
 
-	@Column(name="modified_by")
-	private String modifiedBy;
+    @Column(name = "modified_by")
+    private String modifiedBy;
 
-	private String text;
+    private String text;
 
-	private String title;
+    private String title;
 
-	//bi-directional many-to-one association to ReviewFormulaEntity
-	@ManyToOne
-	@JoinColumn(name="formula_id")
-	private ReviewFormulaEntity hurReviewFormula;
+    // bi-directional many-to-one association to ReviewFormulaEntity
+    @ManyToOne
+    @JoinColumn(name = "formula_id")
+    private ReviewFormulaEntity reviewFormula;
 
-	//bi-directional many-to-one association to GameEntity
-	@ManyToOne
-	@JoinColumn(name="game_id")
-	private GameEntity hutGame;
+    // bi-directional many-to-one association to GameEntity
+    @ManyToOne
+    @JoinColumn(name = "game_id")
+    private GameEntity game;
 
-	//bi-directional many-to-one association to ReviewGradeEntity
-	@OneToMany(mappedBy="hutReview")
-	private List<ReviewGradeEntity> hutReviewGrades;
-
-	public ReviewEntity() {
-	}
-
-	public double getId() {
-		return this.id;
-	}
-
-	public void setId(double id) {
-		this.id = id;
-	}
-
-	public Timestamp getCreated() {
-		return this.created;
-	}
-
-	public void setCreated(Timestamp created) {
-		this.created = created;
-	}
-
-	public String getCreatedBy() {
-		return this.createdBy;
-	}
-
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
-
-	public Timestamp getModified() {
-		return this.modified;
-	}
-
-	public void setModified(Timestamp modified) {
-		this.modified = modified;
-	}
-
-	public String getModifiedBy() {
-		return this.modifiedBy;
-	}
-
-	public void setModifiedBy(String modifiedBy) {
-		this.modifiedBy = modifiedBy;
-	}
-
-	public String getText() {
-		return this.text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
-	}
-
-	public String getTitle() {
-		return this.title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public ReviewFormulaEntity getHurReviewFormula() {
-		return this.hurReviewFormula;
-	}
-
-	public void setHurReviewFormula(ReviewFormulaEntity hurReviewFormula) {
-		this.hurReviewFormula = hurReviewFormula;
-	}
-
-	public GameEntity getHutGame() {
-		return this.hutGame;
-	}
-
-	public void setHutGame(GameEntity hutGame) {
-		this.hutGame = hutGame;
-	}
-
-	public List<ReviewGradeEntity> getHutReviewGrades() {
-		return this.hutReviewGrades;
-	}
-
-	public void setHutReviewGrades(List<ReviewGradeEntity> hutReviewGrades) {
-		this.hutReviewGrades = hutReviewGrades;
-	}
-
-	public ReviewGradeEntity addHutReviewGrade(ReviewGradeEntity hutReviewGrade) {
-		getHutReviewGrades().add(hutReviewGrade);
-		hutReviewGrade.setHutReview(this);
-
-		return hutReviewGrade;
-	}
-
-	public ReviewGradeEntity removeHutReviewGrade(ReviewGradeEntity hutReviewGrade) {
-		getHutReviewGrades().remove(hutReviewGrade);
-		hutReviewGrade.setHutReview(null);
-
-		return hutReviewGrade;
-	}
+    // bi-directional many-to-one association to ReviewGradeEntity
+    @OneToMany(mappedBy = "review")
+    private List<ReviewGradeEntity> reviewGrades;
 
 }

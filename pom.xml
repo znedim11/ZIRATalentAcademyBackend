@@ -19,7 +19,7 @@
 
 	<properties>
 		<app.dir>praksa</app.dir>
-		<project.release.version>0.0.1-SNAPSHOT</project.release.version>
+		<project.release.version>1.0.0-SNAPSHOT</project.release.version>
 		<!-- Prefix for nexus repository i.e zira to use zira-snapshots or zira-releases -->
 		<distribution.repo.id.prefix>zira</distribution.repo.id.prefix>
 	</properties>

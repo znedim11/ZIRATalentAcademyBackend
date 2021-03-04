@@ -36,7 +36,7 @@ public class GameEntity implements Serializable {
     @Id
     @SequenceGenerator(name = "HUT_GAME_ID_GENERATOR", sequenceName = "HUT_GAME_SEQ")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_GAME_ID_GENERATOR")
-    private double id;
+    private Long id;
 
     private String abbriviation;
 
@@ -63,37 +63,37 @@ public class GameEntity implements Serializable {
     private String outlineText;
 
     // bi-directional many-to-one association to ExternalReviewEntity
-    @OneToMany(mappedBy = "hutGame")
-    private List<ExternalReviewEntity> hutExternalReviews;
+    @OneToMany(mappedBy = "game")
+    private List<ExternalReviewEntity> externalReviews;
 
     // bi-directional many-to-one association to FranchiseEntity
     @ManyToOne
     @JoinColumn(name = "franchise_id")
-    private FranchiseEntity hutFranchise;
+    private FranchiseEntity franchise;
 
     // bi-directional many-to-one association to GameEntity
     @ManyToOne
     @JoinColumn(name = "dlc_game_id")
-    private GameEntity hutGame;
+    private GameEntity parentGame;
 
     // bi-directional many-to-one association to GameEntity
-    @OneToMany(mappedBy = "hutGame")
-    private List<GameEntity> hutGames;
+    @OneToMany(mappedBy = "parentGame")
+    private List<GameEntity> dlcGames;
 
     // bi-directional many-to-one association to GameFeatureEntity
-    @OneToMany(mappedBy = "hutGame")
-    private List<GameFeatureEntity> hutGameFeatures;
+    @OneToMany(mappedBy = "game")
+    private List<GameFeatureEntity> gameFeatures;
 
     // bi-directional many-to-one association to LinkMapEntity
-    @OneToMany(mappedBy = "hutGame")
-    private List<LinkMapEntity> hutLinkMaps;
+    @OneToMany(mappedBy = "game")
+    private List<LinkMapEntity> linkMaps;
 
     // bi-directional many-to-one association to ReleaseEntity
-    @OneToMany(mappedBy = "hutGame")
-    private List<ReleaseEntity> hutReleases;
+    @OneToMany(mappedBy = "game")
+    private List<ReleaseEntity> releases;
 
     // bi-directional many-to-one association to ReviewEntity
-    @OneToMany(mappedBy = "hutGame")
-    private List<ReviewEntity> hutReviews;
+    @OneToMany(mappedBy = "game")
+    private List<ReviewEntity> reviews;
 
 }

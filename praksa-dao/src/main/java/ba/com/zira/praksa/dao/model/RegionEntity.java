@@ -34,7 +34,7 @@ public class RegionEntity implements Serializable {
     @Id
     @SequenceGenerator(name = "HUT_REGION_ID_GENERATOR", sequenceName = "HUT_REGION_SEQ")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_REGION_ID_GENERATOR")
-    private double id;
+    private Long id;
 
     private LocalDateTime created;
 
@@ -51,7 +51,7 @@ public class RegionEntity implements Serializable {
     private String name;
 
     // bi-directional many-to-one association to ReleaseEntity
-    @OneToMany(mappedBy = "hutRegion")
-    private List<ReleaseEntity> hutReleases;
+    @OneToMany(mappedBy = "region")
+    private List<ReleaseEntity> releases;
 
 }

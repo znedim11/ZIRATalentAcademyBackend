@@ -1,77 +1,51 @@
 package ba.com.zira.praksa.dao.model;
 
 import java.io.Serializable;
-import javax.persistence.*;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * The persistent class for the hut_review_grade database table.
- * 
+ *
  */
 @Entity
-@Table(name="hut_review_grade")
-@NamedQuery(name="ReviewGradeEntity.findAll", query="SELECT r FROM ReviewGradeEntity r")
+@Getter
+@Setter
+@NoArgsConstructor
+@Table(name = "hut_review_grade")
+@NamedQuery(name = "ReviewGradeEntity.findAll", query = "SELECT r FROM ReviewGradeEntity r")
 public class ReviewGradeEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Id
-	@SequenceGenerator(name="HUT_REVIEW_GRADE_UUID_GENERATOR", sequenceName="HUT_REVIEW_GRADE_SEQ")
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="HUT_REVIEW_GRADE_UUID_GENERATOR")
-	private String uuid;
+    @Id
+    @GenericGenerator(name = "hibernate-uuid", strategy = "uuid2")
+    @GeneratedValue(generator = "hibernate-uuid")
+    @Column(name = "UUID", unique = true)
+    private String uuid;
 
-	@Column(name="formula_id")
-	private double formulaId;
+    @Column(name = "formula_id")
+    private Long formulaId;
 
-	private double grade;
+    private Long grade;
 
-	private String type;
+    private String type;
 
-	//bi-directional many-to-one association to ReviewEntity
-	@ManyToOne
-	@JoinColumn(name="review_id")
-	private ReviewEntity hutReview;
-
-	public ReviewGradeEntity() {
-	}
-
-	public String getUuid() {
-		return this.uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	public double getFormulaId() {
-		return this.formulaId;
-	}
-
-	public void setFormulaId(double formulaId) {
-		this.formulaId = formulaId;
-	}
-
-	public double getGrade() {
-		return this.grade;
-	}
-
-	public void setGrade(double grade) {
-		this.grade = grade;
-	}
-
-	public String getType() {
-		return this.type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public ReviewEntity getHutReview() {
-		return this.hutReview;
-	}
-
-	public void setHutReview(ReviewEntity hutReview) {
-		this.hutReview = hutReview;
-	}
+    // bi-directional many-to-one association to ReviewEntity
+    @ManyToOne
+    @JoinColumn(name = "review_id")
+    private ReviewEntity review;
 
 }
