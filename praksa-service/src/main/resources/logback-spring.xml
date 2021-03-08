@@ -13,9 +13,7 @@
 		</layout>
 	</appender>
 	<logger name="ba.com.zira" level="${ziraLogLevel}"/>
-
 	<root level="${rootLogLevel}">
 		<appender-ref ref="STDOUT" />
 	</root>
-
 </configuration>

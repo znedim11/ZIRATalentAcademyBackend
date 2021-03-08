@@ -32,7 +32,7 @@ public class FranchiseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "HUT_FRANCHISE_ID_GENERATOR", sequenceName = "HUT_FRANCHISE_SEQ")
+    @SequenceGenerator(name = "HUT_FRANCHISE_ID_GENERATOR", sequenceName = "HUT_FRANCHISE_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_FRANCHISE_ID_GENERATOR")
     private Long id;
 

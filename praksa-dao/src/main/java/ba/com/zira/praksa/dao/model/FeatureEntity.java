@@ -32,7 +32,7 @@ public class FeatureEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "HUT_FEATURE_ID_GENERATOR", sequenceName = "HUT_FEATURE_SEQ")
+    @SequenceGenerator(name = "HUT_FEATURE_ID_GENERATOR", sequenceName = "HUT_FEATURE_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_FEATURE_ID_GENERATOR")
     private Long id;
 

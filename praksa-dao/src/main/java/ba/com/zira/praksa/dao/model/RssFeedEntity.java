@@ -32,7 +32,7 @@ public class RssFeedEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "HUR_RSS_FEED_ID_GENERATOR", sequenceName = "HUR_RSS_FEED_SEQ")
+    @SequenceGenerator(name = "HUR_RSS_FEED_ID_GENERATOR", sequenceName = "HUR_RSS_FEED_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUR_RSS_FEED_ID_GENERATOR")
     private Long id;
 

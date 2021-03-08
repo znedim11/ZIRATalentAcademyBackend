@@ -32,7 +32,7 @@ public class ConceptEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "HUT_CONCEPT_ID_GENERATOR", sequenceName = "HUT_CONCEPT_SEQ")
+    @SequenceGenerator(name = "HUT_CONCEPT_ID_GENERATOR", sequenceName = "HUT_CONCEPT_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_CONCEPT_ID_GENERATOR")
     private Long id;
 

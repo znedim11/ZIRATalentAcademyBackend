@@ -32,7 +32,7 @@ public class ObjectEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "HUT_OBJECT_ID_GENERATOR", sequenceName = "HUT_OBJECT_SEQ")
+    @SequenceGenerator(name = "HUT_OBJECT_ID_GENERATOR", sequenceName = "HUT_OBJECT_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_OBJECT_ID_GENERATOR")
     private Long id;
 

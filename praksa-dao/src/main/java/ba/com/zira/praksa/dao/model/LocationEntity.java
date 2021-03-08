@@ -32,7 +32,7 @@ public class LocationEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "HUT_LOCATION_ID_GENERATOR", sequenceName = "HUT_LOCATION_SEQ")
+    @SequenceGenerator(name = "HUT_LOCATION_ID_GENERATOR", sequenceName = "HUT_LOCATION_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_LOCATION_ID_GENERATOR")
     private Long id;
 

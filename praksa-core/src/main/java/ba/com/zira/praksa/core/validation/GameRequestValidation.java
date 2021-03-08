@@ -6,46 +6,45 @@ import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.response.ValidationResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
-import ba.com.zira.praksa.dao.SampleDAO;
-import ba.com.zira.praksa.api.SampleService;
-import ba.com.zira.praksa.api.model.SampleModel; 
+import ba.com.zira.praksa.api.GameService;
+import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.dao.GameDAO;
 
 /**
- * SampleRequestValidation is used for validation of
- * {@link SampleService} requests.<br>
+ * SampleRequestValidation is used for validation of {@link GameService}
+ * requests.<br>
  * e.g. database validation needed
- * 
+ *
  * @author zira
  *
  */
-@Component("sampleRequestValidation")
-public class SampleRequestValidation {
+@Component("gameRequestValidation")
+public class GameRequestValidation {
 
     private RequestValidator requestValidator;
-    private SampleDAO sampleDAO;
+    private GameDAO gameDAO;
 
-    public SampleRequestValidation(final RequestValidator requestValidator, SampleDAO sampleDAO) {
+    public GameRequestValidation(final RequestValidator requestValidator, GameDAO gameDAO) {
         this.requestValidator = requestValidator;
-        this.sampleDAO = sampleDAO;
+        this.gameDAO = gameDAO;
     }
-    
+
     /**
-     * Validates update SampleModel plan from {@link SampleService}.
+     * Validates update Game plan from {@link GameService}.
      *
      * @param request
      *            the {@link EntityRequest} to validate.
      * @param validationRuleMessage
      *            name of the validation rule that is going to be used for
-     *            validating {@link SampleModel}
-     * 
+     *            validating {@link Game}
+     *
      * @return {@link ValidationResponse}
      */
-    public ValidationResponse validateUpdateSampleModelRequest(final EntityRequest<SampleModel> request,
-            final String validationRuleMessage) {
+    public ValidationResponse validateUpdateGameRequest(final EntityRequest<Game> request, final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
             StringBuilder errorDescription = new StringBuilder();
-            if (!sampleDAO.existsByPK(request.getEntity().getId())) {
+            if (!gameDAO.existsByPK(request.getEntity().getId())) {
                 errorDescription.append("Sample with id: ").append(request.getEntity().getId()).append(" does not exist !");
             }
             validationResponse = requestValidator.createResponse(request, errorDescription);

@@ -47,9 +47,6 @@ public class LinkMapEntity implements Serializable {
     @Column(name = "modified_by")
     private String modifiedBy;
 
-    @Column(name = "person_id")
-    private Long personId;
-
     // bi-directional many-to-one association to CharacterEntity
     @ManyToOne
     @JoinColumn(name = "character_id")
@@ -77,7 +74,7 @@ public class LinkMapEntity implements Serializable {
 
     // bi-directional many-to-one association to PersonEntity
     @ManyToOne
-    @JoinColumn(name = "character_id")
+    @JoinColumn(name = "person_id")
     private PersonEntity person;
 
 }

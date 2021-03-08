@@ -32,7 +32,7 @@ public class MediaEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "HUT_MEDIA_ID_GENERATOR", sequenceName = "HUT_MEDIA_SEQ")
+    @SequenceGenerator(name = "HUT_MEDIA_ID_GENERATOR", sequenceName = "HUT_MEDIA_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_MEDIA_ID_GENERATOR")
     private Long id;
 
@@ -47,7 +47,7 @@ public class MediaEntity implements Serializable {
     private String modifiedBy;
 
     @Column(name = "object_id")
-    private double objectId;
+    private Long objectId;
 
     @Column(name = "object_type")
     private String objectType;

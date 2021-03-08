@@ -32,7 +32,7 @@ public class RegionEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "HUT_REGION_ID_GENERATOR", sequenceName = "HUT_REGION_SEQ")
+    @SequenceGenerator(name = "HUT_REGION_ID_GENERATOR", sequenceName = "HUT_REGION_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_REGION_ID_GENERATOR")
     private Long id;
 

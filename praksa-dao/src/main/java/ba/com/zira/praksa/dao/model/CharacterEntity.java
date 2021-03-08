@@ -32,7 +32,7 @@ public class CharacterEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "HUT_CHARACTER_ID_GENERATOR", sequenceName = "HUT_CHARACTER_SEQ")
+    @SequenceGenerator(name = "HUT_CHARACTER_ID_GENERATOR", sequenceName = "HUT_CHARACTER_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_CHARACTER_ID_GENERATOR")
     private Long id;
 

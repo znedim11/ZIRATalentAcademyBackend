@@ -32,7 +32,7 @@ public class ReviewFormulaEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "HUR_REVIEW_FORMULA_ID_GENERATOR", sequenceName = "HUR_REVIEW_FORMULA_SEQ")
+    @SequenceGenerator(name = "HUR_REVIEW_FORMULA_ID_GENERATOR", sequenceName = "HUR_REVIEW_FORMULA_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUR_REVIEW_FORMULA_ID_GENERATOR")
     private Long id;
 

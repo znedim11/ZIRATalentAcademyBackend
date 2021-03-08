@@ -32,7 +32,7 @@ public class ExternalReviewEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "HUT_EXTERNAL_REVIEW_ID_GENERATOR", sequenceName = "HUT_EXTERNAL_REVIEW_SEQ")
+    @SequenceGenerator(name = "HUT_EXTERNAL_REVIEW_ID_GENERATOR", sequenceName = "HUT_EXTERNAL_REVIEW_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_EXTERNAL_REVIEW_ID_GENERATOR")
     private Long id;
 
