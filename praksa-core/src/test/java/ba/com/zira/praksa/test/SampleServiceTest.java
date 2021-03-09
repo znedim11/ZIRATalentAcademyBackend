@@ -1,61 +1,53 @@
 package ba.com.zira.praksa.test;
 
-import static org.testng.Assert.assertEquals;
-
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import ba.com.zira.commons.exception.ApiException;
-import ba.com.zira.commons.message.request.EntityRequest;
-import ba.com.zira.commons.message.request.Request;
+import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
-import ba.com.zira.commons.model.Filter;
-import ba.com.zira.commons.model.User;
 import ba.com.zira.commons.validation.RequestValidator;
-import ba.com.zira.praksa.api.SampleService;
-import ba.com.zira.praksa.api.model.SampleModel;
-import ba.com.zira.praksa.api.response.SampleResponse;
-import ba.com.zira.praksa.dao.SampleDAO;
-import ba.com.zira.praksa.test.configuration.BasicTestConfiguration;
+import ba.com.zira.praksa.api.GameService;
+import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.core.impl.GameServiceImpl;
+import ba.com.zira.praksa.core.validation.GameRequestValidation;
+import ba.com.zira.praksa.dao.GameDAO;
+import ba.com.zira.praksa.mapper.GameMapper;
 import ba.com.zira.praksa.test.configuration.ApplicationTestConfiguration;
-import ba.com.zira.praksa.core.validation.SampleRequestValidation;
-import ba.com.zira.praksa.core.impl.SampleServiceImpl;
-import ba.com.zira.praksa.mapper.SampleModelMapper;
+import ba.com.zira.praksa.test.configuration.BasicTestConfiguration;
 
 @ContextConfiguration(classes = ApplicationTestConfiguration.class)
 public class SampleServiceTest extends BasicTestConfiguration {
 
     @Autowired
-    private SampleModelMapper sampleMapper;
+    private GameMapper sampleMapper;
 
-    private SampleDAO sampleDAO;
+    private GameDAO gameDAO;
     private RequestValidator requestValidator;
-    private SampleRequestValidation sampleRequestValidation;
-    private SampleService sampleService;
+    private GameRequestValidation sampleRequestValidation;
+    private GameService gameService;
 
     @BeforeMethod
     public void beforeMethod() throws ApiException {
         this.requestValidator = Mockito.mock(RequestValidator.class);
-        this.sampleDAO = Mockito.mock(SampleDAO.class);
-        this.sampleRequestValidation = Mockito.mock(SampleRequestValidation.class);
-        this.sampleService = new SampleServiceImpl(requestValidator, sampleDAO, sampleMapper);
+        this.gameDAO = Mockito.mock(GameDAO.class);
+        this.sampleRequestValidation = Mockito.mock(GameRequestValidation.class);
+        this.gameService = new GameServiceImpl(requestValidator, gameDAO, sampleMapper);
     }
-    
+
     @Test
     public void createTemplateMandatoryFields() {
         try {
-            SampleResponse sampleModel = new SampleResponse();
-            Request request = new Request();
-            PagedPayloadResponse<SampleResponse> response = sampleService.find(request);
+            Game sampleModel = new Game();
+            SearchRequest<String> request = new SearchRequest();
+            PagedPayloadResponse<Game> response = gameService.find(request);
 
-            Mockito.verify(sampleDAO).persist(Mockito.any());
-            //assert
+            Mockito.verify(gameDAO).persist(Mockito.any());
+            // assert
         } catch (ApiException e) {
             Assert.fail();
         }
