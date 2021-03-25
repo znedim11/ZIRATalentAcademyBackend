@@ -19,7 +19,7 @@ import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.PlatformService;
 import ba.com.zira.praksa.api.ReleaseService;
-import ba.com.zira.praksa.api.model.enums.Release;
+import ba.com.zira.praksa.api.model.enums.ReleaseType;
 import ba.com.zira.praksa.api.model.platform.PlatformCreateRequest;
 import ba.com.zira.praksa.api.model.platform.PlatformResponse;
 import ba.com.zira.praksa.api.model.platform.PlatformUpdateRequest;
@@ -36,7 +36,7 @@ public class PlatformRestService
 	private PlatformService platformService;
 	@Autowired
 	private ReleaseService releaseService;
-	private Release releaseType;
+	private ReleaseType releaseType;
 
     @ApiOperation(value = "Find Platforms", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")

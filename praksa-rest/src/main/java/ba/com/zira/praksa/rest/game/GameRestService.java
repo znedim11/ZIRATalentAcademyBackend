@@ -19,7 +19,7 @@ import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.GameService;
 import ba.com.zira.praksa.api.ReleaseService;
-import ba.com.zira.praksa.api.model.enums.Release;
+import ba.com.zira.praksa.api.model.enums.ReleaseType;
 import ba.com.zira.praksa.api.model.game.GameCreateRequest;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
@@ -39,7 +39,7 @@ public class GameRestService
 	private GameService sampleService;
 	@Autowired
 	private ReleaseService releaseService;
-	private Release releaseType;
+	private ReleaseType releaseType;
 
     @ApiOperation(value = "Find Games", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")

@@ -1,6 +1,6 @@
 package ba.com.zira.praksa.api.model.enums;
 
-public enum Release
+public enum ReleaseType
 {
 	/** GAME */
 	Game("GAME"),
@@ -14,7 +14,7 @@ public enum Release
 	 * @param value
 	 */
 
-	private Release(final String value)
+	private ReleaseType(final String value)
 	{
 		this.value = value;
 	}
