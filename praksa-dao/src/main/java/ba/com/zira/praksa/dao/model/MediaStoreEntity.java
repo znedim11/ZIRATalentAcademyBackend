@@ -42,8 +42,6 @@ public class MediaStoreEntity implements Serializable {
     @Column(name = "created_by")
     private String createdBy;
 
-    private byte[] data;
-
     private LocalDateTime modified;
 
     @Column(name = "modified_by")
@@ -52,6 +50,10 @@ public class MediaStoreEntity implements Serializable {
     private String name;
 
     private String type;
+
+    private String url;
+
+    private String extension;
 
     // bi-directional many-to-one association to MediaEntity
     @ManyToOne

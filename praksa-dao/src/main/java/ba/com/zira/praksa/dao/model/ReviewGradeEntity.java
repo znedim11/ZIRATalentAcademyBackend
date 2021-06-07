@@ -39,7 +39,7 @@ public class ReviewGradeEntity implements Serializable {
     @Column(name = "formula_id")
     private Long formulaId;
 
-    private Long grade;
+    private Double grade;
 
     private String type;
 
