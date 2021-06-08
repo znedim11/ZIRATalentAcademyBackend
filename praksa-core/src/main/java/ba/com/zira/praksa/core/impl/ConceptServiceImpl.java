@@ -19,9 +19,11 @@ import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.ConceptService;
 import ba.com.zira.praksa.api.model.concept.Concept;
+import ba.com.zira.praksa.core.validation.ConceptRequestValidation;
 import ba.com.zira.praksa.dao.ConceptDAO;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.mapper.ConceptMapper;
+import lombok.AllArgsConstructor;
 
 /**
  * @author irma
@@ -29,17 +31,13 @@ import ba.com.zira.praksa.mapper.ConceptMapper;
  */
 
 @Service
+@AllArgsConstructor
 public class ConceptServiceImpl implements ConceptService {
 
     private RequestValidator requestValidator;
+    private ConceptRequestValidation conceptRequestValidation;
     private ConceptDAO conceptDAO;
     private ConceptMapper conceptMapper;
-
-    public ConceptServiceImpl(RequestValidator requestValidator, ConceptDAO conceptDAO, ConceptMapper conceptMapper) {
-        this.requestValidator = requestValidator;
-        this.conceptDAO = conceptDAO;
-        this.conceptMapper = conceptMapper;
-    }
 
     @Override
     public PagedPayloadResponse<Concept> find(SearchRequest<String> request) throws ApiException {
@@ -57,7 +55,7 @@ public class ConceptServiceImpl implements ConceptService {
 
     @Override
     public PayloadResponse<Concept> findById(SearchRequest<Long> request) throws ApiException {
-        requestValidator.validate(request);
+        conceptRequestValidation.validateFindConceptByIdRequest(request, "validateAbstractRequest");
 
         final ConceptEntity conceptEntity = conceptDAO.findByPK(request.getEntity());
 
@@ -82,7 +80,7 @@ public class ConceptServiceImpl implements ConceptService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<Concept> update(EntityRequest<Concept> request) throws ApiException {
-        requestValidator.validate(request);
+        conceptRequestValidation.validateUpdateConceptRequest(request, "validateAbstractRequest");
 
         final Concept concept = request.getEntity();
         final ConceptEntity conceptEntity = conceptMapper.dtoToEntity(concept);
@@ -94,7 +92,7 @@ public class ConceptServiceImpl implements ConceptService {
 
     @Override
     public PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException {
-        requestValidator.validate(request);
+        conceptRequestValidation.validateDeleteConceptRequest(request, "validateAbstractRequest");
 
         conceptDAO.removeByPK(request.getEntity());
 

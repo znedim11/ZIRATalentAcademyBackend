@@ -6,6 +6,7 @@ package ba.com.zira.praksa.core.validation;
 import org.springframework.stereotype.Component;
 
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.ValidationResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
@@ -32,7 +33,7 @@ public class ConceptRequestValidation {
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
             StringBuilder errorDescription = new StringBuilder();
             if (!conceptDAO.existsByPK(request.getEntity().getId())) {
-                errorDescription.append("Sample with id: ").append(request.getEntity().getId()).append(" does not exist !");
+                errorDescription.append("Concept with id ").append(request.getEntity().getId()).append(" does not exist!");
             }
             validationResponse = requestValidator.createResponse(request, errorDescription);
         }
@@ -40,20 +41,29 @@ public class ConceptRequestValidation {
         return validationResponse;
     }
 
-    // public ValidationResponse validateDeleteConceptRequest(final
-    // EntityRequest<Concept> request, final String validationRuleMessage) {
-    // ValidationResponse validationResponse =
-    // requestValidator.validate(request, validationRuleMessage);
-    // if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-    // StringBuilder errorDescription = new StringBuilder();
-    // if (!conceptDAO.existsByPK(request.getEntity().getId())) {
-    // errorDescription.append("Sample with id:
-    // ").append(request.getEntity().getId()).append(" does not exist !");
-    // }
-    // validationResponse = requestValidator.createResponse(request,
-    // errorDescription);
-    // }
-    //
-    // return validationResponse;
-    // }
+    public ValidationResponse validateDeleteConceptRequest(final EntityRequest<Long> request, final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (!conceptDAO.existsByPK(request.getEntity())) {
+                errorDescription.append("Concept with id ").append(request.getEntity()).append(" does not exist !");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+
+        return validationResponse;
+    }
+
+    public ValidationResponse validateFindConceptByIdRequest(final SearchRequest<Long> request, final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (!conceptDAO.existsByPK(request.getEntity())) {
+                errorDescription.append("Concept with id ").append(request.getEntity()).append(" does not exist !");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+
+        return validationResponse;
+    }
 }
