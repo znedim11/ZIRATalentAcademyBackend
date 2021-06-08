@@ -53,8 +53,8 @@ public class SwaggerConfiguration {
     @Bean
     public Docket gameApi() {
         return new Docket(DocumentationType.SWAGGER_2).groupName("game-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.game")).build().tags(new Tag("game", "Game APIs"))
-                .globalOperationParameters(operationParameters);
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.game")).build()
+                .tags(new Tag("game", "Game APIs"), new Tag("concept", "Concept APIs")).globalOperationParameters(operationParameters);
     }
 
     private static ApiInfo apiInfo() {
