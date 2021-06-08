@@ -3,7 +3,6 @@
  */
 package ba.com.zira.praksa.core.impl;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +16,7 @@ import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
+import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.ConceptService;
 import ba.com.zira.praksa.api.model.concept.Concept;
 import ba.com.zira.praksa.dao.ConceptDAO;
@@ -30,16 +30,21 @@ import ba.com.zira.praksa.mapper.ConceptMapper;
 
 @Service
 public class ConceptServiceImpl implements ConceptService {
+
+    private RequestValidator requestValidator;
     private ConceptDAO conceptDAO;
     private ConceptMapper conceptMapper;
 
-    public ConceptServiceImpl(ConceptDAO conceptDAO, ConceptMapper conceptMapper) {
+    public ConceptServiceImpl(RequestValidator requestValidator, ConceptDAO conceptDAO, ConceptMapper conceptMapper) {
+        this.requestValidator = requestValidator;
         this.conceptDAO = conceptDAO;
         this.conceptMapper = conceptMapper;
     }
 
     @Override
     public PagedPayloadResponse<Concept> find(SearchRequest<String> request) throws ApiException {
+        requestValidator.validate(request);
+
         PagedData<ConceptEntity> conceptEntites = conceptDAO.findAll(request.getFilter());
         final List<Concept> conceptList = new ArrayList<Concept>();
 
@@ -52,6 +57,8 @@ public class ConceptServiceImpl implements ConceptService {
 
     @Override
     public PayloadResponse<Concept> findById(SearchRequest<Long> request) throws ApiException {
+        requestValidator.validate(request);
+
         final ConceptEntity conceptEntity = conceptDAO.findByPK(request.getEntity());
 
         final Concept concept = conceptMapper.entityToDto(conceptEntity);
@@ -61,6 +68,8 @@ public class ConceptServiceImpl implements ConceptService {
 
     @Override
     public PayloadResponse<Concept> create(EntityRequest<Concept> request) throws ApiException {
+        requestValidator.validate(request);
+
         ConceptEntity entity = conceptMapper.dtoToEntity(request.getEntity());
 
         conceptDAO.persist(entity);
@@ -71,9 +80,10 @@ public class ConceptServiceImpl implements ConceptService {
     }
 
     @Override
+    @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<Concept> update(EntityRequest<Concept> request) throws ApiException {
+        requestValidator.validate(request);
 
-        final LocalDateTime dateTime = LocalDateTime.now();
         final Concept concept = request.getEntity();
         final ConceptEntity conceptEntity = conceptMapper.dtoToEntity(concept);
 
@@ -82,9 +92,10 @@ public class ConceptServiceImpl implements ConceptService {
         return new PayloadResponse<Concept>(request, ResponseCode.OK, concept);
     }
 
-    @Transactional(rollbackFor = ApiException.class)
     @Override
     public PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException {
+        requestValidator.validate(request);
+
         conceptDAO.removeByPK(request.getEntity());
 
         return new PayloadResponse<String>(request, ResponseCode.OK, "Concept deleted!");
