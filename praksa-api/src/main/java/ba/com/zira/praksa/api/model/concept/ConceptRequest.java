@@ -3,12 +3,15 @@ package ba.com.zira.praksa.api.model.concept;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 
 @Data
-public class Concept implements Serializable {
+public class ConceptRequest implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @JsonIgnore
     private Long id;
 
     private String aliases;

@@ -6,6 +6,7 @@ import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.model.concept.Concept;
+import ba.com.zira.praksa.api.model.concept.ConceptRequest;
 
 /**
  * @author irma
@@ -21,10 +22,10 @@ public interface ConceptService {
     PayloadResponse<Concept> findById(SearchRequest<Long> request) throws ApiException;
 
     // Create Concept and save it to database
-    PayloadResponse<Concept> create(EntityRequest<Concept> request) throws ApiException;
+    PayloadResponse<Concept> create(EntityRequest<ConceptRequest> request) throws ApiException;
 
     // Update existing Concept
-    PayloadResponse<Concept> update(final EntityRequest<Concept> request) throws ApiException;
+    PayloadResponse<Concept> update(final EntityRequest<ConceptRequest> request) throws ApiException;
 
     // Delete Concept form database
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
