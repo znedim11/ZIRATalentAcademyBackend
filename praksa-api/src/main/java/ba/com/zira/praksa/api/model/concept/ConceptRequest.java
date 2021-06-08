@@ -16,14 +16,16 @@ public class ConceptRequest implements Serializable {
 
     private String aliases;
 
+    @JsonIgnore
     private LocalDateTime created;
-
+    @JsonIgnore
     private String createdBy;
 
     private String information;
 
+    @JsonIgnore
     private LocalDateTime modified;
-
+    @JsonIgnore
     private String modifiedBy;
 
     private String name;

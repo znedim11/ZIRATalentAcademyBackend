@@ -3,6 +3,7 @@
  */
 package ba.com.zira.praksa.core.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,6 +71,8 @@ public class ConceptServiceImpl implements ConceptService {
         requestValidator.validate(request);
 
         ConceptEntity entity = conceptMapper.dtoRequestToEntity(request.getEntity());
+        entity.setCreated(LocalDateTime.now());
+        entity.setCreatedBy(request.getUser().getUserId());
 
         conceptDAO.persist(entity);
 
@@ -84,6 +87,10 @@ public class ConceptServiceImpl implements ConceptService {
         conceptRequestValidation.validateUpdateConceptRequest(request, "validateAbstractRequest");
 
         final ConceptRequest conceptRequest = request.getEntity();
+
+        conceptRequest.setModified(LocalDateTime.now());
+        conceptRequest.setModifiedBy(request.getUser().getUserId());
+
         final ConceptEntity conceptEntity = conceptMapper.dtoRequestToEntity(conceptRequest);
 
         conceptDAO.merge(conceptEntity);
