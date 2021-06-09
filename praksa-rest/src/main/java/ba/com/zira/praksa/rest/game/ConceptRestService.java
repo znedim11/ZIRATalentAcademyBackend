@@ -21,8 +21,9 @@ import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.ConceptService;
+import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
-import ba.com.zira.praksa.api.model.concept.ConceptRequest;
+import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -60,17 +61,17 @@ public class ConceptRestService {
 
     @ApiOperation(value = "Create Concept", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/create")
-    public PayloadResponse<ConceptResponse> createGame(@RequestBody EntityRequest<ConceptRequest> request) throws ApiException {
+    public PayloadResponse<ConceptResponse> createGame(@RequestBody EntityRequest<ConceptCreateRequest> request) throws ApiException {
         return conceptService.create(request);
     }
 
     @ApiOperation(value = "Update Concept", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PutMapping(value = "/{id}")
-    public PayloadResponse<ConceptResponse> update(@PathVariable final String id, @RequestBody final EntityRequest<ConceptRequest> request)
-            throws ApiException {
+    public PayloadResponse<ConceptResponse> update(@PathVariable final String id,
+            @RequestBody final EntityRequest<ConceptUpdateRequest> request) throws ApiException {
 
-        final ConceptRequest sample = request.getEntity();
-        sample.setId(Long.decode(id));
+        final ConceptUpdateRequest concept = request.getEntity();
+        concept.setId(Long.decode(id));
 
         return conceptService.update(request);
     }

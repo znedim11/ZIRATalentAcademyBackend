@@ -10,7 +10,7 @@ import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.ValidationResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
-import ba.com.zira.praksa.api.model.concept.ConceptRequest;
+import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
 import ba.com.zira.praksa.dao.ConceptDAO;
 
 /**
@@ -28,7 +28,7 @@ public class ConceptRequestValidation {
         this.conceptDAO = conceptDAO;
     }
 
-    public ValidationResponse validateUpdateConceptRequest(final EntityRequest<ConceptRequest> request,
+    public ValidationResponse validateUpdateConceptRequest(final EntityRequest<ConceptUpdateRequest> request,
             final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {

@@ -19,8 +19,9 @@ import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.ConceptService;
-import ba.com.zira.praksa.api.model.concept.ConceptRequest;
+import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
+import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
 import ba.com.zira.praksa.core.validation.ConceptRequestValidation;
 import ba.com.zira.praksa.dao.ConceptDAO;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
@@ -68,12 +69,12 @@ public class ConceptServiceImpl implements ConceptService {
     }
 
     @Override
-    public PayloadResponse<ConceptResponse> create(EntityRequest<ConceptRequest> request) throws ApiException {
+    public PayloadResponse<ConceptResponse> create(EntityRequest<ConceptCreateRequest> request) throws ApiException {
         requestValidator.validate(request);
 
-        ConceptEntity entity = conceptMapper.requestToEntity(request.getEntity());
+        ConceptEntity entity = conceptMapper.createRequestToEntity(request.getEntity());
         entity.setCreated(LocalDateTime.now());
-        entity.setCreatedBy(request.getUser().getUserId());
+        entity.setCreatedBy(request.getUserId());
 
         conceptDAO.persist(entity);
 
@@ -84,21 +85,21 @@ public class ConceptServiceImpl implements ConceptService {
 
     @Override
     @Transactional(rollbackFor = ApiException.class)
-    public PayloadResponse<ConceptResponse> update(final EntityRequest<ConceptRequest> request) throws ApiException {
+    public PayloadResponse<ConceptResponse> update(final EntityRequest<ConceptUpdateRequest> request) throws ApiException {
         conceptRequestValidation.validateUpdateConceptRequest(request, "validateAbstractRequest");
 
-        final ConceptRequest conceptRequest = request.getEntity();
+        final ConceptUpdateRequest conceptRequest = request.getEntity();
 
-        conceptRequest.setModified(LocalDateTime.now());
-        conceptRequest.setModifiedBy(request.getUser().getUserId());
-
-        final ConceptEntity conceptEntity = conceptMapper.requestToEntity(conceptRequest);
+        ConceptEntity conceptEntity = conceptDAO.findByPK(request.getEntity().getId());
+        conceptEntity = conceptMapper.updateRequestToEntity(conceptRequest, conceptEntity);
+        conceptEntity.setModified(LocalDateTime.now());
+        conceptEntity.setModifiedBy(request.getUserId());
 
         conceptDAO.merge(conceptEntity);
 
-        final ConceptResponse concept = conceptMapper.entityToResponse(conceptEntity);
+        final ConceptResponse conceptResponse = conceptMapper.entityToResponse(conceptEntity);
 
-        return new PayloadResponse<ConceptResponse>(request, ResponseCode.OK, concept);
+        return new PayloadResponse<ConceptResponse>(request, ResponseCode.OK, conceptResponse);
     }
 
     @Override
