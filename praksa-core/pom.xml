@@ -33,6 +33,11 @@
 			<groupId>ba.com.zira</groupId>
 			<artifactId>zira-commons</artifactId>
 		</dependency>
+		<dependency>
+		    <groupId>org.projectlombok</groupId>
+		    <artifactId>lombok</artifactId>
+		    <scope>provided</scope>
+		</dependency>
 		<!-- Apache commons -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
