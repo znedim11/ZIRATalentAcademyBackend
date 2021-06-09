@@ -21,7 +21,7 @@ import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.ConceptService;
-import ba.com.zira.praksa.api.model.concept.Concept;
+import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,7 +41,7 @@ public class ConceptRestService {
 
     @ApiOperation(value = "Find Concepts", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")
-    public PagedPayloadResponse<Concept> find(@RequestParam(required = false) final String pagination) throws ApiException {
+    public PagedPayloadResponse<ConceptResponse> find(@RequestParam(required = false) final String pagination) throws ApiException {
 
         SearchRequest<String> request = new SearchRequest<>();
         request.setPagination(pagination);
@@ -50,7 +50,7 @@ public class ConceptRestService {
 
     @ApiOperation(value = "Get Concept by Id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}")
-    public PayloadResponse<Concept> findById(@PathVariable final Long id) throws ApiException {
+    public PayloadResponse<ConceptResponse> findById(@PathVariable final Long id) throws ApiException {
 
         final SearchRequest<Long> request = new SearchRequest<>();
         request.setEntity(id);
@@ -60,13 +60,13 @@ public class ConceptRestService {
 
     @ApiOperation(value = "Create Concept", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/create")
-    public PayloadResponse<Concept> createGame(@RequestBody EntityRequest<ConceptRequest> request) throws ApiException {
+    public PayloadResponse<ConceptResponse> createGame(@RequestBody EntityRequest<ConceptRequest> request) throws ApiException {
         return conceptService.create(request);
     }
 
     @ApiOperation(value = "Update Concept", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PutMapping(value = "/{id}")
-    public PayloadResponse<Concept> update(@PathVariable final String id, @RequestBody final EntityRequest<ConceptRequest> request)
+    public PayloadResponse<ConceptResponse> update(@PathVariable final String id, @RequestBody final EntityRequest<ConceptRequest> request)
             throws ApiException {
 
         final ConceptRequest sample = request.getEntity();

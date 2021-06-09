@@ -19,8 +19,8 @@ import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.ConceptService;
-import ba.com.zira.praksa.api.model.concept.Concept;
 import ba.com.zira.praksa.api.model.concept.ConceptRequest;
+import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.core.validation.ConceptRequestValidation;
 import ba.com.zira.praksa.dao.ConceptDAO;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
@@ -42,48 +42,49 @@ public class ConceptServiceImpl implements ConceptService {
     private ConceptMapper conceptMapper;
 
     @Override
-    public PagedPayloadResponse<Concept> find(SearchRequest<String> request) throws ApiException {
+    public PagedPayloadResponse<ConceptResponse> find(SearchRequest<String> request) throws ApiException {
         requestValidator.validate(request);
 
         PagedData<ConceptEntity> conceptEntites = conceptDAO.findAll(request.getFilter());
-        final List<Concept> conceptList = new ArrayList<Concept>();
+        final List<ConceptResponse> conceptList = new ArrayList<ConceptResponse>();
 
         for (final ConceptEntity conceptEntity : conceptEntites.getRecords()) {
-            conceptList.add(conceptMapper.entityToDto(conceptEntity));
+            conceptList.add(conceptMapper.entityToResponse(conceptEntity));
         }
 
-        return new PagedPayloadResponse<Concept>(request, ResponseCode.OK, conceptList.size(), 1, 1, conceptList.size(), conceptList);
+        return new PagedPayloadResponse<ConceptResponse>(request, ResponseCode.OK, conceptList.size(), 1, 1, conceptList.size(),
+                conceptList);
     }
 
     @Override
-    public PayloadResponse<Concept> findById(SearchRequest<Long> request) throws ApiException {
+    public PayloadResponse<ConceptResponse> findById(SearchRequest<Long> request) throws ApiException {
         conceptRequestValidation.validateFindConceptByIdRequest(request, "validateAbstractRequest");
 
         final ConceptEntity conceptEntity = conceptDAO.findByPK(request.getEntity());
 
-        final Concept concept = conceptMapper.entityToDto(conceptEntity);
+        final ConceptResponse conceptResponse = conceptMapper.entityToResponse(conceptEntity);
 
-        return new PayloadResponse<Concept>(request, ResponseCode.OK, concept);
+        return new PayloadResponse<ConceptResponse>(request, ResponseCode.OK, conceptResponse);
     }
 
     @Override
-    public PayloadResponse<Concept> create(EntityRequest<ConceptRequest> request) throws ApiException {
+    public PayloadResponse<ConceptResponse> create(EntityRequest<ConceptRequest> request) throws ApiException {
         requestValidator.validate(request);
 
-        ConceptEntity entity = conceptMapper.dtoRequestToEntity(request.getEntity());
+        ConceptEntity entity = conceptMapper.requestToEntity(request.getEntity());
         entity.setCreated(LocalDateTime.now());
         entity.setCreatedBy(request.getUser().getUserId());
 
         conceptDAO.persist(entity);
 
-        Concept response = conceptMapper.entityToDto(entity);
+        ConceptResponse response = conceptMapper.entityToResponse(entity);
 
-        return new PayloadResponse<Concept>(request, ResponseCode.OK, response);
+        return new PayloadResponse<ConceptResponse>(request, ResponseCode.OK, response);
     }
 
     @Override
     @Transactional(rollbackFor = ApiException.class)
-    public PayloadResponse<Concept> update(final EntityRequest<ConceptRequest> request) throws ApiException {
+    public PayloadResponse<ConceptResponse> update(final EntityRequest<ConceptRequest> request) throws ApiException {
         conceptRequestValidation.validateUpdateConceptRequest(request, "validateAbstractRequest");
 
         final ConceptRequest conceptRequest = request.getEntity();
@@ -91,13 +92,13 @@ public class ConceptServiceImpl implements ConceptService {
         conceptRequest.setModified(LocalDateTime.now());
         conceptRequest.setModifiedBy(request.getUser().getUserId());
 
-        final ConceptEntity conceptEntity = conceptMapper.dtoRequestToEntity(conceptRequest);
+        final ConceptEntity conceptEntity = conceptMapper.requestToEntity(conceptRequest);
 
         conceptDAO.merge(conceptEntity);
 
-        final Concept concept = conceptMapper.entityToDto(conceptEntity);
+        final ConceptResponse concept = conceptMapper.entityToResponse(conceptEntity);
 
-        return new PayloadResponse<Concept>(request, ResponseCode.OK, concept);
+        return new PayloadResponse<ConceptResponse>(request, ResponseCode.OK, concept);
     }
 
     @Override

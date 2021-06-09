@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
-public class Concept implements Serializable {
+public class ConceptResponse implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;

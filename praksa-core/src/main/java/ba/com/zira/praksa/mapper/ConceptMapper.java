@@ -3,8 +3,8 @@ package ba.com.zira.praksa.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import ba.com.zira.praksa.api.model.concept.Concept;
 import ba.com.zira.praksa.api.model.concept.ConceptRequest;
+import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 
 /**
@@ -16,9 +16,9 @@ import ba.com.zira.praksa.dao.model.ConceptEntity;
 public interface ConceptMapper {
     ConceptMapper INSTANCE = Mappers.getMapper(ConceptMapper.class);
 
-    ConceptEntity dtoToEntity(Concept concept);
+    ConceptEntity responseToEntity(ConceptResponse concept);
 
-    Concept entityToDto(ConceptEntity conceptEntity);
+    ConceptResponse entityToResponse(ConceptEntity conceptEntity);
 
-    ConceptEntity dtoRequestToEntity(ConceptRequest concept);
+    ConceptEntity requestToEntity(ConceptRequest concept);
 }
