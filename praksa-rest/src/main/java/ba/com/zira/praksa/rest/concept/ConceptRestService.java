@@ -3,6 +3,8 @@
  */
 package ba.com.zira.praksa.rest.concept;
 
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -65,7 +67,7 @@ public class ConceptRestService {
 
     @ApiOperation(value = "Create Concept", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/create")
-    public PayloadResponse<ConceptResponse> createGame(@RequestBody EntityRequest<ConceptCreateRequest> request) throws ApiException {
+    public PayloadResponse<ConceptResponse> create(@RequestBody EntityRequest<ConceptCreateRequest> request) throws ApiException {
         return conceptService.create(request);
     }
 
@@ -75,7 +77,9 @@ public class ConceptRestService {
             @RequestBody final EntityRequest<ConceptUpdateRequest> request) throws ApiException {
 
         final ConceptUpdateRequest concept = request.getEntity();
-        concept.setId(Long.decode(id));
+        if (!Objects.isNull(concept)) {
+            concept.setId(Long.decode(id));
+        }
 
         return conceptService.update(request);
     }

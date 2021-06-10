@@ -10,6 +10,8 @@ import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.response.ValidationResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
+import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
+import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
 import ba.com.zira.praksa.dao.ConceptDAO;
 
 /**
@@ -45,6 +47,32 @@ public class ConceptRequestValidation {
             StringBuilder errorDescription = new StringBuilder();
             if (StringUtils.isBlank(request.getEntity())) {
                 errorDescription.append("Concept must have name!");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateEntityExistsInCreateRequest(final EntityRequest<ConceptCreateRequest> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (request.getEntity() == null) {
+                errorDescription.append("Entity must exist in request!");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateEntityExistsInUpdateRequest(final EntityRequest<ConceptUpdateRequest> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (request.getEntity() == null) {
+                errorDescription.append("Entity must exist in request!");
             }
             validationResponse = requestValidator.createResponse(request, errorDescription);
         }
