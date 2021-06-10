@@ -4,7 +4,6 @@
 package ba.com.zira.praksa.core.impl;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ import ba.com.zira.praksa.mapper.ConceptMapper;
 import lombok.AllArgsConstructor;
 
 /**
- * @author irma
+ * @author zira
  *
  */
 
@@ -46,20 +45,26 @@ public class ConceptServiceImpl implements ConceptService {
     public PagedPayloadResponse<ConceptResponse> find(SearchRequest<String> request) throws ApiException {
         requestValidator.validate(request);
 
-        PagedData<ConceptEntity> conceptEntites = conceptDAO.findAll(request.getFilter());
-        final List<ConceptResponse> conceptList = new ArrayList<ConceptResponse>();
+        PagedData<ConceptEntity> conceptEntitesData = conceptDAO.findAll(request.getFilter());
+        List<ConceptEntity> conceptEntities = conceptEntitesData.getRecords();
 
-        for (final ConceptEntity conceptEntity : conceptEntites.getRecords()) {
-            conceptList.add(conceptMapper.entityToResponse(conceptEntity));
-        }
+        final List<ConceptResponse> conceptList = conceptMapper.entityListToResponseList(conceptEntities);
 
-        return new PagedPayloadResponse<ConceptResponse>(request, ResponseCode.OK, conceptList.size(), 1, 1, conceptList.size(),
-                conceptList);
+        PagedData<ConceptResponse> pagedData = new PagedData<ConceptResponse>();
+        pagedData.setNumberOfPages(conceptEntitesData.getNumberOfPages());
+        pagedData.setNumberOfRecords(conceptEntitesData.getNumberOfRecords());
+        pagedData.setPage(conceptEntitesData.getPage());
+        pagedData.setRecords(conceptList);
+        pagedData.setRecordsPerPage(conceptEntitesData.getRecordsPerPage());
+
+        return new PagedPayloadResponse<ConceptResponse>(request, ResponseCode.OK, pagedData.getRecordsPerPage(), pagedData.getPage(),
+                pagedData.getNumberOfPages(), pagedData.getNumberOfRecords(), pagedData.getRecords());
     }
 
     @Override
     public PayloadResponse<ConceptResponse> findById(SearchRequest<Long> request) throws ApiException {
-        conceptRequestValidation.validateFindConceptByIdRequest(request, "validateAbstractRequest");
+        EntityRequest<Long> entityRequest = new EntityRequest<Long>(request.getEntity(), request);
+        conceptRequestValidation.validateConceptExists(entityRequest, "validateAbstractRequest");
 
         final ConceptEntity conceptEntity = conceptDAO.findByPK(request.getEntity());
 
@@ -69,6 +74,7 @@ public class ConceptServiceImpl implements ConceptService {
     }
 
     @Override
+    @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ConceptResponse> create(EntityRequest<ConceptCreateRequest> request) throws ApiException {
         requestValidator.validate(request);
 
@@ -86,7 +92,8 @@ public class ConceptServiceImpl implements ConceptService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ConceptResponse> update(final EntityRequest<ConceptUpdateRequest> request) throws ApiException {
-        conceptRequestValidation.validateUpdateConceptRequest(request, "validateAbstractRequest");
+        EntityRequest<Long> entityRequest = new EntityRequest<Long>(request.getEntity().getId(), request);
+        conceptRequestValidation.validateConceptExists(entityRequest, "validateAbstractRequest");
 
         final ConceptUpdateRequest conceptRequest = request.getEntity();
 
@@ -103,8 +110,10 @@ public class ConceptServiceImpl implements ConceptService {
     }
 
     @Override
+    @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException {
-        conceptRequestValidation.validateDeleteConceptRequest(request, "validateAbstractRequest");
+        EntityRequest<Long> entityRequest = new EntityRequest<Long>(request.getEntity(), request);
+        conceptRequestValidation.validateConceptExists(entityRequest, "validateAbstractRequest");
 
         conceptDAO.removeByPK(request.getEntity());
 

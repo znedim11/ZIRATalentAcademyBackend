@@ -13,6 +13,4 @@ public class ConceptCreateRequest implements Serializable {
     private String information;
 
     private String name;
-
-    // TODO: Add connection to LinkMap
 }

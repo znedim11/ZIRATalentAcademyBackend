@@ -1,7 +1,7 @@
 /**
  *
  */
-package ba.com.zira.praksa.rest.game;
+package ba.com.zira.praksa.rest.concept;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -28,7 +28,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * @author irma
+ * @author zira
  *
  */
 
@@ -42,10 +42,14 @@ public class ConceptRestService {
 
     @ApiOperation(value = "Find Concepts", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")
-    public PagedPayloadResponse<ConceptResponse> find(@RequestParam(required = false) final String pagination) throws ApiException {
+    public PagedPayloadResponse<ConceptResponse> find(@RequestParam(required = false) final String pagination,
+            @RequestParam(required = false) final String filter, @RequestParam(required = false) final String sorting) throws ApiException {
 
         SearchRequest<String> request = new SearchRequest<>();
         request.setPagination(pagination);
+        request.setFilterExpression(filter);
+        request.setSorting(sorting);
+
         return conceptService.find(request);
     }
 

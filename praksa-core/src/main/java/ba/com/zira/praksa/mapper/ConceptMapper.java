@@ -1,5 +1,7 @@
 package ba.com.zira.praksa.mapper;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -11,7 +13,7 @@ import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 
 /**
- * @author irma
+ * @author zira
  *
  */
 
@@ -28,4 +30,6 @@ public interface ConceptMapper {
     ConceptEntity updateRequestToEntity(ConceptUpdateRequest conceptUpdateRequest, @MappingTarget ConceptEntity conceptEntity);
 
     ConceptEntity createRequestToEntity(ConceptCreateRequest conceptCreateRequest);
+
+    List<ConceptResponse> entityListToResponseList(List<ConceptEntity> conceptEntityList);
 }

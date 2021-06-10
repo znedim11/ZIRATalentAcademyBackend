@@ -5,29 +5,92 @@ import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
+import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
-import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
+import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
 
 /**
- * @author irma
+ * * Methods used to manipulate {@link ConceptResponse} data. <br>
+ * List of APIs implemented in this class with links:
+ * <ul>
+ * <li>{@link #find}</li>
+ * </ul>
+ *
+ * @author zira
  *
  */
 
 public interface ConceptService {
-
-    // Get all Concepts from database
+    /**
+     * Retrieve All {@link ConceptResponse}s from database.
+     *
+     * @param request
+     *            {@link SearchRequest} containing pagination and sorting
+     *            information.
+     * @return {@link PagedPayloadResponse} for {@link ConceptResponse}.
+     * @throws ApiException
+     *             If there was a problem during API invocation then.
+     *             {@link ApiException} will be generated/returned with
+     *             corresponding error message and {@link ResponseCode}.
+     */
     public PagedPayloadResponse<ConceptResponse> find(final SearchRequest<String> request) throws ApiException;
 
-    // Get Concept by Id
+    /**
+     * Retrieve {@link ConceptResponse} by Id.
+     *
+     * @param request
+     *            {@link SearchRequest} for ConceptResponse Id and additional
+     *            pagination and sorting information.
+     * @return {@link PayloadResponse} for {@link ConceptResponse}.
+     * @throws ApiException
+     *             If there was a problem during API invocation then.
+     *             {@link ApiException} will be generated/returned with
+     *             corresponding error message and {@link ResponseCode}.
+     */
     PayloadResponse<ConceptResponse> findById(SearchRequest<Long> request) throws ApiException;
 
-    // Create Concept and save it to database
+    /**
+     * Create {@link ConceptResponse}. <br>
+     * Method creates Sample if the request is valid.
+     *
+     * @param request
+     *            {@link EntityRequest} for {@link ConceptResponse}
+     * @return {@link PayloadResponse} holding created {@link ConceptResponse}.
+     * @throws ApiException
+     *             If there was a problem during API invocation then.
+     *             {@link ApiException} will be generated/returned with
+     *             corresponding error message and {@link ResponseCode}.
+     */
     PayloadResponse<ConceptResponse> create(EntityRequest<ConceptCreateRequest> request) throws ApiException;
 
-    // Update existing Concept
+    /**
+     * Update existing {@link ConceptResponse}. <br>
+     * Method validates if Sample exists and if the request is valid update
+     * database.
+     *
+     * @param request
+     *            {@link EntityRequest} for {@link ConceptResponse}
+     * @return {@link PayloadResponse} holding created {@link ConceptResponse}.
+     * @throws ApiException
+     *             If there was a problem during API invocation then.
+     *             {@link ApiException} will be generated/returned with
+     *             corresponding error message and {@link ResponseCode}.
+     */
     PayloadResponse<ConceptResponse> update(final EntityRequest<ConceptUpdateRequest> request) throws ApiException;
 
-    // Delete Concept form database
+    /**
+     * Delete {@link ConceptResponse} from the database. <br>
+     * If {@link ConceptResponse} with the given Id does not exist a validation
+     * exception will be thrown.
+     *
+     * @param request
+     *            {@link ConceptResponse} for ConceptResponse Id.
+     * @return {@link PayloadResponse} confirming deletion.
+     * @throws ApiException
+     *             If there was a problem during API invocation then
+     *             {@link ApiException} will be generated/returned with
+     *             corresponding error message and {@link ResponseCode}.
+     */
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
 }
