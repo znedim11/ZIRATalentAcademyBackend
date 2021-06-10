@@ -76,7 +76,8 @@ public class ConceptServiceImpl implements ConceptService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ConceptResponse> create(EntityRequest<ConceptCreateRequest> request) throws ApiException {
-        requestValidator.validate(request);
+        EntityRequest<String> entityRequest = new EntityRequest<String>(request.getEntity().getName(), request);
+        conceptRequestValidation.validateConceptNameExists(entityRequest, "basicNotNull");
 
         ConceptEntity entity = conceptMapper.createRequestToEntity(request.getEntity());
         entity.setCreated(LocalDateTime.now());
@@ -92,8 +93,11 @@ public class ConceptServiceImpl implements ConceptService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ConceptResponse> update(final EntityRequest<ConceptUpdateRequest> request) throws ApiException {
-        EntityRequest<Long> entityRequest = new EntityRequest<Long>(request.getEntity().getId(), request);
-        conceptRequestValidation.validateConceptExists(entityRequest, "validateAbstractRequest");
+        EntityRequest<Long> entityRequestId = new EntityRequest<Long>(request.getEntity().getId(), request);
+        conceptRequestValidation.validateConceptExists(entityRequestId, "validateAbstractRequest");
+
+        EntityRequest<String> entityRequestName = new EntityRequest<String>(request.getEntity().getName(), request);
+        conceptRequestValidation.validateConceptNameExists(entityRequestName, "basicNotNull");
 
         final ConceptUpdateRequest conceptRequest = request.getEntity();
 
