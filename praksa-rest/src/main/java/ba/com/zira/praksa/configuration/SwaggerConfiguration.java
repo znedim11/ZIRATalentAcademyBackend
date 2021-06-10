@@ -57,6 +57,13 @@ public class SwaggerConfiguration {
                 .globalOperationParameters(operationParameters);
     }
 
+    @Bean
+    public Docket mediaApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("media-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.media")).build().tags(new Tag("media", "Media APIs"))
+                .globalOperationParameters(operationParameters);
+    }
+
     private static ApiInfo apiInfo() {
         final Contact contact = new Contact("ZIRA", "http://www.zira.com.ba", "info@zira.com.ba");
         ApiInfoBuilder builder = new ApiInfoBuilder();
