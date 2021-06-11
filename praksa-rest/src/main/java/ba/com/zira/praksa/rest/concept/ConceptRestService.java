@@ -73,12 +73,12 @@ public class ConceptRestService {
 
     @ApiOperation(value = "Update Concept", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PutMapping(value = "/{id}")
-    public PayloadResponse<ConceptResponse> update(@PathVariable final String id,
+    public PayloadResponse<ConceptResponse> update(@PathVariable final Long id,
             @RequestBody final EntityRequest<ConceptUpdateRequest> request) throws ApiException {
 
         final ConceptUpdateRequest concept = request.getEntity();
         if (!Objects.isNull(concept)) {
-            concept.setId(Long.decode(id));
+            concept.setId(id);
         }
 
         return conceptService.update(request);

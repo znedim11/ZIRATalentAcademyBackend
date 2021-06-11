@@ -57,8 +57,7 @@ public class ConceptServiceImpl implements ConceptService {
         pagedData.setRecords(conceptList);
         pagedData.setRecordsPerPage(conceptEntitesData.getRecordsPerPage());
 
-        return new PagedPayloadResponse<ConceptResponse>(request, ResponseCode.OK, pagedData.getRecordsPerPage(), pagedData.getPage(),
-                pagedData.getNumberOfPages(), pagedData.getNumberOfRecords(), pagedData.getRecords());
+        return new PagedPayloadResponse<ConceptResponse>(request, ResponseCode.OK, pagedData);
     }
 
     @Override
