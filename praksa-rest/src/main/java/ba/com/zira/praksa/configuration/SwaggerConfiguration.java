@@ -64,6 +64,13 @@ public class SwaggerConfiguration {
                 .tags(new Tag("concept", "Concept APIs")).globalOperationParameters(operationParameters);
     }
 
+    @Bean
+    public Docket linkApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("linkMap-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.linkMap")).build()
+                .tags(new Tag("linkMap", "LinkMap APIs")).globalOperationParameters(operationParameters);
+    }
+
     private static ApiInfo apiInfo() {
         final Contact contact = new Contact("ZIRA", "http://www.zira.com.ba", "info@zira.com.ba");
         ApiInfoBuilder builder = new ApiInfoBuilder();

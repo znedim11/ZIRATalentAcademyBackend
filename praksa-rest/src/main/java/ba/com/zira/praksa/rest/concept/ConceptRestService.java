@@ -86,10 +86,10 @@ public class ConceptRestService {
 
     @ApiOperation(value = "Delete Concept by Id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @DeleteMapping(value = "/{id}")
-    public void delete(@PathVariable final Long id) throws ApiException {
+    public PayloadResponse<String> delete(@PathVariable final Long id) throws ApiException {
         final EntityRequest<Long> request = new EntityRequest<>();
         request.setEntity(id);
 
-        conceptService.delete(request);
+        return conceptService.delete(request);
     }
 }
