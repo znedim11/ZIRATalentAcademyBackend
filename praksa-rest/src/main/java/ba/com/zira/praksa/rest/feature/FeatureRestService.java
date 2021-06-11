@@ -18,11 +18,17 @@ import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.FeatureService;
-import ba.com.zira.praksa.api.model.feature.Feature;
 import ba.com.zira.praksa.api.model.feature.FeatureCreateRequest;
+import ba.com.zira.praksa.api.model.feature.FeatureResponse;
+import ba.com.zira.praksa.api.model.feature.FeatureUpdateRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+/**
+ * 
+ * @author zira
+ *
+ */
 @Api(tags = "feature")
 @RestController
 @RequestMapping(value = "feature")
@@ -33,17 +39,20 @@ public class FeatureRestService {
 
     @ApiOperation(value = "Find Features", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")
-    public PagedPayloadResponse<Feature> find(@RequestParam(required = false) final String pagination) throws ApiException {
+    public PagedPayloadResponse<FeatureResponse> find(@RequestParam(required = false) final String pagination,
+            @RequestParam(required = false) final String filter, @RequestParam(required = false) final String sorting) throws ApiException {
 
         SearchRequest<String> request = new SearchRequest<>();
         request.setPagination(pagination);
+        request.setFilterExpression(filter);
+        request.setSorting(sorting);
 
         return featureService.find(request);
     }
 
     @ApiOperation(value = "Get Feature by Id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}")
-    public PayloadResponse<Feature> findById(@PathVariable final Long id) throws ApiException {
+    public PayloadResponse<FeatureResponse> findById(@PathVariable final Long id) throws ApiException {
 
         final SearchRequest<Long> request = new SearchRequest<>();
         request.setEntity(id);
@@ -53,17 +62,17 @@ public class FeatureRestService {
 
     @ApiOperation(value = "Create Feature", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/create")
-    public PayloadResponse<Feature> createFeature(@RequestBody EntityRequest<FeatureCreateRequest> request) throws ApiException {
+    public PayloadResponse<FeatureResponse> createFeature(@RequestBody EntityRequest<FeatureCreateRequest> request) throws ApiException {
         return featureService.create(request);
     }
 
     @ApiOperation(value = "Update Feature", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PutMapping(value = "/{id}")
-    public PayloadResponse<Feature> update(@PathVariable final String id, @RequestBody final EntityRequest<Feature> request)
-            throws ApiException {
+    public PayloadResponse<FeatureResponse> update(@PathVariable final Long id,
+            @RequestBody final EntityRequest<FeatureUpdateRequest> request) throws ApiException {
 
-        final Feature feature = request.getEntity();
-        feature.setId(Long.decode(id));
+        final FeatureUpdateRequest featureUpdateRequest = request.getEntity();
+        featureUpdateRequest.setId(id);
 
         return featureService.update(request);
     }
