@@ -21,6 +21,7 @@
 					<context>entity</context>
 				</rule>
 			</validateNumber>
+			
 			<validateString>
 				<rule>
 					<path>Basic/stringNotNullAndNotEmpty</path>
