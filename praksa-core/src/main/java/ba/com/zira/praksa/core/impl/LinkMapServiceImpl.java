@@ -1,6 +1,8 @@
 package ba.com.zira.praksa.core.impl;
 
 import java.time.LocalDateTime;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -95,7 +97,20 @@ public class LinkMapServiceImpl implements LinkMapService {
 
     @Override
     public PayloadResponse<String> multiple(EntityRequest<MultipleLinkRequest> request) throws ApiException {
-        // TODO Auto-generated method stub
-        return null;
+        Set<Entry<String, Long>> requestMap = request.getEntity().getObjectBMap().entrySet();
+        for (Entry<String, Long> requestMapEntry : requestMap) {
+
+            LinkMapEntity entity = new LinkMapEntity();
+            entity.setUuid(UUID.randomUUID().toString());
+            entity.setCreated(LocalDateTime.now());
+            entity.setCreatedBy(request.getUserId());
+
+            setLinkId(entity, request.getEntity().getObjectAType(), request.getEntity().getObjectAId());
+            setLinkId(entity, requestMapEntry.getKey(), requestMapEntry.getValue());
+
+            linkMapDAO.merge(entity);
+        }
+
+        return new PayloadResponse<String>(request, ResponseCode.OK, "Objects linked!");
     }
 }
