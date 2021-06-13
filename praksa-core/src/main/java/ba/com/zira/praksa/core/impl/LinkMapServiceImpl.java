@@ -53,6 +53,7 @@ public class LinkMapServiceImpl implements LinkMapService {
         linkMapRequestValidation.validateEntityExistsInLinkRequest(request, "basicNotNull");
         linkMapRequestValidation.validateRequiredFieldsExist(request, "basicNotNull");
         linkMapRequestValidation.validateKeysExist(request, "validateAbstractRequest");
+        linkMapRequestValidation.validateLinkDoesNotExist(request, "basicNotNull");
 
         LinkRequest requestEntity = request.getEntity();
 
