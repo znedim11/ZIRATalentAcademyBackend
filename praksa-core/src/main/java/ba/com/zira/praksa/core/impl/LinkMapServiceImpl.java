@@ -53,23 +53,53 @@ public class LinkMapServiceImpl implements LinkMapService {
     @Transactional(rollbackFor = Exception.class)
     public PayloadResponse<String> single(EntityRequest<LinkRequest> request) throws ApiException {
         linkMapRequestValidation.validateEntityExistsInLinkRequest(request, "basicNotNull");
-        linkMapRequestValidation.validateRequiredFieldsExist(request, "basicNotNull");
-        linkMapRequestValidation.validateKeysExist(request, "validateAbstractRequest");
-        linkMapRequestValidation.validateLinkDoesNotExist(request, "basicNotNull");
+        linkMapRequestValidation.validateRequiredFieldsExistInLinkRequest(request, "basicNotNull");
+        linkMapRequestValidation.validateKeysExistInLinkRequest(request, "validateAbstractRequest");
+        linkMapRequestValidation.validateLinkDoesNotExistInLinkRequest(request, "basicNotNull");
 
         LinkRequest requestEntity = request.getEntity();
 
-        LinkMapEntity entity = new LinkMapEntity();
-        entity.setUuid(UUID.randomUUID().toString());
-        entity.setCreated(LocalDateTime.now());
-        entity.setCreatedBy(request.getUserId());
-
-        setLinkId(entity, requestEntity.getObjectAType(), requestEntity.getObjectAId());
-        setLinkId(entity, requestEntity.getObjectBType(), requestEntity.getObjectBId());
+        LinkMapEntity entity = createLinkMapEntity(requestEntity.getObjectAType(), requestEntity.getObjectAId(),
+                requestEntity.getObjectBType(), requestEntity.getObjectBId(), request.getUserId());
 
         linkMapDAO.merge(entity);
 
         return new PayloadResponse<String>(request, ResponseCode.OK, "Objects linked!");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public PayloadResponse<String> multiple(EntityRequest<MultipleLinkRequest> request) throws ApiException {
+        linkMapRequestValidation.validateEntityExistsInMultipleLinkRequest(request, "basicNotNull");
+        linkMapRequestValidation.validateRequiredFieldsExistInMultipleLinkRequest(request, "basicNotNull");
+        linkMapRequestValidation.validateKeysExistInMultipleLinkRequest(request, "validateAbstractRequest");
+        linkMapRequestValidation.validateLinkDoesNotExistInMultipleLinkRequest(request, "basicNotNull");
+
+        Set<Entry<String, Long>> requestMap = request.getEntity().getObjectBMap().entrySet();
+        for (Entry<String, Long> requestMapEntry : requestMap) {
+            LinkMapEntity entity = createLinkMapEntity(request.getEntity().getObjectAType(), request.getEntity().getObjectAId(),
+                    requestMapEntry.getKey(), requestMapEntry.getValue(), request.getUserId());
+
+            linkMapDAO.merge(entity);
+        }
+
+        return new PayloadResponse<String>(request, ResponseCode.OK, "Objects linked!");
+    }
+
+    /**
+     * Helper functions
+     */
+
+    private LinkMapEntity createLinkMapEntity(String objectAType, Long objectAId, String objectBType, Long objectBId, String userId) {
+        LinkMapEntity entity = new LinkMapEntity();
+        entity.setUuid(UUID.randomUUID().toString());
+        entity.setCreated(LocalDateTime.now());
+        entity.setCreatedBy(userId);
+
+        setLinkId(entity, objectAType, objectAId);
+        setLinkId(entity, objectBType, objectBId);
+
+        return entity;
     }
 
     private void setLinkId(LinkMapEntity entity, String objectType, Long objectId) {
@@ -92,30 +122,6 @@ public class LinkMapServiceImpl implements LinkMapService {
             PersonEntity objEntity = personDAO.findByPK(objectId);
             entity.setPerson(objEntity);
         }
-
     }
 
-    @Override
-    public PayloadResponse<String> multiple(EntityRequest<MultipleLinkRequest> request) throws ApiException {
-        linkMapRequestValidation.validateEntityExistsInMultipleLinkRequest(request, "basicNotNull");
-        linkMapRequestValidation.validateMultipleRequiredFieldsExist(request, "basicNotNull");
-        linkMapRequestValidation.validateMultipleKeysExist(request, "validateAbstractRequest");
-        linkMapRequestValidation.validateMultipleLinkDoesNotExist(request, "basicNotNull");
-
-        Set<Entry<String, Long>> requestMap = request.getEntity().getObjectBMap().entrySet();
-        for (Entry<String, Long> requestMapEntry : requestMap) {
-
-            LinkMapEntity entity = new LinkMapEntity();
-            entity.setUuid(UUID.randomUUID().toString());
-            entity.setCreated(LocalDateTime.now());
-            entity.setCreatedBy(request.getUserId());
-
-            setLinkId(entity, request.getEntity().getObjectAType(), request.getEntity().getObjectAId());
-            setLinkId(entity, requestMapEntry.getKey(), requestMapEntry.getValue());
-
-            linkMapDAO.merge(entity);
-        }
-
-        return new PayloadResponse<String>(request, ResponseCode.OK, "Objects linked!");
-    }
 }

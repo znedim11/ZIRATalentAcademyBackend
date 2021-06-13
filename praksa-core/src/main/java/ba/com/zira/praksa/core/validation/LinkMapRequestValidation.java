@@ -29,7 +29,9 @@ import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.dao.model.LocationEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 /**
  * @author zira
@@ -38,6 +40,7 @@ import lombok.AllArgsConstructor;
 
 @Component("linkMapRequestValidation")
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class LinkMapRequestValidation {
     private LinkMapDAO linkMapDAO;
     private RequestValidator requestValidator;
@@ -49,7 +52,42 @@ public class LinkMapRequestValidation {
     ObjectDAO objectDAO;
     PersonDAO personDAO;
 
-    public ValidationResponse validateKeysExist(final EntityRequest<LinkRequest> request, final String validationRuleMessage) {
+    public ValidationResponse validateEntityExistsInLinkRequest(final EntityRequest<LinkRequest> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (request.getEntity() == null) {
+                errorDescription.append("Entity must exist in request!");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateRequiredFieldsExistInLinkRequest(final EntityRequest<LinkRequest> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (StringUtils.isBlank(request.getEntity().getObjectAType())) {
+                errorDescription.append("ObjectAType must exist!");
+            }
+            if (request.getEntity().getObjectAId() == null) {
+                errorDescription.append("ObjectAId must exist!");
+            }
+            if (StringUtils.isBlank(request.getEntity().getObjectBType())) {
+                errorDescription.append("ObjectBType must exist!");
+            }
+            if (request.getEntity().getObjectBId() == null) {
+                errorDescription.append("ObjectBId must exist!");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateKeysExistInLinkRequest(final EntityRequest<LinkRequest> request, final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         LinkRequest requestEntity = request.getEntity();
 
@@ -63,6 +101,111 @@ public class LinkMapRequestValidation {
         }
         return validationResponse;
     }
+
+    public ValidationResponse validateLinkDoesNotExistInLinkRequest(final EntityRequest<LinkRequest> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        LinkRequest requestEntity = request.getEntity();
+
+        Filter filter = new Filter();
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+
+            createFilter(filter, requestEntity.getObjectAType(), requestEntity.getObjectAId());
+            createFilter(filter, requestEntity.getObjectBType(), requestEntity.getObjectBId());
+
+            if (filter.getFilterExpressions().size() > 0 && linkMapDAO.findAll(filter).getRecords().size() > 0) {
+                errorDescription.append("Objects are already linked!");
+            }
+
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateEntityExistsInMultipleLinkRequest(final EntityRequest<MultipleLinkRequest> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (request.getEntity() == null) {
+                errorDescription.append("Entity must exist in request!");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateRequiredFieldsExistInMultipleLinkRequest(final EntityRequest<MultipleLinkRequest> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (StringUtils.isBlank(request.getEntity().getObjectAType())) {
+                errorDescription.append("ObjectAType must exist!");
+            }
+            if (request.getEntity().getObjectAId() == null) {
+                errorDescription.append("ObjectAId must exist!");
+            }
+            if (request.getEntity().getObjectBMap() == null || request.getEntity().getObjectBMap().size() == 0) {
+                errorDescription.append("ObjectBMap must exist!");
+            }
+
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateKeysExistInMultipleLinkRequest(final EntityRequest<MultipleLinkRequest> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        MultipleLinkRequest requestEntity = request.getEntity();
+
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+
+            checkKey(errorDescription, requestEntity.getObjectAType(), requestEntity.getObjectAId());
+
+            Set<Entry<String, Long>> requestMap = request.getEntity().getObjectBMap().entrySet();
+            for (Entry<String, Long> requestMapEntry : requestMap) {
+
+                checkKey(errorDescription, requestMapEntry.getKey(), requestMapEntry.getValue());
+            }
+
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateLinkDoesNotExistInMultipleLinkRequest(final EntityRequest<MultipleLinkRequest> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        MultipleLinkRequest requestEntity = request.getEntity();
+
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+
+            Set<Entry<String, Long>> requestMap = request.getEntity().getObjectBMap().entrySet();
+            for (Entry<String, Long> requestMapEntry : requestMap) {
+                Filter filter = new Filter();
+                createFilter(filter, requestEntity.getObjectAType(), requestEntity.getObjectAId());
+                createFilter(filter, requestMapEntry.getKey(), requestMapEntry.getValue());
+
+                if (filter.getFilterExpressions().size() > 0 && linkMapDAO.findAll(filter).getRecords().size() > 0) {
+                    errorDescription.append("Objects ").append(requestEntity.getObjectAType()).append("#")
+                            .append(requestEntity.getObjectAId()).append(" and ").append(requestMapEntry.getKey()).append("#")
+                            .append(requestMapEntry.getValue()).append(" are already linked!");
+                }
+            }
+
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    /**
+     * Helper functions
+     */
 
     private void checkKey(StringBuilder errorDescription, String objectType, Long objectId) {
         if (ObjectType.CHARACTER.getValue().equalsIgnoreCase(objectType)) {
@@ -92,60 +235,6 @@ public class LinkMapRequestValidation {
         } else {
             errorDescription.append("Type ").append(objectType).append(" does not exist!");
         }
-    }
-
-    public ValidationResponse validateRequiredFieldsExist(final EntityRequest<LinkRequest> request, final String validationRuleMessage) {
-        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
-        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-            StringBuilder errorDescription = new StringBuilder();
-            if (StringUtils.isBlank(request.getEntity().getObjectAType())) {
-                errorDescription.append("ObjectAType must exist!");
-            }
-            if (request.getEntity().getObjectAId() == null) {
-                errorDescription.append("ObjectAId must exist!");
-            }
-            if (StringUtils.isBlank(request.getEntity().getObjectBType())) {
-                errorDescription.append("ObjectBType must exist!");
-            }
-            if (request.getEntity().getObjectBId() == null) {
-                errorDescription.append("ObjectBId must exist!");
-            }
-            validationResponse = requestValidator.createResponse(request, errorDescription);
-        }
-        return validationResponse;
-    }
-
-    public ValidationResponse validateEntityExistsInLinkRequest(final EntityRequest<LinkRequest> request,
-            final String validationRuleMessage) {
-        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
-        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-            StringBuilder errorDescription = new StringBuilder();
-            if (request.getEntity() == null) {
-                errorDescription.append("Entity must exist in request!");
-            }
-            validationResponse = requestValidator.createResponse(request, errorDescription);
-        }
-        return validationResponse;
-    }
-
-    public ValidationResponse validateLinkDoesNotExist(final EntityRequest<LinkRequest> request, final String validationRuleMessage) {
-        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
-        LinkRequest requestEntity = request.getEntity();
-
-        Filter filter = new Filter();
-        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-            StringBuilder errorDescription = new StringBuilder();
-
-            createFilter(filter, requestEntity.getObjectAType(), requestEntity.getObjectAId());
-            createFilter(filter, requestEntity.getObjectBType(), requestEntity.getObjectBId());
-
-            if (filter.getFilterExpressions().size() > 0 && linkMapDAO.findAll(filter).getRecords().size() > 0) {
-                errorDescription.append("Objects are already linked!");
-            }
-
-            validationResponse = requestValidator.createResponse(request, errorDescription);
-        }
-        return validationResponse;
     }
 
     private void createFilter(Filter filter, String objectType, Long objectId) {
@@ -197,83 +286,4 @@ public class LinkMapRequestValidation {
         }
     }
 
-    public ValidationResponse validateMultipleKeysExist(final EntityRequest<MultipleLinkRequest> request,
-            final String validationRuleMessage) {
-        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
-        MultipleLinkRequest requestEntity = request.getEntity();
-
-        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-            StringBuilder errorDescription = new StringBuilder();
-
-            checkKey(errorDescription, requestEntity.getObjectAType(), requestEntity.getObjectAId());
-
-            Set<Entry<String, Long>> requestMap = request.getEntity().getObjectBMap().entrySet();
-            for (Entry<String, Long> requestMapEntry : requestMap) {
-
-                checkKey(errorDescription, requestMapEntry.getKey(), requestMapEntry.getValue());
-            }
-
-            validationResponse = requestValidator.createResponse(request, errorDescription);
-        }
-        return validationResponse;
-    }
-
-    public ValidationResponse validateMultipleRequiredFieldsExist(final EntityRequest<MultipleLinkRequest> request,
-            final String validationRuleMessage) {
-        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
-        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-            StringBuilder errorDescription = new StringBuilder();
-            if (StringUtils.isBlank(request.getEntity().getObjectAType())) {
-                errorDescription.append("ObjectAType must exist!");
-            }
-            if (request.getEntity().getObjectAId() == null) {
-                errorDescription.append("ObjectAId must exist!");
-            }
-            if (request.getEntity().getObjectBMap() == null || request.getEntity().getObjectBMap().size() == 0) {
-                errorDescription.append("ObjectBMap must exist!");
-            }
-
-            validationResponse = requestValidator.createResponse(request, errorDescription);
-        }
-        return validationResponse;
-    }
-
-    public ValidationResponse validateEntityExistsInMultipleLinkRequest(final EntityRequest<MultipleLinkRequest> request,
-            final String validationRuleMessage) {
-        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
-        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-            StringBuilder errorDescription = new StringBuilder();
-            if (request.getEntity() == null) {
-                errorDescription.append("Entity must exist in request!");
-            }
-            validationResponse = requestValidator.createResponse(request, errorDescription);
-        }
-        return validationResponse;
-    }
-
-    public ValidationResponse validateMultipleLinkDoesNotExist(final EntityRequest<MultipleLinkRequest> request,
-            final String validationRuleMessage) {
-        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
-        MultipleLinkRequest requestEntity = request.getEntity();
-
-        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-            StringBuilder errorDescription = new StringBuilder();
-
-            Set<Entry<String, Long>> requestMap = request.getEntity().getObjectBMap().entrySet();
-            for (Entry<String, Long> requestMapEntry : requestMap) {
-                Filter filter = new Filter();
-                createFilter(filter, requestEntity.getObjectAType(), requestEntity.getObjectAId());
-                createFilter(filter, requestMapEntry.getKey(), requestMapEntry.getValue());
-
-                if (filter.getFilterExpressions().size() > 0 && linkMapDAO.findAll(filter).getRecords().size() > 0) {
-                    errorDescription.append("Objects ").append(requestEntity.getObjectAType()).append("#")
-                            .append(requestEntity.getObjectAId()).append(" and ").append(requestMapEntry.getKey()).append("#")
-                            .append(requestMapEntry.getValue()).append(" are already linked!");
-                }
-            }
-
-            validationResponse = requestValidator.createResponse(request, errorDescription);
-        }
-        return validationResponse;
-    }
 }
