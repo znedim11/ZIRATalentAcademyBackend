@@ -97,6 +97,11 @@ public class LinkMapServiceImpl implements LinkMapService {
 
     @Override
     public PayloadResponse<String> multiple(EntityRequest<MultipleLinkRequest> request) throws ApiException {
+        linkMapRequestValidation.validateEntityExistsInMultipleLinkRequest(request, "basicNotNull");
+        linkMapRequestValidation.validateMultipleRequiredFieldsExist(request, "basicNotNull");
+        linkMapRequestValidation.validateMultipleKeysExist(request, "validateAbstractRequest");
+        linkMapRequestValidation.validateMultipleLinkDoesNotExist(request, "basicNotNull");
+
         Set<Entry<String, Long>> requestMap = request.getEntity().getObjectBMap().entrySet();
         for (Entry<String, Long> requestMapEntry : requestMap) {
 
