@@ -3,8 +3,8 @@ package ba.com.zira.praksa.api;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.response.PayloadResponse;
-import ba.com.zira.praksa.api.model.linkMap.LinkRequest;
-import ba.com.zira.praksa.api.model.linkMap.MultipleLinkRequest;
+import ba.com.zira.praksa.api.model.linkmap.LinkRequest;
+import ba.com.zira.praksa.api.model.linkmap.MultipleLinkRequest;
 
 /**
  *

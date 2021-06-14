@@ -67,8 +67,8 @@ public class SwaggerConfiguration {
     @Bean
     public Docket linkMapApi() {
         return new Docket(DocumentationType.SWAGGER_2).groupName("link-map-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.linkmap")).build()
-                .tags(new Tag("linkMap", "LinkMap APIs")).globalOperationParameters(operationParameters);
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.linkmap")).build().tags(new Tag("link", "LinkMap APIs"))
+                .globalOperationParameters(operationParameters);
     }
 
     private static ApiInfo apiInfo() {

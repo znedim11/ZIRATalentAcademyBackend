@@ -1,4 +1,4 @@
-package ba.com.zira.praksa.api.model.linkMap;
+package ba.com.zira.praksa.api.model.linkmap;
 
 import java.io.Serializable;
 import java.util.Map;

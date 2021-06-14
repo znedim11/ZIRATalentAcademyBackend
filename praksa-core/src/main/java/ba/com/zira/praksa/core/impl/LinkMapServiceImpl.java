@@ -14,8 +14,8 @@ import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.praksa.api.LinkMapService;
 import ba.com.zira.praksa.api.model.enums.ObjectType;
-import ba.com.zira.praksa.api.model.linkMap.LinkRequest;
-import ba.com.zira.praksa.api.model.linkMap.MultipleLinkRequest;
+import ba.com.zira.praksa.api.model.linkmap.LinkRequest;
+import ba.com.zira.praksa.api.model.linkmap.MultipleLinkRequest;
 import ba.com.zira.praksa.core.validation.LinkMapRequestValidation;
 import ba.com.zira.praksa.dao.CharacterDAO;
 import ba.com.zira.praksa.dao.ConceptDAO;
@@ -54,7 +54,7 @@ public class LinkMapServiceImpl implements LinkMapService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PayloadResponse<String> createSingleLinkRequest(EntityRequest<LinkRequest> request) throws ApiException {
-        linkMapRequestValidation.validateEntityExistsInSingleLinkRequest(request, BASIC_NOT_NULL);
+        linkMapRequestValidation.validateEntityExistsInLinkRequest(request, BASIC_NOT_NULL);
         linkMapRequestValidation.validateRequiredFieldsExistInSingleLinkRequest(request, BASIC_NOT_NULL);
         linkMapRequestValidation.validateKeysExistInSingleLinkRequest(request, "validateAbstractRequest");
         linkMapRequestValidation.validateLinkDoesNotExistInSingleLinkRequest(request, BASIC_NOT_NULL);
@@ -72,7 +72,7 @@ public class LinkMapServiceImpl implements LinkMapService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PayloadResponse<String> createMultipleLinkRequest(EntityRequest<MultipleLinkRequest> request) throws ApiException {
-        linkMapRequestValidation.validateEntityExistsInMultipleLinkRequest(request, BASIC_NOT_NULL);
+        linkMapRequestValidation.validateEntityExistsInLinkRequest(request, BASIC_NOT_NULL);
         linkMapRequestValidation.validateRequiredFieldsExistInMultipleLinkRequest(request, BASIC_NOT_NULL);
         linkMapRequestValidation.validateKeysExistInMultipleLinkRequest(request, "validateAbstractRequest");
         linkMapRequestValidation.validateLinkDoesNotExistInMultipleLinkRequest(request, BASIC_NOT_NULL);

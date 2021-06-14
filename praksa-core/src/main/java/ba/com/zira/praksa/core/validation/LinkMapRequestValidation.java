@@ -14,8 +14,8 @@ import ba.com.zira.commons.model.FilterExpression.FilterOperation;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.model.enums.ObjectType;
-import ba.com.zira.praksa.api.model.linkMap.LinkRequest;
-import ba.com.zira.praksa.api.model.linkMap.MultipleLinkRequest;
+import ba.com.zira.praksa.api.model.linkmap.LinkRequest;
+import ba.com.zira.praksa.api.model.linkmap.MultipleLinkRequest;
 import ba.com.zira.praksa.dao.CharacterDAO;
 import ba.com.zira.praksa.dao.ConceptDAO;
 import ba.com.zira.praksa.dao.GameDAO;
@@ -53,8 +53,7 @@ public class LinkMapRequestValidation {
     ObjectDAO objectDAO;
     PersonDAO personDAO;
 
-    public ValidationResponse validateEntityExistsInSingleLinkRequest(final EntityRequest<LinkRequest> request,
-            final String validationRuleMessage) {
+    public ValidationResponse validateEntityExistsInLinkRequest(final EntityRequest<?> request, final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
             StringBuilder errorDescription = new StringBuilder();
@@ -122,19 +121,6 @@ public class LinkMapRequestValidation {
                         requestEntity.getObjectAId(), requestEntity.getObjectBType(), requestEntity.getObjectBId()));
             }
 
-            validationResponse = requestValidator.createResponse(request, errorDescription);
-        }
-        return validationResponse;
-    }
-
-    public ValidationResponse validateEntityExistsInMultipleLinkRequest(final EntityRequest<MultipleLinkRequest> request,
-            final String validationRuleMessage) {
-        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
-        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-            StringBuilder errorDescription = new StringBuilder();
-            if (request.getEntity() == null) {
-                errorDescription.append("Entity must exist in request!");
-            }
             validationResponse = requestValidator.createResponse(request, errorDescription);
         }
         return validationResponse;
@@ -242,52 +228,24 @@ public class LinkMapRequestValidation {
     }
 
     private void createFilter(Filter filter, String objectType, Long objectId) {
-        FilterExpression filterExpression = new FilterExpression();
-        filterExpression.setFilterOperation(FilterOperation.EQUALS);
-
         if (ObjectType.CHARACTER.getValue().equalsIgnoreCase(objectType)) {
-
             CharacterEntity entity = characterDAO.findByPK(objectId);
-            String name = LinkMapEntity_.character.getName();
-            filterExpression.setAttribute(name);
-            filterExpression.setExpressionValueObject(entity);
-
-            filter.addFilterExpression(filterExpression);
+            filter.addFilterExpression(new FilterExpression(LinkMapEntity_.character.getName(), FilterOperation.EQUALS, entity));
         } else if (ObjectType.CONCEPT.getValue().equalsIgnoreCase(objectType)) {
-            filterExpression.setAttribute("concept");
-
             ConceptEntity entity = conceptDAO.findByPK(objectId);
-            filterExpression.setExpressionValueObject(entity);
-
-            filter.addFilterExpression(filterExpression);
+            filter.addFilterExpression(new FilterExpression(LinkMapEntity_.concept.getName(), FilterOperation.EQUALS, entity));
         } else if (ObjectType.GAME.getValue().equalsIgnoreCase(objectType)) {
-            filterExpression.setAttribute("game");
-
             GameEntity entity = gameDAO.findByPK(objectId);
-            filterExpression.setExpressionValueObject(entity);
-
-            filter.addFilterExpression(filterExpression);
+            filter.addFilterExpression(new FilterExpression(LinkMapEntity_.game.getName(), FilterOperation.EQUALS, entity));
         } else if (ObjectType.LOCATION.getValue().equalsIgnoreCase(objectType)) {
-            filterExpression.setAttribute("location");
-
             LocationEntity entity = locationDAO.findByPK(objectId);
-            filterExpression.setExpressionValueObject(entity);
-
-            filter.addFilterExpression(filterExpression);
+            filter.addFilterExpression(new FilterExpression(LinkMapEntity_.location.getName(), FilterOperation.EQUALS, entity));
         } else if (ObjectType.OBJECT.getValue().equalsIgnoreCase(objectType)) {
-            filterExpression.setAttribute("object");
-
             ObjectEntity entity = objectDAO.findByPK(objectId);
-            filterExpression.setExpressionValueObject(entity);
-
-            filter.addFilterExpression(filterExpression);
+            filter.addFilterExpression(new FilterExpression(LinkMapEntity_.object.getName(), FilterOperation.EQUALS, entity));
         } else if (ObjectType.PERSON.getValue().equalsIgnoreCase(objectType)) {
-            filterExpression.setAttribute("person");
-
             PersonEntity entity = personDAO.findByPK(objectId);
-            filterExpression.setExpressionValueObject(entity);
-
-            filter.addFilterExpression(filterExpression);
+            filter.addFilterExpression(new FilterExpression(LinkMapEntity_.person.getName(), FilterOperation.EQUALS, entity));
         }
     }
 
