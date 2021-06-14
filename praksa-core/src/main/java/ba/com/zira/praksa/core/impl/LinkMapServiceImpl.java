@@ -39,6 +39,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LinkMapServiceImpl implements LinkMapService {
+    static final String BASIC_NOT_NULL = "basicNotNull";
+
     LinkMapRequestValidation linkMapRequestValidation;
 
     LinkMapDAO linkMapDAO;
@@ -51,11 +53,11 @@ public class LinkMapServiceImpl implements LinkMapService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PayloadResponse<String> single(EntityRequest<LinkRequest> request) throws ApiException {
-        linkMapRequestValidation.validateEntityExistsInLinkRequest(request, "basicNotNull");
-        linkMapRequestValidation.validateRequiredFieldsExistInLinkRequest(request, "basicNotNull");
-        linkMapRequestValidation.validateKeysExistInLinkRequest(request, "validateAbstractRequest");
-        linkMapRequestValidation.validateLinkDoesNotExistInLinkRequest(request, "basicNotNull");
+    public PayloadResponse<String> createSingleLinkRequest(EntityRequest<LinkRequest> request) throws ApiException {
+        linkMapRequestValidation.validateEntityExistsInSingleLinkRequest(request, BASIC_NOT_NULL);
+        linkMapRequestValidation.validateRequiredFieldsExistInSingleLinkRequest(request, BASIC_NOT_NULL);
+        linkMapRequestValidation.validateKeysExistInSingleLinkRequest(request, "validateAbstractRequest");
+        linkMapRequestValidation.validateLinkDoesNotExistInSingleLinkRequest(request, BASIC_NOT_NULL);
 
         LinkRequest requestEntity = request.getEntity();
 
@@ -64,16 +66,16 @@ public class LinkMapServiceImpl implements LinkMapService {
 
         linkMapDAO.merge(entity);
 
-        return new PayloadResponse<String>(request, ResponseCode.OK, "Objects linked!");
+        return new PayloadResponse<>(request, ResponseCode.OK, "Objects linked!");
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PayloadResponse<String> multiple(EntityRequest<MultipleLinkRequest> request) throws ApiException {
-        linkMapRequestValidation.validateEntityExistsInMultipleLinkRequest(request, "basicNotNull");
-        linkMapRequestValidation.validateRequiredFieldsExistInMultipleLinkRequest(request, "basicNotNull");
+    public PayloadResponse<String> createMultipleLinkRequest(EntityRequest<MultipleLinkRequest> request) throws ApiException {
+        linkMapRequestValidation.validateEntityExistsInMultipleLinkRequest(request, BASIC_NOT_NULL);
+        linkMapRequestValidation.validateRequiredFieldsExistInMultipleLinkRequest(request, BASIC_NOT_NULL);
         linkMapRequestValidation.validateKeysExistInMultipleLinkRequest(request, "validateAbstractRequest");
-        linkMapRequestValidation.validateLinkDoesNotExistInMultipleLinkRequest(request, "basicNotNull");
+        linkMapRequestValidation.validateLinkDoesNotExistInMultipleLinkRequest(request, BASIC_NOT_NULL);
 
         Set<Entry<String, Long>> requestMap = request.getEntity().getObjectBMap().entrySet();
         for (Entry<String, Long> requestMapEntry : requestMap) {
@@ -83,7 +85,7 @@ public class LinkMapServiceImpl implements LinkMapService {
             linkMapDAO.merge(entity);
         }
 
-        return new PayloadResponse<String>(request, ResponseCode.OK, "Objects linked!");
+        return new PayloadResponse<>(request, ResponseCode.OK, "Objects linked!");
     }
 
     /**

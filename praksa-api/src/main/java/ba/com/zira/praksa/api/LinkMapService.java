@@ -14,7 +14,7 @@ import ba.com.zira.praksa.api.model.linkMap.MultipleLinkRequest;
 
 public interface LinkMapService {
 
-    PayloadResponse<String> single(EntityRequest<LinkRequest> request) throws ApiException;
+    PayloadResponse<String> createSingleLinkRequest(EntityRequest<LinkRequest> request) throws ApiException;
 
-    PayloadResponse<String> multiple(EntityRequest<MultipleLinkRequest> request) throws ApiException;
+    PayloadResponse<String> createMultipleLinkRequest(EntityRequest<MultipleLinkRequest> request) throws ApiException;
 }

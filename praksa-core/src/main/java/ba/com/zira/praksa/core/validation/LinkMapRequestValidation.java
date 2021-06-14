@@ -26,6 +26,7 @@ import ba.com.zira.praksa.dao.PersonDAO;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
+import ba.com.zira.praksa.dao.model.LinkMapEntity_;
 import ba.com.zira.praksa.dao.model.LocationEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
@@ -52,7 +53,7 @@ public class LinkMapRequestValidation {
     ObjectDAO objectDAO;
     PersonDAO personDAO;
 
-    public ValidationResponse validateEntityExistsInLinkRequest(final EntityRequest<LinkRequest> request,
+    public ValidationResponse validateEntityExistsInSingleLinkRequest(final EntityRequest<LinkRequest> request,
             final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
@@ -65,7 +66,7 @@ public class LinkMapRequestValidation {
         return validationResponse;
     }
 
-    public ValidationResponse validateRequiredFieldsExistInLinkRequest(final EntityRequest<LinkRequest> request,
+    public ValidationResponse validateRequiredFieldsExistInSingleLinkRequest(final EntityRequest<LinkRequest> request,
             final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
@@ -87,7 +88,8 @@ public class LinkMapRequestValidation {
         return validationResponse;
     }
 
-    public ValidationResponse validateKeysExistInLinkRequest(final EntityRequest<LinkRequest> request, final String validationRuleMessage) {
+    public ValidationResponse validateKeysExistInSingleLinkRequest(final EntityRequest<LinkRequest> request,
+            final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         LinkRequest requestEntity = request.getEntity();
 
@@ -102,7 +104,7 @@ public class LinkMapRequestValidation {
         return validationResponse;
     }
 
-    public ValidationResponse validateLinkDoesNotExistInLinkRequest(final EntityRequest<LinkRequest> request,
+    public ValidationResponse validateLinkDoesNotExistInSingleLinkRequest(final EntityRequest<LinkRequest> request,
             final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         LinkRequest requestEntity = request.getEntity();
@@ -114,8 +116,10 @@ public class LinkMapRequestValidation {
             createFilter(filter, requestEntity.getObjectAType(), requestEntity.getObjectAId());
             createFilter(filter, requestEntity.getObjectBType(), requestEntity.getObjectBId());
 
-            if (filter.getFilterExpressions().size() > 0 && linkMapDAO.findAll(filter).getRecords().size() > 0) {
-                errorDescription.append("Objects are already linked!");
+            if (!filter.getFilterExpressions().isEmpty() && !linkMapDAO.findAll(filter).getRecords().isEmpty()) {
+
+                errorDescription.append(String.format("Objects %s#%d and %s#%d are already linked", requestEntity.getObjectAType(),
+                        requestEntity.getObjectAId(), requestEntity.getObjectBType(), requestEntity.getObjectBId()));
             }
 
             validationResponse = requestValidator.createResponse(request, errorDescription);
@@ -191,10 +195,10 @@ public class LinkMapRequestValidation {
                 createFilter(filter, requestEntity.getObjectAType(), requestEntity.getObjectAId());
                 createFilter(filter, requestMapEntry.getKey(), requestMapEntry.getValue());
 
-                if (filter.getFilterExpressions().size() > 0 && linkMapDAO.findAll(filter).getRecords().size() > 0) {
-                    errorDescription.append("Objects ").append(requestEntity.getObjectAType()).append("#")
-                            .append(requestEntity.getObjectAId()).append(" and ").append(requestMapEntry.getKey()).append("#")
-                            .append(requestMapEntry.getValue()).append(" are already linked!");
+                if (!filter.getFilterExpressions().isEmpty() && !linkMapDAO.findAll(filter).getRecords().isEmpty()) {
+
+                    errorDescription.append(String.format("Objects %s#%d and %s#%d are already linked", requestEntity.getObjectAType(),
+                            requestEntity.getObjectAId(), requestMapEntry.getKey(), requestMapEntry.getValue()));
                 }
             }
 
@@ -210,30 +214,30 @@ public class LinkMapRequestValidation {
     private void checkKey(StringBuilder errorDescription, String objectType, Long objectId) {
         if (ObjectType.CHARACTER.getValue().equalsIgnoreCase(objectType)) {
             if (!characterDAO.existsByPK(objectId)) {
-                errorDescription.append("Character with id ").append(objectId).append(" does not exist!");
+                errorDescription.append(String.format("Character with id %d does not exist!", objectId));
             }
         } else if (ObjectType.CONCEPT.getValue().equalsIgnoreCase(objectType)) {
             if (!conceptDAO.existsByPK(objectId)) {
-                errorDescription.append("Concept with id ").append(objectId).append(" does not exist!");
+                errorDescription.append(String.format("Concept with id %d does not exist!", objectId));
             }
         } else if (ObjectType.GAME.getValue().equalsIgnoreCase(objectType)) {
             if (!gameDAO.existsByPK(objectId)) {
-                errorDescription.append("Game with id ").append(objectId).append(" does not exist!");
+                errorDescription.append(String.format("Game with id %d does not exist!", objectId));
             }
         } else if (ObjectType.LOCATION.getValue().equalsIgnoreCase(objectType)) {
             if (!locationDAO.existsByPK(objectId)) {
-                errorDescription.append("Location with id ").append(objectId).append(" does not exist!");
+                errorDescription.append(String.format("Location with id %d does not exist!", objectId));
             }
         } else if (ObjectType.OBJECT.getValue().equalsIgnoreCase(objectType)) {
             if (!objectDAO.existsByPK(objectId)) {
-                errorDescription.append("Object with id ").append(objectId).append(" does not exist!");
+                errorDescription.append(String.format("Object with id %d does not exist!", objectId));
             }
         } else if (ObjectType.PERSON.getValue().equalsIgnoreCase(objectType)) {
             if (!personDAO.existsByPK(objectId)) {
-                errorDescription.append("Person with id ").append(objectId).append(" does not exist!");
+                errorDescription.append(String.format("Person with id %d does not exist!", objectId));
             }
         } else {
-            errorDescription.append("Type ").append(objectType).append(" does not exist!");
+            errorDescription.append(String.format("Type %s does not exist!", objectType));
         }
     }
 
@@ -242,9 +246,10 @@ public class LinkMapRequestValidation {
         filterExpression.setFilterOperation(FilterOperation.EQUALS);
 
         if (ObjectType.CHARACTER.getValue().equalsIgnoreCase(objectType)) {
-            filterExpression.setAttribute("character");
 
             CharacterEntity entity = characterDAO.findByPK(objectId);
+            String name = LinkMapEntity_.character.getName();
+            filterExpression.setAttribute(name);
             filterExpression.setExpressionValueObject(entity);
 
             filter.addFilterExpression(filterExpression);

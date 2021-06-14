@@ -1,4 +1,4 @@
-package ba.com.zira.praksa.rest.linkMap;
+package ba.com.zira.praksa.rest.linkmap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -16,9 +16,9 @@ import ba.com.zira.praksa.api.model.linkMap.MultipleLinkRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-@Api(tags = "linkMap")
+@Api(tags = "link")
 @RestController
-@RequestMapping(value = "linkMap")
+@RequestMapping(value = "link")
 public class LinkMapRestService {
     @Autowired
     private LinkMapService linkMapService;
@@ -26,12 +26,12 @@ public class LinkMapRestService {
     @ApiOperation(value = "Create single Link", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/single")
     public PayloadResponse<String> single(@RequestBody EntityRequest<LinkRequest> request) throws ApiException {
-        return linkMapService.single(request);
+        return linkMapService.createSingleLinkRequest(request);
     }
 
     @ApiOperation(value = "Create multiple Link", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/multiple")
     public PayloadResponse<String> multiple(@RequestBody EntityRequest<MultipleLinkRequest> request) throws ApiException {
-        return linkMapService.multiple(request);
+        return linkMapService.createMultipleLinkRequest(request);
     }
 }
