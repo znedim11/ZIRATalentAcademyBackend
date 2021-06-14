@@ -1,9 +1,9 @@
 package ba.com.zira.praksa.core.impl;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +22,7 @@ import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.mapper.GameMapper;
 
 @Service
+@ComponentScan
 public class GameServiceImpl implements GameService {
 
     private RequestValidator requestValidator;
@@ -71,7 +72,6 @@ public class GameServiceImpl implements GameService {
     public PayloadResponse<Game> update(final EntityRequest<Game> request) throws ApiException {
         requestValidator.validate(request);
 
-        final LocalDateTime date = LocalDateTime.now();
         final Game game = request.getEntity();
         final GameEntity gameEntity = gameMapper.dtoToEntity(game);
 
