@@ -57,6 +57,13 @@ public class SwaggerConfiguration {
                 .globalOperationParameters(operationParameters);
     }
 
+    @Bean
+    public Docket reviewApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("externalReview-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.externalReview")).build()
+                .tags(new Tag("externalReview", "ExternalReview APIs")).globalOperationParameters(operationParameters);
+    }
+
     private static ApiInfo apiInfo() {
         final Contact contact = new Contact("ZIRA", "http://www.zira.com.ba", "info@zira.com.ba");
         ApiInfoBuilder builder = new ApiInfoBuilder();
