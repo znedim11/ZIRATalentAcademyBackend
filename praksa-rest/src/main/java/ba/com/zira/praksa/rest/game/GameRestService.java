@@ -28,7 +28,7 @@ import io.swagger.annotations.ApiOperation;
 public class GameRestService {
 
     @Autowired
-    private GameService sampleService;
+    GameService sampleService;
 
     @ApiOperation(value = "Find Games", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")

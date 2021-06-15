@@ -24,10 +24,10 @@ public class GameValidationTest extends BasicTestConfiguration {
     private static final String TEMPLATE_CODE = "TEST_1";
 
     @Autowired
-    private RequestValidator requestValidator;
+    RequestValidator requestValidator;
 
-    private GameDAO gameDAO;
-    private GameRequestValidation validation;
+    GameDAO gameDAO;
+    GameRequestValidation validation;
 
     @BeforeMethod
     public void beforeMethod() throws ApiException {
