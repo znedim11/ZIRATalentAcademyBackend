@@ -21,7 +21,8 @@ import ba.com.zira.praksa.core.validation.FeatureRequestValidation;
 import ba.com.zira.praksa.dao.FeatureDAO;
 import ba.com.zira.praksa.dao.model.FeatureEntity;
 import ba.com.zira.praksa.mapper.FeatureMapper;
-import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  *
@@ -29,11 +30,15 @@ import lombok.AllArgsConstructor;
  *
  */
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class FeatureServiceImpl implements FeatureService {
+    @NonNull
     private RequestValidator requestValidator;
+    @NonNull
     private FeatureRequestValidation featureRequestValidation;
+    @NonNull
     private FeatureDAO featureDAO;
+    @NonNull
     private FeatureMapper featureMapper;
 
     @Override

@@ -26,7 +26,8 @@ import ba.com.zira.praksa.dao.ConceptDAO;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.mapper.ConceptMapper;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 /**
@@ -35,15 +36,19 @@ import lombok.experimental.FieldDefaults;
  */
 
 @Service
-@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class ConceptServiceImpl implements ConceptService {
 
     static final String VALIDATE_ABSTRACT_REQUEST = "validateAbstractRequest";
     static final String BASIC_NOT_NULL = "basicNotNull";
+    @NonNull
     RequestValidator requestValidator;
+    @NonNull
     ConceptRequestValidation conceptRequestValidation;
+    @NonNull
     ConceptDAO conceptDAO;
+    @NonNull
     ConceptMapper conceptMapper;
 
     @Override

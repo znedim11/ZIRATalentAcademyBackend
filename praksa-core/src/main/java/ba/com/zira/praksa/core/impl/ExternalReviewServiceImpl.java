@@ -25,7 +25,8 @@ import ba.com.zira.praksa.dao.RssFeedDAO;
 import ba.com.zira.praksa.dao.model.ExternalReviewEntity;
 import ba.com.zira.praksa.dao.model.RssFeedEntity;
 import ba.com.zira.praksa.mapper.ExternalReviewMapper;
-import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author zira
@@ -34,15 +35,20 @@ import lombok.AllArgsConstructor;
 
 @Service
 @ComponentScan
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ExternalReviewServiceImpl implements ExternalReviewService {
 
     private static final String VALIDATE_ABSTRACT_REQUEST = "validateAbstractRequest";
 
+    @NonNull
     private RequestValidator requestValidator;
+    @NonNull
     private ExternalReviewRequestValidation externalReviewRequestValidation;
+    @NonNull
     private ExternalReviewDAO externalReviewDAO;
+    @NonNull
     private RssFeedDAO rssFeedDAO;
+    @NonNull
     private ExternalReviewMapper externalReviewMapper;
 
     @Override

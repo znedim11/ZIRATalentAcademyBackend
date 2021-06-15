@@ -3,7 +3,6 @@ package ba.com.zira.praksa.core.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,20 +19,19 @@ import ba.com.zira.praksa.api.model.game.Game;
 import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.mapper.GameMapper;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Service
-@ComponentScan
+@RequiredArgsConstructor
 public class GameServiceImpl implements GameService {
 
-    private RequestValidator requestValidator;
-    private GameDAO gameDAO;
-    private GameMapper gameMapper;
-
-    public GameServiceImpl(final RequestValidator requestValidator, GameDAO gameDAO, GameMapper gameMapper) {
-        this.requestValidator = requestValidator;
-        this.gameDAO = gameDAO;
-        this.gameMapper = gameMapper;
-    }
+    @NonNull
+    RequestValidator requestValidator;
+    @NonNull
+    GameDAO gameDAO;
+    @NonNull
+    GameMapper gameMapper;
 
     @Override
     public PagedPayloadResponse<Game> find(final SearchRequest<String> request) throws ApiException {
