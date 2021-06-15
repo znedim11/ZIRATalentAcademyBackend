@@ -9,6 +9,7 @@ import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
+import ba.com.zira.praksa.api.model.game.Game;
 
 /**
  * * Methods used to manipulate {@link ConceptResponse} data. <br>
@@ -93,4 +94,10 @@ public interface ConceptService {
      *             corresponding error message and {@link ResponseCode}.
      */
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
+
+    // ListPayloadResponse<Game> getGamesByConcept(SearchRequest<Long> request)
+    // throws ApiException;
+
+    PagedPayloadResponse<Game> getGamesByConcept(final EntityRequest<Long> request) throws ApiException;
+
 }

@@ -21,10 +21,13 @@ import ba.com.zira.praksa.api.ConceptService;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
+import ba.com.zira.praksa.api.model.game.Game;
 import ba.com.zira.praksa.core.validation.ConceptRequestValidation;
 import ba.com.zira.praksa.dao.ConceptDAO;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
+import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.mapper.ConceptMapper;
+import ba.com.zira.praksa.mapper.GameMapper;
 
 /**
  * @author zira
@@ -41,6 +44,7 @@ public class ConceptServiceImpl implements ConceptService {
     ConceptRequestValidation conceptRequestValidation;
     ConceptDAO conceptDAO;
     ConceptMapper conceptMapper;
+    GameMapper gameMapper;
 
     public ConceptServiceImpl(RequestValidator requestValidator, ConceptRequestValidation conceptRequestValidation, ConceptDAO conceptDAO,
             ConceptMapper conceptMapper) {
@@ -137,4 +141,21 @@ public class ConceptServiceImpl implements ConceptService {
         return new PayloadResponse<>(request, ResponseCode.OK, "Concept deleted!");
     }
 
+    // @Override
+    // public ListPayloadResponse<Game> getGamesByConcept(SearchRequest<Long>
+    // request) throws ApiException {
+    // List<GameEntity> entityList =
+    // conceptDAO.getGamesByLocation(request.getEntity());
+    // List<Game> gameList = gameMapper.entityListToDtoList(entityList);
+    //
+    // return new ListPayloadResponse<>(request, ResponseCode.OK, gameList);
+    // }
+
+    @Override
+    public PagedPayloadResponse<Game> getGamesByConcept(final EntityRequest<Long> request) throws ApiException {
+        List<GameEntity> entityList = conceptDAO.getGamesByLocation(request.getEntity());
+        List<Game> gameList = gameMapper.entityListToDtoList(entityList);
+
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, gameList.size(), 1, 1, gameList.size(), gameList);
+    }
 }
