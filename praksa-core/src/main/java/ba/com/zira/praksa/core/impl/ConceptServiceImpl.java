@@ -25,7 +25,9 @@ import ba.com.zira.praksa.core.validation.ConceptRequestValidation;
 import ba.com.zira.praksa.dao.ConceptDAO;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.mapper.ConceptMapper;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 /**
  * @author zira
@@ -34,12 +36,15 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ConceptServiceImpl implements ConceptService {
 
-    private RequestValidator requestValidator;
-    private ConceptRequestValidation conceptRequestValidation;
-    private ConceptDAO conceptDAO;
-    private ConceptMapper conceptMapper;
+    static final String VALIDATE_ABSTRACT_REQUEST = "validateAbstractRequest";
+    static final String BASIC_NOT_NULL = "basicNotNull";
+    RequestValidator requestValidator;
+    ConceptRequestValidation conceptRequestValidation;
+    ConceptDAO conceptDAO;
+    ConceptMapper conceptMapper;
 
     @Override
     public PagedPayloadResponse<ConceptResponse> find(SearchRequest<String> request) throws ApiException {
@@ -50,35 +55,35 @@ public class ConceptServiceImpl implements ConceptService {
 
         final List<ConceptResponse> conceptList = conceptMapper.entityListToResponseList(conceptEntities);
 
-        PagedData<ConceptResponse> pagedData = new PagedData<ConceptResponse>();
+        PagedData<ConceptResponse> pagedData = new PagedData<>();
         pagedData.setNumberOfPages(conceptEntitesData.getNumberOfPages());
         pagedData.setNumberOfRecords(conceptEntitesData.getNumberOfRecords());
         pagedData.setPage(conceptEntitesData.getPage());
         pagedData.setRecords(conceptList);
         pagedData.setRecordsPerPage(conceptEntitesData.getRecordsPerPage());
 
-        return new PagedPayloadResponse<ConceptResponse>(request, ResponseCode.OK, pagedData);
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, pagedData);
     }
 
     @Override
     public PayloadResponse<ConceptResponse> findById(SearchRequest<Long> request) throws ApiException {
-        EntityRequest<Long> entityRequest = new EntityRequest<Long>(request.getEntity(), request);
-        conceptRequestValidation.validateConceptExists(entityRequest, "validateAbstractRequest");
+        EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
+        conceptRequestValidation.validateConceptExists(entityRequest, VALIDATE_ABSTRACT_REQUEST);
 
         final ConceptEntity conceptEntity = conceptDAO.findByPK(request.getEntity());
 
         final ConceptResponse conceptResponse = conceptMapper.entityToResponse(conceptEntity);
 
-        return new PayloadResponse<ConceptResponse>(request, ResponseCode.OK, conceptResponse);
+        return new PayloadResponse<>(request, ResponseCode.OK, conceptResponse);
     }
 
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ConceptResponse> create(EntityRequest<ConceptCreateRequest> request) throws ApiException {
-        conceptRequestValidation.validateEntityExistsInCreateRequest(request, "basicNotNull");
+        conceptRequestValidation.validateEntityExistsInCreateRequest(request, BASIC_NOT_NULL);
 
-        EntityRequest<String> entityRequest = new EntityRequest<String>(request.getEntity().getName(), request);
-        conceptRequestValidation.validateConceptNameExists(entityRequest, "basicNotNull");
+        EntityRequest<String> entityRequest = new EntityRequest<>(request.getEntity().getName(), request);
+        conceptRequestValidation.validateConceptNameExists(entityRequest, BASIC_NOT_NULL);
 
         ConceptEntity entity = conceptMapper.createRequestToEntity(request.getEntity());
         entity.setCreated(LocalDateTime.now());
@@ -88,19 +93,19 @@ public class ConceptServiceImpl implements ConceptService {
 
         ConceptResponse response = conceptMapper.entityToResponse(entity);
 
-        return new PayloadResponse<ConceptResponse>(request, ResponseCode.OK, response);
+        return new PayloadResponse<>(request, ResponseCode.OK, response);
     }
 
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ConceptResponse> update(final EntityRequest<ConceptUpdateRequest> request) throws ApiException {
-        conceptRequestValidation.validateEntityExistsInUpdateRequest(request, "basicNotNull");
+        conceptRequestValidation.validateEntityExistsInUpdateRequest(request, BASIC_NOT_NULL);
 
-        EntityRequest<Long> entityRequestId = new EntityRequest<Long>(request.getEntity().getId(), request);
-        conceptRequestValidation.validateConceptExists(entityRequestId, "validateAbstractRequest");
+        EntityRequest<Long> entityRequestId = new EntityRequest<>(request.getEntity().getId(), request);
+        conceptRequestValidation.validateConceptExists(entityRequestId, VALIDATE_ABSTRACT_REQUEST);
 
-        EntityRequest<String> entityRequestName = new EntityRequest<String>(request.getEntity().getName(), request);
-        conceptRequestValidation.validateConceptNameExists(entityRequestName, "basicNotNull");
+        EntityRequest<String> entityRequestName = new EntityRequest<>(request.getEntity().getName(), request);
+        conceptRequestValidation.validateConceptNameExists(entityRequestName, BASIC_NOT_NULL);
 
         final ConceptUpdateRequest conceptRequest = request.getEntity();
 
@@ -113,18 +118,18 @@ public class ConceptServiceImpl implements ConceptService {
 
         final ConceptResponse conceptResponse = conceptMapper.entityToResponse(conceptEntity);
 
-        return new PayloadResponse<ConceptResponse>(request, ResponseCode.OK, conceptResponse);
+        return new PayloadResponse<>(request, ResponseCode.OK, conceptResponse);
     }
 
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException {
-        EntityRequest<Long> entityRequest = new EntityRequest<Long>(request.getEntity(), request);
-        conceptRequestValidation.validateConceptExists(entityRequest, "validateAbstractRequest");
+        EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
+        conceptRequestValidation.validateConceptExists(entityRequest, VALIDATE_ABSTRACT_REQUEST);
 
         conceptDAO.removeByPK(request.getEntity());
 
-        return new PayloadResponse<String>(request, ResponseCode.OK, "Concept deleted!");
+        return new PayloadResponse<>(request, ResponseCode.OK, "Concept deleted!");
     }
 
 }

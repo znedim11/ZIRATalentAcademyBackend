@@ -20,7 +20,7 @@ import lombok.AllArgsConstructor;
  *
  */
 
-@Component("componentRequestValidation")
+@Component("conceptRequestValidation")
 @AllArgsConstructor
 public class ConceptRequestValidation {
     private RequestValidator requestValidator;
