@@ -40,7 +40,7 @@ import io.swagger.annotations.ApiOperation;
 public class ConceptRestService {
 
     @Autowired
-    private ConceptService conceptService;
+    ConceptService conceptService;
 
     @ApiOperation(value = "Find Concepts", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")

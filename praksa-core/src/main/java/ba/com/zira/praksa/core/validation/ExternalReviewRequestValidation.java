@@ -13,9 +13,9 @@ import lombok.AllArgsConstructor;
 @Component("externalReviewRequestValidation")
 @AllArgsConstructor
 public class ExternalReviewRequestValidation {
-    private RequestValidator requestValidator;
-    private ExternalReviewDAO externalReviewDAO;
-    private RssFeedDAO rssFeedDAO;
+    RequestValidator requestValidator;
+    ExternalReviewDAO externalReviewDAO;
+    RssFeedDAO rssFeedDAO;
 
     public ValidationResponse validateExternalReviewExists(final EntityRequest<Long> request, final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);

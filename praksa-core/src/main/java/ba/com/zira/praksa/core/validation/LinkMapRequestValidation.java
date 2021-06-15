@@ -30,9 +30,7 @@ import ba.com.zira.praksa.dao.model.LinkMapEntity_;
 import ba.com.zira.praksa.dao.model.LocationEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
 /**
  * @author zira
@@ -41,11 +39,9 @@ import lombok.experimental.FieldDefaults;
 
 @Component("linkMapRequestValidation")
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class LinkMapRequestValidation {
-    private LinkMapDAO linkMapDAO;
-    private RequestValidator requestValidator;
-
+    LinkMapDAO linkMapDAO;
+    RequestValidator requestValidator;
     CharacterDAO characterDAO;
     ConceptDAO conceptDAO;
     GameDAO gameDAO;

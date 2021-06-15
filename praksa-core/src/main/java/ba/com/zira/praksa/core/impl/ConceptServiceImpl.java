@@ -25,8 +25,6 @@ import ba.com.zira.praksa.core.validation.ConceptRequestValidation;
 import ba.com.zira.praksa.dao.ConceptDAO;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.mapper.ConceptMapper;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 /**
  * @author zira
@@ -34,19 +32,24 @@ import lombok.RequiredArgsConstructor;
  */
 
 @Service
-@RequiredArgsConstructor
 public class ConceptServiceImpl implements ConceptService {
 
     static final String VALIDATE_ABSTRACT_REQUEST = "validateAbstractRequest";
     static final String BASIC_NOT_NULL = "basicNotNull";
-    @NonNull
+
     RequestValidator requestValidator;
-    @NonNull
     ConceptRequestValidation conceptRequestValidation;
-    @NonNull
     ConceptDAO conceptDAO;
-    @NonNull
     ConceptMapper conceptMapper;
+
+    public ConceptServiceImpl(RequestValidator requestValidator, ConceptRequestValidation conceptRequestValidation, ConceptDAO conceptDAO,
+            ConceptMapper conceptMapper) {
+        super();
+        this.requestValidator = requestValidator;
+        this.conceptRequestValidation = conceptRequestValidation;
+        this.conceptDAO = conceptDAO;
+        this.conceptMapper = conceptMapper;
+    }
 
     @Override
     public PagedPayloadResponse<ConceptResponse> find(SearchRequest<String> request) throws ApiException {

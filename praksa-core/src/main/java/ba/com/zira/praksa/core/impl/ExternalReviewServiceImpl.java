@@ -25,8 +25,6 @@ import ba.com.zira.praksa.dao.RssFeedDAO;
 import ba.com.zira.praksa.dao.model.ExternalReviewEntity;
 import ba.com.zira.praksa.dao.model.RssFeedEntity;
 import ba.com.zira.praksa.mapper.ExternalReviewMapper;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 /**
  * @author zira
@@ -35,21 +33,24 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @ComponentScan
-@RequiredArgsConstructor
 public class ExternalReviewServiceImpl implements ExternalReviewService {
 
     private static final String VALIDATE_ABSTRACT_REQUEST = "validateAbstractRequest";
-
-    @NonNull
     private RequestValidator requestValidator;
-    @NonNull
     private ExternalReviewRequestValidation externalReviewRequestValidation;
-    @NonNull
     private ExternalReviewDAO externalReviewDAO;
-    @NonNull
     private RssFeedDAO rssFeedDAO;
-    @NonNull
     private ExternalReviewMapper externalReviewMapper;
+
+    public ExternalReviewServiceImpl(RequestValidator requestValidator, ExternalReviewRequestValidation externalReviewRequestValidation,
+            ExternalReviewDAO externalReviewDAO, RssFeedDAO rssFeedDAO, ExternalReviewMapper externalReviewMapper) {
+        super();
+        this.requestValidator = requestValidator;
+        this.externalReviewRequestValidation = externalReviewRequestValidation;
+        this.externalReviewDAO = externalReviewDAO;
+        this.rssFeedDAO = rssFeedDAO;
+        this.externalReviewMapper = externalReviewMapper;
+    }
 
     @Override
     public PagedPayloadResponse<ExternalReview> find(SearchRequest<String> request) throws ApiException {

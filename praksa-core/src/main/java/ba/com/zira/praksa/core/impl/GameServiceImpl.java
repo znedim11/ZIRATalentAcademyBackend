@@ -19,19 +19,20 @@ import ba.com.zira.praksa.api.model.game.Game;
 import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.mapper.GameMapper;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class GameServiceImpl implements GameService {
 
-    @NonNull
     RequestValidator requestValidator;
-    @NonNull
     GameDAO gameDAO;
-    @NonNull
     GameMapper gameMapper;
+
+    public GameServiceImpl(RequestValidator requestValidator, GameDAO gameDAO, GameMapper gameMapper) {
+        super();
+        this.requestValidator = requestValidator;
+        this.gameDAO = gameDAO;
+        this.gameMapper = gameMapper;
+    }
 
     @Override
     public PagedPayloadResponse<Game> find(final SearchRequest<String> request) throws ApiException {

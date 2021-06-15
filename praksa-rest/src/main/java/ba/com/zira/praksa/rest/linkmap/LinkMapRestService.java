@@ -21,7 +21,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping(value = "link")
 public class LinkMapRestService {
     @Autowired
-    private LinkMapService linkMapService;
+    LinkMapService linkMapService;
 
     @ApiOperation(value = "Create single Link", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/single")

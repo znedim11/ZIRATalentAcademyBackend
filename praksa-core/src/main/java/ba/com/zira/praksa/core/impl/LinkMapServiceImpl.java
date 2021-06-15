@@ -31,29 +31,32 @@ import ba.com.zira.praksa.dao.model.LinkMapEntity;
 import ba.com.zira.praksa.dao.model.LocationEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class LinkMapServiceImpl implements LinkMapService {
     static final String BASIC_NOT_NULL = "basicNotNull";
-    @NonNull
+
     LinkMapRequestValidation linkMapRequestValidation;
-    @NonNull
     LinkMapDAO linkMapDAO;
-    @NonNull
     CharacterDAO characterDAO;
-    @NonNull
     ConceptDAO conceptDAO;
-    @NonNull
     GameDAO gameDAO;
-    @NonNull
     LocationDAO locationDAO;
-    @NonNull
     ObjectDAO objectDAO;
-    @NonNull
     PersonDAO personDAO;
+
+    public LinkMapServiceImpl(LinkMapRequestValidation linkMapRequestValidation, LinkMapDAO linkMapDAO, CharacterDAO characterDAO,
+            ConceptDAO conceptDAO, GameDAO gameDAO, LocationDAO locationDAO, ObjectDAO objectDAO, PersonDAO personDAO) {
+        super();
+        this.linkMapRequestValidation = linkMapRequestValidation;
+        this.linkMapDAO = linkMapDAO;
+        this.characterDAO = characterDAO;
+        this.conceptDAO = conceptDAO;
+        this.gameDAO = gameDAO;
+        this.locationDAO = locationDAO;
+        this.objectDAO = objectDAO;
+        this.personDAO = personDAO;
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

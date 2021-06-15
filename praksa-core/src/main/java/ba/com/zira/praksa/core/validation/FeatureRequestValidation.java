@@ -25,9 +25,9 @@ import lombok.AllArgsConstructor;
 @Component("featureRequestValidation")
 public class FeatureRequestValidation {
 
-    private RequestValidator requestValidator;
-    private FeatureDAO featureDAO;
-    private FeatureMapper featureMapper;
+    RequestValidator requestValidator;
+    FeatureDAO featureDAO;
+    FeatureMapper featureMapper;
 
     /**
      * Validates if Feature exists in database.

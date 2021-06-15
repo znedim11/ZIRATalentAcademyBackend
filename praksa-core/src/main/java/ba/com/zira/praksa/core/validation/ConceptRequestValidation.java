@@ -13,7 +13,6 @@ import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
 import ba.com.zira.praksa.dao.ConceptDAO;
-import lombok.AllArgsConstructor;
 
 /**
  * @author zira
@@ -21,10 +20,15 @@ import lombok.AllArgsConstructor;
  */
 
 @Component("conceptRequestValidation")
-@AllArgsConstructor
 public class ConceptRequestValidation {
-    private RequestValidator requestValidator;
-    private ConceptDAO conceptDAO;
+    RequestValidator requestValidator;
+    ConceptDAO conceptDAO;
+
+    public ConceptRequestValidation(RequestValidator requestValidator, ConceptDAO conceptDAO) {
+        super();
+        this.requestValidator = requestValidator;
+        this.conceptDAO = conceptDAO;
+    }
 
     public ValidationResponse validateConceptExists(final EntityRequest<Long> request, final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);

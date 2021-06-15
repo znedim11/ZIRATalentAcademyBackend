@@ -30,7 +30,7 @@ import io.swagger.annotations.ApiOperation;
 public class ExternalReviewRestService {
 
     @Autowired
-    private ExternalReviewService externalReviewService;
+    ExternalReviewService externalReviewService;
 
     @ApiOperation(value = "Find a review", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")

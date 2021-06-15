@@ -25,7 +25,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * 
+ *
  * @author zira
  *
  */
@@ -35,7 +35,7 @@ import io.swagger.annotations.ApiOperation;
 public class FeatureRestService {
 
     @Autowired
-    private FeatureService featureService;
+    FeatureService featureService;
 
     @ApiOperation(value = "Find Features", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")

@@ -21,8 +21,6 @@ import ba.com.zira.praksa.core.validation.FeatureRequestValidation;
 import ba.com.zira.praksa.dao.FeatureDAO;
 import ba.com.zira.praksa.dao.model.FeatureEntity;
 import ba.com.zira.praksa.mapper.FeatureMapper;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 /**
  *
@@ -30,16 +28,21 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @Service
-@RequiredArgsConstructor
 public class FeatureServiceImpl implements FeatureService {
-    @NonNull
+
     private RequestValidator requestValidator;
-    @NonNull
     private FeatureRequestValidation featureRequestValidation;
-    @NonNull
     private FeatureDAO featureDAO;
-    @NonNull
     private FeatureMapper featureMapper;
+
+    public FeatureServiceImpl(RequestValidator requestValidator, FeatureRequestValidation featureRequestValidation, FeatureDAO featureDAO,
+            FeatureMapper featureMapper) {
+        super();
+        this.requestValidator = requestValidator;
+        this.featureRequestValidation = featureRequestValidation;
+        this.featureDAO = featureDAO;
+        this.featureMapper = featureMapper;
+    }
 
     @Override
     public PagedPayloadResponse<FeatureResponse> find(final SearchRequest<String> request) throws ApiException {
