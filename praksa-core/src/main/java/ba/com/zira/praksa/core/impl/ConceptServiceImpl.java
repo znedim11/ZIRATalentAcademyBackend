@@ -25,10 +25,8 @@ import ba.com.zira.praksa.core.validation.ConceptRequestValidation;
 import ba.com.zira.praksa.dao.ConceptDAO;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.mapper.ConceptMapper;
-import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
 /**
  * @author zira
@@ -36,7 +34,6 @@ import lombok.experimental.FieldDefaults;
  */
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public class ConceptServiceImpl implements ConceptService {
 

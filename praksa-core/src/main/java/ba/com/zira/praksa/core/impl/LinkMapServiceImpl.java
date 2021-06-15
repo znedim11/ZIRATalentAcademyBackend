@@ -31,14 +31,11 @@ import ba.com.zira.praksa.dao.model.LinkMapEntity;
 import ba.com.zira.praksa.dao.model.LocationEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
-import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class LinkMapServiceImpl implements LinkMapService {
     static final String BASIC_NOT_NULL = "basicNotNull";
     @NonNull
