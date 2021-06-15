@@ -1,23 +1,23 @@
-package ba.com.zira.praksa.api.model.game;
+package ba.com.zira.praksa.api.model.location;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import ba.com.zira.praksa.api.model.linkmap.LinkMap;
 import lombok.Data;
 
 @Data
-public class Game implements Serializable {
+public class Location implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private Long id;
-    private String abbriviation;
+    private String aliases;
     private LocalDateTime created;
     private String createdBy;
-    private String dlc;
-    private String fullName;
-    private String genre;
     private String information;
     private LocalDateTime modified;
     private String modifiedBy;
-    private String outlineText;
+    private String name;
+    private List<LinkMap> linkMaps;
 }
