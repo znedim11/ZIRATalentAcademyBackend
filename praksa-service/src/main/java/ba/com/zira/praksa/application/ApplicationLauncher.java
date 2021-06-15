@@ -20,13 +20,11 @@ public class ApplicationLauncher implements Daemon {
     public void init(final DaemonContext context) throws DaemonInitException {
         try {
             LOGGER.info("Initializing application");
-            applicationContext = SpringApplication.run(ApplicationConfiguration.class, new String[] {});
+            applicationContext = SpringApplication.run(ApplicationConfiguration.class);
         } catch (Exception e) {
-            LOGGER.error("init => {}", e);
             if (context != null) {
                 context.getController().shutdown();
             }
-            return;
         }
     }
 
@@ -45,8 +43,8 @@ public class ApplicationLauncher implements Daemon {
         LOGGER.info("Destroying application");
     }
 
-    public static void main(final String[] args) throws Exception {
-        SpringApplication.run(ApplicationConfiguration.class, new String[] {});
+    public static void main(final String[] args) {
+        SpringApplication.run(ApplicationConfiguration.class);
     }
 
 }

@@ -1,4 +1,4 @@
-package ba.com.zira.praksa.rest.externalReview;
+package ba.com.zira.praksa.rest.externalreview;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -18,9 +18,9 @@ import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.ExternalReviewService;
-import ba.com.zira.praksa.api.model.externalReview.ExternalReview;
-import ba.com.zira.praksa.api.model.externalReview.ExternalReviewCreateRequest;
-import ba.com.zira.praksa.api.model.externalReview.ExternalReviewUpdateRequest;
+import ba.com.zira.praksa.api.model.externalreview.ExternalReview;
+import ba.com.zira.praksa.api.model.externalreview.ExternalReviewCreateRequest;
+import ba.com.zira.praksa.api.model.externalreview.ExternalReviewUpdateRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 

@@ -6,9 +6,9 @@ import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
-import ba.com.zira.praksa.api.model.externalReview.ExternalReview;
-import ba.com.zira.praksa.api.model.externalReview.ExternalReviewCreateRequest;
-import ba.com.zira.praksa.api.model.externalReview.ExternalReviewUpdateRequest;
+import ba.com.zira.praksa.api.model.externalreview.ExternalReview;
+import ba.com.zira.praksa.api.model.externalreview.ExternalReviewCreateRequest;
+import ba.com.zira.praksa.api.model.externalreview.ExternalReviewUpdateRequest;
 import ba.com.zira.praksa.api.model.game.Game;
 
 /**

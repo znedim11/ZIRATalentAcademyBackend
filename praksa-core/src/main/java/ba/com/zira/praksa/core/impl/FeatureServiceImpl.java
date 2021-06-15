@@ -24,7 +24,7 @@ import ba.com.zira.praksa.mapper.FeatureMapper;
 import lombok.AllArgsConstructor;
 
 /**
- * 
+ *
  * @author zira
  *
  */
@@ -49,7 +49,7 @@ public class FeatureServiceImpl implements FeatureService {
 
     @Override
     public PayloadResponse<FeatureResponse> findById(final SearchRequest<Long> request) throws ApiException {
-        EntityRequest<Long> entityRequest = new EntityRequest<Long>(request.getEntity(), request);
+        EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
         featureRequestValidation.validateIfFeatureExists(entityRequest, "validateAbstractRequest");
 
         final FeatureEntity featureEntity = featureDAO.findByPK(request.getEntity());
@@ -93,7 +93,7 @@ public class FeatureServiceImpl implements FeatureService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<String> delete(final EntityRequest<Long> request) throws ApiException {
-        EntityRequest<Long> entityRequest = new EntityRequest<Long>(request.getEntity(), request);
+        EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
         featureRequestValidation.validateIfFeatureExists(entityRequest, "validateAbstractRequest");
 
         featureDAO.removeByPK(request.getEntity());

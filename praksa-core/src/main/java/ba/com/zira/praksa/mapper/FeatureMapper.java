@@ -3,7 +3,6 @@ package ba.com.zira.praksa.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
 
 import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.praksa.api.model.feature.FeatureCreateRequest;
@@ -20,8 +19,6 @@ import ba.com.zira.praksa.dao.model.FeatureEntity;
  */
 @Mapper(componentModel = "spring")
 public interface FeatureMapper {
-
-    FeatureMapper INSTANCE = Mappers.getMapper(FeatureMapper.class);
 
     FeatureEntity dtoToEntity(FeatureResponse featureDto);
 

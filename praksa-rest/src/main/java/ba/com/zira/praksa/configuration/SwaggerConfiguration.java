@@ -24,23 +24,26 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfiguration {
 
+    private static final String STRING = "string";
+    private static final String HEADER = "header";
+
     private static final List<Parameter> operationParameters;
     static {
         List<Parameter> parameters = new ArrayList<>();
         ParameterBuilder userHeader = new ParameterBuilder();
-        userHeader.name(ZiraHttpHeader.USER_ID).modelRef(new ModelRef("string")).parameterType("header").defaultValue("swagger")
-                .required(true).build();
+        userHeader.name(ZiraHttpHeader.USER_ID).modelRef(new ModelRef(STRING)).parameterType(HEADER).defaultValue("swagger").required(true)
+                .build();
         ParameterBuilder transactionHeader = new ParameterBuilder();
-        transactionHeader.name(ZiraHttpHeader.TRANSACTION_ID).modelRef(new ModelRef("string")).parameterType("header")
+        transactionHeader.name(ZiraHttpHeader.TRANSACTION_ID).modelRef(new ModelRef(STRING)).parameterType(HEADER)
                 .defaultValue("swagger-TID-1").required(true).build();
         ParameterBuilder sessionHeader = new ParameterBuilder();
-        sessionHeader.name(ZiraHttpHeader.SESSION_ID).modelRef(new ModelRef("string")).parameterType("header")
+        sessionHeader.name(ZiraHttpHeader.SESSION_ID).modelRef(new ModelRef(STRING)).parameterType(HEADER)
                 .defaultValue("swagger-session-id-1").required(false).build();
         ParameterBuilder channelHeader = new ParameterBuilder();
-        channelHeader.name(ZiraHttpHeader.CHANNEL).modelRef(new ModelRef("string")).parameterType("header").defaultValue("SWAGGER")
+        channelHeader.name(ZiraHttpHeader.CHANNEL).modelRef(new ModelRef(STRING)).parameterType(HEADER).defaultValue("SWAGGER")
                 .required(false).build();
         ParameterBuilder languageHeader = new ParameterBuilder();
-        languageHeader.name(ZiraHttpHeader.LANGUAGE_ID).modelRef(new ModelRef("string")).parameterType("header").defaultValue("ba")
+        languageHeader.name(ZiraHttpHeader.LANGUAGE_ID).modelRef(new ModelRef(STRING)).parameterType(HEADER).defaultValue("ba")
                 .required(false).build();
         parameters.add(userHeader.build());
         parameters.add(transactionHeader.build());

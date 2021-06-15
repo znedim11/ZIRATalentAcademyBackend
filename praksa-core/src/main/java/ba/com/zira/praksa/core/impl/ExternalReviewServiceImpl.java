@@ -16,15 +16,16 @@ import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.ExternalReviewService;
-import ba.com.zira.praksa.api.model.externalReview.ExternalReview;
-import ba.com.zira.praksa.api.model.externalReview.ExternalReviewCreateRequest;
-import ba.com.zira.praksa.api.model.externalReview.ExternalReviewUpdateRequest;
+import ba.com.zira.praksa.api.model.externalreview.ExternalReview;
+import ba.com.zira.praksa.api.model.externalreview.ExternalReviewCreateRequest;
+import ba.com.zira.praksa.api.model.externalreview.ExternalReviewUpdateRequest;
 import ba.com.zira.praksa.core.validation.ExternalReviewRequestValidation;
 import ba.com.zira.praksa.dao.ExternalReviewDAO;
 import ba.com.zira.praksa.dao.RssFeedDAO;
 import ba.com.zira.praksa.dao.model.ExternalReviewEntity;
 import ba.com.zira.praksa.dao.model.RssFeedEntity;
 import ba.com.zira.praksa.mapper.ExternalReviewMapper;
+import lombok.AllArgsConstructor;
 
 /**
  * @author zira
@@ -33,22 +34,16 @@ import ba.com.zira.praksa.mapper.ExternalReviewMapper;
 
 @Service
 @ComponentScan
+@AllArgsConstructor
 public class ExternalReviewServiceImpl implements ExternalReviewService {
+
+    private static final String VALIDATE_ABSTRACT_REQUEST = "validateAbstractRequest";
 
     private RequestValidator requestValidator;
     private ExternalReviewRequestValidation externalReviewRequestValidation;
     private ExternalReviewDAO externalReviewDAO;
     private RssFeedDAO rssFeedDAO;
     private ExternalReviewMapper externalReviewMapper;
-
-    public ExternalReviewServiceImpl(RequestValidator requestValidator, ExternalReviewRequestValidation externalReviewRequestValidation,
-            ExternalReviewDAO externalReviewDAO, ExternalReviewMapper externalReviewMapper, RssFeedDAO rssFeedDAO) {
-        this.requestValidator = requestValidator;
-        this.externalReviewRequestValidation = externalReviewRequestValidation;
-        this.externalReviewDAO = externalReviewDAO;
-        this.externalReviewMapper = externalReviewMapper;
-        this.rssFeedDAO = rssFeedDAO;
-    }
 
     @Override
     public PagedPayloadResponse<ExternalReview> find(SearchRequest<String> request) throws ApiException {
@@ -59,7 +54,7 @@ public class ExternalReviewServiceImpl implements ExternalReviewService {
 
         final List<ExternalReview> externalReviewList = externalReviewMapper.entityListToExternalReviewList(externalReviewEntities);
 
-        PagedData<ExternalReview> pagedData = new PagedData<ExternalReview>();
+        PagedData<ExternalReview> pagedData = new PagedData<>();
         pagedData.setNumberOfPages(externalReviewPagedData.getNumberOfPages());
         pagedData.setNumberOfRecords(externalReviewPagedData.getNumberOfRecords());
         pagedData.setPage(externalReviewPagedData.getPage());
@@ -71,30 +66,29 @@ public class ExternalReviewServiceImpl implements ExternalReviewService {
 
     @Override
     public PayloadResponse<ExternalReview> findById(SearchRequest<Long> request) throws ApiException {
-        EntityRequest<Long> entityRequest = new EntityRequest<Long>(request.getEntity(), request);
-        externalReviewRequestValidation.validateExternalReviewExists(entityRequest, "validateAbstractRequest");
+        EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
+        externalReviewRequestValidation.validateExternalReviewExists(entityRequest, VALIDATE_ABSTRACT_REQUEST);
 
         final ExternalReviewEntity externalReviewEntity = externalReviewDAO.findByPK(request.getEntity());
 
         final ExternalReview externalReview = externalReviewMapper.entityToDto(externalReviewEntity);
 
-        return new PayloadResponse<ExternalReview>(request, ResponseCode.OK, externalReview);
+        return new PayloadResponse<>(request, ResponseCode.OK, externalReview);
     }
 
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ExternalReview> create(EntityRequest<ExternalReviewCreateRequest> request) throws ApiException {
-        EntityRequest<ExternalReviewCreateRequest> reviewEntityRequest = new EntityRequest<ExternalReviewCreateRequest>(request.getEntity(),
-                request);
-        externalReviewRequestValidation.validateEntityExistsInCreateRequest(reviewEntityRequest, "validateAbstractRequest");
+        EntityRequest<ExternalReviewCreateRequest> reviewEntityRequest = new EntityRequest<>(request.getEntity(), request);
+        externalReviewRequestValidation.validateEntityExists(reviewEntityRequest, VALIDATE_ABSTRACT_REQUEST);
 
         ExternalReviewEntity entity = externalReviewMapper.createRequestToEntity(request.getEntity());
         entity.setCreated(LocalDateTime.now());
         entity.setCreatedBy(request.getUserId());
 
-        EntityRequest<Long> rssFeedEntityRequest = new EntityRequest<Long>(request.getEntity().getRss_feed_id(), request);
-        externalReviewRequestValidation.validateRssFeedExists(rssFeedEntityRequest, "validateAbstractRequest");
-        RssFeedEntity rssEntity = rssFeedDAO.findByPK(request.getEntity().getRss_feed_id());
+        EntityRequest<Long> rssFeedEntityRequest = new EntityRequest<>(request.getEntity().getRssFeedId(), request);
+        externalReviewRequestValidation.validateRssFeedExists(rssFeedEntityRequest, VALIDATE_ABSTRACT_REQUEST);
+        RssFeedEntity rssEntity = rssFeedDAO.findByPK(request.getEntity().getRssFeedId());
         entity.setRssFeed(rssEntity);
 
         externalReviewDAO.persist(entity);
@@ -105,19 +99,19 @@ public class ExternalReviewServiceImpl implements ExternalReviewService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ExternalReview> update(EntityRequest<ExternalReviewUpdateRequest> request) throws ApiException {
-        externalReviewRequestValidation.validateEntityExistsInUpdateRequest(request, "validateReviewExists");
+        externalReviewRequestValidation.validateEntityExists(request, "validateReviewExists");
 
-        EntityRequest<Long> entityRequestId = new EntityRequest<Long>(request.getEntity().getId(), request);
-        externalReviewRequestValidation.validateExternalReviewExists(entityRequestId, "validateAbstractRequest");
+        EntityRequest<Long> entityRequestId = new EntityRequest<>(request.getEntity().getId(), request);
+        externalReviewRequestValidation.validateExternalReviewExists(entityRequestId, VALIDATE_ABSTRACT_REQUEST);
 
         final ExternalReviewUpdateRequest externalReviewUpdateRequest = request.getEntity();
 
         ExternalReviewEntity externalReviewEntity = externalReviewDAO.findByPK(request.getEntity().getId());
         externalReviewEntity = externalReviewMapper.updateRequestToEntity(externalReviewUpdateRequest, externalReviewEntity);
 
-        EntityRequest<Long> rssFeedEntityRequest = new EntityRequest<Long>(request.getEntity().getRss_feed_id(), request);
-        externalReviewRequestValidation.validateRssFeedExists(rssFeedEntityRequest, "validateAbstractRequest");
-        RssFeedEntity rssEntity = rssFeedDAO.findByPK(request.getEntity().getRss_feed_id());
+        EntityRequest<Long> rssFeedEntityRequest = new EntityRequest<>(request.getEntity().getRssFeedId(), request);
+        externalReviewRequestValidation.validateRssFeedExists(rssFeedEntityRequest, VALIDATE_ABSTRACT_REQUEST);
+        RssFeedEntity rssEntity = rssFeedDAO.findByPK(request.getEntity().getRssFeedId());
         externalReviewEntity.setRssFeed(rssEntity);
 
         externalReviewDAO.merge(externalReviewEntity);
@@ -130,8 +124,8 @@ public class ExternalReviewServiceImpl implements ExternalReviewService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException {
-        EntityRequest<Long> entityRequest = new EntityRequest<Long>(request.getEntity(), request);
-        externalReviewRequestValidation.validateExternalReviewExists(entityRequest, "validateAbstractRequest");
+        EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
+        externalReviewRequestValidation.validateExternalReviewExists(entityRequest, VALIDATE_ABSTRACT_REQUEST);
 
         externalReviewDAO.removeByPK(request.getEntity());
         return new PayloadResponse<>(request, ResponseCode.OK, "External review deleted!");

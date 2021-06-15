@@ -97,7 +97,7 @@ public class FeatureRequestValidation {
      * @return {@link ValidationResponse}
      */
     public ValidationResponse validateBasicFeatureRequest(final EntityRequest<FeatureUpdateRequest> request) {
-        EntityRequest<Long> entityRequest = new EntityRequest<Long>(request.getEntity().getId(), request);
+        EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity().getId(), request);
         ValidationResponse validationResponseExists = validateIfFeatureExists(entityRequest, "validateAbstractRequest");
 
         if (StringUtils.isNotBlank(validationResponseExists.getDescription())) {
@@ -105,7 +105,7 @@ public class FeatureRequestValidation {
         }
 
         ValidationResponse validationResponseFields = validateFeatureRequestFields(
-                new EntityRequest<FeatureCreateRequest>(featureMapper.updateToCreateRequest(request.getEntity()), request), "basicNotNull");
+                new EntityRequest<>(featureMapper.updateToCreateRequest(request.getEntity()), request), "basicNotNull");
 
         if (validationResponseFields.getResponseCode() == ResponseCode.OK.getCode()) {
             return validationResponseFields;
