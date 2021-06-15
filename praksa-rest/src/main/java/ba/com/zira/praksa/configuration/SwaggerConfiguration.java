@@ -58,6 +58,13 @@ public class SwaggerConfiguration {
     }
 
     @Bean
+    public Docket featureApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("feature-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.feature")).build()
+                .tags(new Tag("feature", "Feature APIs")).globalOperationParameters(operationParameters);
+    }
+
+    @Bean
     public Docket reviewApi() {
         return new Docket(DocumentationType.SWAGGER_2).groupName("externalReview-api").apiInfo(apiInfo()).select()
                 .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.externalReview")).build()
