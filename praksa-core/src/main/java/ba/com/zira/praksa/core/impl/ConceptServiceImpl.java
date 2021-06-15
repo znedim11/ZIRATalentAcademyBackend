@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.PagedData;
@@ -47,12 +48,13 @@ public class ConceptServiceImpl implements ConceptService {
     GameMapper gameMapper;
 
     public ConceptServiceImpl(RequestValidator requestValidator, ConceptRequestValidation conceptRequestValidation, ConceptDAO conceptDAO,
-            ConceptMapper conceptMapper) {
+            ConceptMapper conceptMapper, GameMapper gameMapper) {
         super();
         this.requestValidator = requestValidator;
         this.conceptRequestValidation = conceptRequestValidation;
         this.conceptDAO = conceptDAO;
         this.conceptMapper = conceptMapper;
+        this.gameMapper = gameMapper;
     }
 
     @Override
@@ -141,21 +143,11 @@ public class ConceptServiceImpl implements ConceptService {
         return new PayloadResponse<>(request, ResponseCode.OK, "Concept deleted!");
     }
 
-    // @Override
-    // public ListPayloadResponse<Game> getGamesByConcept(SearchRequest<Long>
-    // request) throws ApiException {
-    // List<GameEntity> entityList =
-    // conceptDAO.getGamesByLocation(request.getEntity());
-    // List<Game> gameList = gameMapper.entityListToDtoList(entityList);
-    //
-    // return new ListPayloadResponse<>(request, ResponseCode.OK, gameList);
-    // }
-
     @Override
-    public PagedPayloadResponse<Game> getGamesByConcept(final EntityRequest<Long> request) throws ApiException {
-        List<GameEntity> entityList = conceptDAO.getGamesByLocation(request.getEntity());
+    public ListPayloadResponse<Game> getGamesByConcept(final EntityRequest<Long> request) throws ApiException {
+        List<GameEntity> entityList = conceptDAO.getGamesByConcept(request.getEntity());
         List<Game> gameList = gameMapper.entityListToDtoList(entityList);
 
-        return new PagedPayloadResponse<>(request, ResponseCode.OK, gameList.size(), 1, 1, gameList.size(), gameList);
+        return new ListPayloadResponse<>(request, ResponseCode.OK, gameList);
     }
 }

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.ConceptService;
@@ -94,22 +95,9 @@ public class ConceptRestService {
         return conceptService.delete(request);
     }
 
-    // @ApiOperation(value = "Get Games by Concept.", consumes =
-    // MediaType.APPLICATION_JSON_VALUE, produces =
-    // MediaType.APPLICATION_JSON_VALUE)
-    // @GetMapping(value = "/{id}/games")
-    // public ListPayloadResponse<Game> getGamesByConcept(@PathVariable final
-    // Long id) throws ApiException {
-    //
-    // final SearchRequest<Long> request = new SearchRequest<>();
-    // request.setEntity(id);
-    //
-    // return conceptService.getGamesByConcept(request);
-    // }
-
     @ApiOperation(value = "Get Games by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}/games")
-    public PagedPayloadResponse<Game> getGamesByConcept(@PathVariable final Long id) throws ApiException {
+    public ListPayloadResponse<Game> getGamesByConcept(@PathVariable final Long id) throws ApiException {
 
         final EntityRequest<Long> request = new EntityRequest<>();
         request.setEntity(id);

@@ -10,11 +10,11 @@ import ba.com.zira.praksa.dao.model.GameEntity;
 
 @Repository
 public class ConceptDAO extends AbstractDAO<ConceptEntity, Long> {
-    public List<GameEntity> getGamesByLocation(final Long conceptId) {
+    public List<GameEntity> getGamesByConcept(final Long conceptId) {
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(String.format(
-                "SELECT g FROM GameEntity g, ConceptEntity c, LinkMapEntity lm WHERE l.id = %d AND lm.location.id = l.id AND lm.game.id = g.id",
+                "SELECT g FROM GameEntity g, ConceptEntity c, LinkMapEntity lm WHERE c.id = %d AND lm.concept.id = c.id AND lm.game.id = g.id",
                 conceptId));
 
         return entityManager.createQuery(stringBuilder.toString(), GameEntity.class).getResultList();
