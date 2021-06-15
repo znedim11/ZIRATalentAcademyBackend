@@ -67,8 +67,8 @@ public class PersonRestService {
 	public PayloadResponse<Person> update(@PathVariable final String id,
 			@RequestBody final EntityRequest<PersonUpdateRequest> request) throws ApiException {
 
-		final PersonUpdateRequest sample = request.getEntity();
-		sample.setId(Long.decode(id));
+		final PersonUpdateRequest person = request.getEntity();
+		person.setId(Long.decode(id));
 
 		return personService.update(request);
 	}

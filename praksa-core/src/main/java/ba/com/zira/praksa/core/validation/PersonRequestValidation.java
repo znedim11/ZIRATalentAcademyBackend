@@ -8,6 +8,7 @@ import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.PersonService;
 import ba.com.zira.praksa.api.model.person.Person;
+import ba.com.zira.praksa.api.model.person.PersonCreateRequest;
 import ba.com.zira.praksa.dao.PersonDAO;
 import lombok.AllArgsConstructor;
 
@@ -28,7 +29,7 @@ public class PersonRequestValidation {
 	private PersonDAO personDAO;
 
 	/**
-	 * Validates find, findById, update, delete Person plan from
+	 * Validates findById, create, update, delete Person plan from
 	 * {@link PersonService}.
 	 *
 	 * @param request               the {@link EntityRequest} to validate.
@@ -44,7 +45,24 @@ public class PersonRequestValidation {
 		if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
 			StringBuilder errorDescription = new StringBuilder();
 			if (!personDAO.existsByPK(request.getEntity())) {
-				errorDescription.append("Sample with id: ").append(request.getEntity()).append(" does not exist !");
+				errorDescription.append(String.format("Person with id: %d does not exist!", request.getEntity()));
+
+			}
+			validationResponse = requestValidator.createResponse(request, errorDescription);
+		}
+
+		return validationResponse;
+	}
+
+	public ValidationResponse validatePersonLastName(final EntityRequest<PersonCreateRequest> request,
+			final String validationRuleMessage) {
+		ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+		if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+			StringBuilder errorDescription = new StringBuilder();
+			if ((request != null)
+					&& ((request.getEntity().getLastName() == null) || (request.getEntity().getLastName().isEmpty()))) {
+				errorDescription.append("Person's last name must be entered!");
+
 			}
 			validationResponse = requestValidator.createResponse(request, errorDescription);
 		}

@@ -40,10 +40,10 @@ public interface PersonMapper {
 
 	PersonCreateRequest personEntityToPersonCreate(PersonEntity personEntity);
 
-	PersonEntity dtoToEntity(Person sample);
+	PersonEntity dtoToEntity(Person person);
 
 	@InheritInverseConfiguration(name = "dtoToEntity")
-	Person entityToDto(PersonEntity sampleEntity);
+	Person entityToDto(PersonEntity personEntity);
 
 	List<Person> entityListToPersonList(List<PersonEntity> personEntityList);
 }
