@@ -24,8 +24,7 @@ public interface RssFeedService {
      * Read {@link RssFeed}s by Id.
      *
      * @param request
-     *            {@link EntityRequest} containing pagination and sorting
-     *            information.
+     *            {@link RssFeedService}
      * @return {@link PagedPayloadResponse} for {@link RssFeed}.
      * @throws ApiException
      *             If there was a problem during API invocation then.
