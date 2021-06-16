@@ -2,11 +2,13 @@ package ba.com.zira.praksa.api;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
@@ -100,5 +102,7 @@ public interface ConceptService {
     ListPayloadResponse<Game> getGamesByConcept(final EntityRequest<Long> request) throws ApiException;
 
     ListPayloadResponse<Person> getPersonsByConcept(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<LoV> getLoVs(ListRequest<Long> request) throws ApiException;
 
 }
