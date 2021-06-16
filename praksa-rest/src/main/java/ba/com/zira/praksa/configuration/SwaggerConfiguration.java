@@ -70,7 +70,7 @@ public class SwaggerConfiguration {
     @Bean
     public Docket reviewApi() {
         return new Docket(DocumentationType.SWAGGER_2).groupName("externalReview-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.externalReview")).build()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.externalreview")).build()
                 .tags(new Tag("externalReview", "ExternalReview APIs")).globalOperationParameters(operationParameters);
     }
 
@@ -86,6 +86,13 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SWAGGER_2).groupName("link-map-api").apiInfo(apiInfo()).select()
                 .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.linkmap")).build().tags(new Tag("link", "LinkMap APIs"))
                 .globalOperationParameters(operationParameters);
+    }
+
+    @Bean
+    public Docket rssFeedApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("rss-feed-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.rssfeed")).build()
+                .tags(new Tag("rssfeed", "RssFeedAPIs")).globalOperationParameters(operationParameters);
     }
 
     private static ApiInfo apiInfo() {

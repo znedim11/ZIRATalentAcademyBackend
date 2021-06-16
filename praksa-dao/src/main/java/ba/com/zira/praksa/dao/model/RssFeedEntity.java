@@ -48,6 +48,8 @@ public class RssFeedEntity implements Serializable {
 
     private String name;
 
+    private String adapter;
+
     private String url;
 
     // bi-directional one-to-one association to ExternalReviewEntity

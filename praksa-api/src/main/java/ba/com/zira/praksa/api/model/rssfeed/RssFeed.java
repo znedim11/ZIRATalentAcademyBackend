@@ -13,5 +13,6 @@ public class RssFeed implements Serializable {
     private Long id;
     private String name;
     private String url;
+    private String adapter;
     private List<ExternalReview> externalReviews;
 }
