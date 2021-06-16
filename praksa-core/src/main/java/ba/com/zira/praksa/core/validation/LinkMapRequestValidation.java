@@ -30,7 +30,6 @@ import ba.com.zira.praksa.dao.model.LinkMapEntity_;
 import ba.com.zira.praksa.dao.model.LocationEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
-import lombok.AllArgsConstructor;
 
 /**
  * @author zira
@@ -38,7 +37,6 @@ import lombok.AllArgsConstructor;
  */
 
 @Component("linkMapRequestValidation")
-@AllArgsConstructor
 public class LinkMapRequestValidation {
     LinkMapDAO linkMapDAO;
     RequestValidator requestValidator;
@@ -48,6 +46,19 @@ public class LinkMapRequestValidation {
     LocationDAO locationDAO;
     ObjectDAO objectDAO;
     PersonDAO personDAO;
+
+    public LinkMapRequestValidation(LinkMapDAO linkMapDAO, RequestValidator requestValidator, CharacterDAO characterDAO,
+            ConceptDAO conceptDAO, GameDAO gameDAO, LocationDAO locationDAO, ObjectDAO objectDAO, PersonDAO personDAO) {
+        super();
+        this.linkMapDAO = linkMapDAO;
+        this.requestValidator = requestValidator;
+        this.characterDAO = characterDAO;
+        this.conceptDAO = conceptDAO;
+        this.gameDAO = gameDAO;
+        this.locationDAO = locationDAO;
+        this.objectDAO = objectDAO;
+        this.personDAO = personDAO;
+    }
 
     public ValidationResponse validateEntityExistsInLinkRequest(final EntityRequest<?> request, final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);

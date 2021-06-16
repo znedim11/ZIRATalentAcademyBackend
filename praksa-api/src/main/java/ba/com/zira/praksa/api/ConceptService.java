@@ -11,6 +11,7 @@ import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
 import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.api.model.person.Person;
 
 /**
  * * Methods used to manipulate {@link ConceptResponse} data. <br>
@@ -97,5 +98,7 @@ public interface ConceptService {
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
 
     ListPayloadResponse<Game> getGamesByConcept(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<Person> getPersonsByConcept(final EntityRequest<Long> request) throws ApiException;
 
 }

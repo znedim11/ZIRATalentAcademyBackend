@@ -16,16 +16,9 @@ import ba.com.zira.praksa.dao.model.GameEntity;
 @Mapper(componentModel = "spring")
 public interface GameMapper {
 
-    // @Mapping(source = "fullName", target = "fullName")
-    // Game gameEntityToGame(GameEntity sampleModelEntity);
-    //
-    // @Mapping(source = "fullName", target = "fullName")
-    // GameEntity gameToGameEntity(Game sampleModel);
+    GameEntity dtoToEntity(Game dto);
 
-    GameEntity dtoToEntity(Game sample);
-
-    // @InheritInverseConfiguration(name = "dtoToEntity")
-    Game entityToDto(GameEntity billingPeriodEntity);
+    Game entityToDto(GameEntity entity);
 
     List<Game> entityListToDtoList(List<GameEntity> entityList);
 

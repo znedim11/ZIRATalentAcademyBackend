@@ -28,6 +28,7 @@ import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
 import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.api.model.person.Person;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -103,5 +104,15 @@ public class ConceptRestService {
         request.setEntity(id);
 
         return conceptService.getGamesByConcept(request);
+    }
+
+    @ApiOperation(value = "Get Games by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/persons")
+    public ListPayloadResponse<Person> getPersonsByConcept(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return conceptService.getPersonsByConcept(request);
     }
 }

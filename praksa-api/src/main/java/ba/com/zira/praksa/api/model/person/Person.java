@@ -2,9 +2,7 @@ package ba.com.zira.praksa.api.model.person;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
-import ba.com.zira.praksa.api.model.linkmap.LinkMap;
 import lombok.Data;
 
 @Data
@@ -28,5 +26,4 @@ public class Person implements Serializable {
     private String modifiedBy;
     private String twitter;
     private String website;
-    private List<LinkMap> linkMaps;
 }
