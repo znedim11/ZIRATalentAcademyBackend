@@ -25,17 +25,25 @@ import ba.com.zira.praksa.dao.MediaStoreDAO;
 import ba.com.zira.praksa.dao.model.MediaEntity;
 import ba.com.zira.praksa.dao.model.MediaStoreEntity;
 import ba.com.zira.praksa.mapper.MediaStoreMapper;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class MediaStoreServiceImpl implements MediaStoreService {
 
-    private RequestValidator requestValidator;
-    private MediaStoreRequestValidation mediaStoreRequestValidation;
-    private MediaStoreDAO mediaStoreDAO;
-    private MediaDAO mediaDAO;
-    private MediaStoreMapper mediaStoreMapper;
+    RequestValidator requestValidator;
+    MediaStoreRequestValidation mediaStoreRequestValidation;
+    MediaStoreDAO mediaStoreDAO;
+    MediaDAO mediaDAO;
+    MediaStoreMapper mediaStoreMapper;
+
+    public MediaStoreServiceImpl(RequestValidator requestValidator, MediaStoreRequestValidation mediaStoreRequestValidation,
+            MediaStoreDAO mediaStoreDAO, MediaStoreMapper mediaStoreMapper, MediaDAO mediaDAO) {
+        super();
+        this.requestValidator = requestValidator;
+        this.mediaStoreRequestValidation = mediaStoreRequestValidation;
+        this.mediaStoreDAO = mediaStoreDAO;
+        this.mediaStoreMapper = mediaStoreMapper;
+        this.mediaDAO = mediaDAO;
+    }
 
     @Override
     public PagedPayloadResponse<MediaStoreResponse> find(final SearchRequest<String> request) throws ApiException {

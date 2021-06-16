@@ -5,7 +5,6 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
 
 import ba.com.zira.praksa.api.model.mediastore.MediaStoreCreateRequest;
 import ba.com.zira.praksa.api.model.mediastore.MediaStoreResponse;
@@ -20,7 +19,6 @@ import ba.com.zira.praksa.dao.model.MediaStoreEntity;
  */
 @Mapper(componentModel = "spring")
 public interface MediaStoreMapper {
-    MediaStoreMapper INSTANCE = Mappers.getMapper(MediaStoreMapper.class);
 
     MediaStoreEntity responseToEntity(MediaStoreResponse mediaStoreResponse);
 

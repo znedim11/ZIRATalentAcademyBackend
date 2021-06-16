@@ -12,7 +12,6 @@ import ba.com.zira.praksa.api.model.mediastore.MediaStoreCreateRequest;
 import ba.com.zira.praksa.api.model.mediastore.MediaStoreUpdateRequest;
 import ba.com.zira.praksa.dao.MediaDAO;
 import ba.com.zira.praksa.dao.MediaStoreDAO;
-import lombok.AllArgsConstructor;
 
 /**
  * SampleRequestValidation is used for validation of {@link MediaStoreService}
@@ -23,11 +22,18 @@ import lombok.AllArgsConstructor;
  *
  */
 @Component("componentRequestValidation")
-@AllArgsConstructor
 public class MediaStoreRequestValidation {
-    private RequestValidator requestValidator;
-    private MediaStoreDAO mediaStoreDAO;
-    private MediaDAO mediaDAO;
+
+    RequestValidator requestValidator;
+    MediaStoreDAO mediaStoreDAO;
+    MediaDAO mediaDAO;
+
+    public MediaStoreRequestValidation(RequestValidator requestValidator, MediaStoreDAO mediaStoreDAO, MediaDAO mediaDAO) {
+        super();
+        this.requestValidator = requestValidator;
+        this.mediaStoreDAO = mediaStoreDAO;
+        this.mediaDAO = mediaDAO;
+    }
 
     public ValidationResponse validateMediaStoreExists(final EntityRequest<String> request, final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
