@@ -17,22 +17,24 @@ public class ConceptDAO extends AbstractDAO<ConceptEntity, Long> {
     public List<GameEntity> getGamesByConcept(final Long conceptId) {
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(String.format(
-                "SELECT g FROM GameEntity g, ConceptEntity c, LinkMapEntity lm WHERE c.id = %d AND lm.concept.id = c.id AND lm.game.id = g.id",
-                conceptId));
+        stringBuilder.append("SELECT g FROM GameEntity g, LinkMapEntity lm WHERE lm.concept.id = :cId AND lm.game.id = g.id");
 
-        return entityManager.createQuery(stringBuilder.toString(), GameEntity.class).getResultList();
+        TypedQuery<GameEntity> query = entityManager.createQuery(stringBuilder.toString(), GameEntity.class);
+        query.setParameter("cId", conceptId);
+
+        return query.getResultList();
 
     }
 
-    public List<PersonEntity> getPersonsByConcept(final Long personId) {
+    public List<PersonEntity> getPersonsByConcept(final Long conceptId) {
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(String.format(
-                "SELECT p FROM PersonEntity p, ConceptEntity c, LinkMapEntity lm WHERE c.id = %d AND lm.concept.id = c.id AND lm.person.id = p.id",
-                personId));
+        stringBuilder.append("SELECT p FROM PersonEntity p, LinkMapEntity lm WHERE lm.concept.id = :cId AND lm.person.id = p.id");
 
-        return entityManager.createQuery(stringBuilder.toString(), PersonEntity.class).getResultList();
+        TypedQuery<PersonEntity> query = entityManager.createQuery(stringBuilder.toString(), PersonEntity.class);
+        query.setParameter("cId", conceptId);
+
+        return query.getResultList();
 
     }
 
