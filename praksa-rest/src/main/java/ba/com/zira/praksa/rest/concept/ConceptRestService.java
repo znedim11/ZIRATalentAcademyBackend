@@ -109,7 +109,8 @@ public class ConceptRestService {
         return conceptService.getGamesByConcept(request);
     }
 
-    @ApiOperation(value = "Get Games by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Persons by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}/persons")
     public ListPayloadResponse<Person> getPersonsByConcept(@PathVariable final Long id) throws ApiException {
 

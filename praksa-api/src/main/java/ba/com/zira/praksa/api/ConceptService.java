@@ -103,6 +103,6 @@ public interface ConceptService {
 
     ListPayloadResponse<Person> getPersonsByConcept(final EntityRequest<Long> request) throws ApiException;
 
-    ListPayloadResponse<LoV> getLoVs(ListRequest<Long> request) throws ApiException;
+    ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException;
 
 }

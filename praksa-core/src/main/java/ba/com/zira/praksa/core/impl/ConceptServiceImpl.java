@@ -159,7 +159,7 @@ public class ConceptServiceImpl implements ConceptService {
     }
 
     @Override
-    public ListPayloadResponse<Person> getPersonsByConcept(EntityRequest<Long> request) throws ApiException {
+    public ListPayloadResponse<Person> getPersonsByConcept(final EntityRequest<Long> request) throws ApiException {
         List<PersonEntity> entityList = conceptDAO.getPersonsByConcept(request.getEntity());
         List<Person> personList = personMapper.entityListToDtoList(entityList);
 
@@ -167,7 +167,7 @@ public class ConceptServiceImpl implements ConceptService {
     }
 
     @Override
-    public ListPayloadResponse<LoV> getLoVs(ListRequest<Long> request) throws ApiException {
+    public ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException {
         List<LoV> loVs = conceptDAO.getLoVs(request.getList());
 
         return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
