@@ -60,44 +60,34 @@ public class SwaggerConfiguration {
 				.tags(new Tag("game", "Game APIs")).globalOperationParameters(operationParameters);
 	}
 
-    @Bean
-    public Docket featureApi() {
-        return new Docket(DocumentationType.SWAGGER_2).groupName("feature-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.feature")).build()
-                .tags(new Tag("feature", "Feature APIs")).globalOperationParameters(operationParameters);
-    }
+	@Bean
+	public Docket featureApi() {
+		return new Docket(DocumentationType.SWAGGER_2).groupName("feature-api").apiInfo(apiInfo()).select()
+				.apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.feature")).build()
+				.tags(new Tag("feature", "Feature APIs")).globalOperationParameters(operationParameters);
+	}
 
-    @Bean
-    public Docket reviewApi() {
-        return new Docket(DocumentationType.SWAGGER_2).groupName("externalReview-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.externalReview")).build()
-                .tags(new Tag("externalReview", "ExternalReview APIs")).globalOperationParameters(operationParameters);
-    }
+	@Bean
+	public Docket reviewApi() {
+		return new Docket(DocumentationType.SWAGGER_2).groupName("externalReview-api").apiInfo(apiInfo()).select()
+				.apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.externalReview")).build()
+				.tags(new Tag("externalReview", "ExternalReview APIs")).globalOperationParameters(operationParameters);
+	}
 
-    @Bean
-    public Docket conceptApi() {
-        return new Docket(DocumentationType.SWAGGER_2).groupName("concept-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.concept")).build()
-                .tags(new Tag("concept", "Concept APIs")).globalOperationParameters(operationParameters);
-    }
+	@Bean
+	public Docket conceptApi() {
+		return new Docket(DocumentationType.SWAGGER_2).groupName("concept-api").apiInfo(apiInfo()).select()
+				.apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.concept")).build()
+				.tags(new Tag("concept", "Concept APIs")).globalOperationParameters(operationParameters);
+	}
 
-    @Bean
-    public Docket linkMapApi() {
-        return new Docket(DocumentationType.SWAGGER_2).groupName("link-map-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.linkmap")).build().tags(new Tag("link", "LinkMap APIs"))
-                .globalOperationParameters(operationParameters);
-    }
+	@Bean
+	public Docket linkMapApi() {
+		return new Docket(DocumentationType.SWAGGER_2).groupName("link-map-api").apiInfo(apiInfo()).select()
+				.apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.linkmap")).build()
+				.tags(new Tag("link", "LinkMap APIs")).globalOperationParameters(operationParameters);
+	}
 
-    private static ApiInfo apiInfo() {
-        final Contact contact = new Contact("ZIRA", "http://www.zira.com.ba", "info@zira.com.ba");
-        ApiInfoBuilder builder = new ApiInfoBuilder();
-        builder.title("ZIRA API");
-        builder.description("ZIRA API");
-        builder.version("Version 0.0.1-SNAPSHOT");
-        builder.contact(contact);
-        return builder.build();
-    }
-}
 	@Bean
 	public Docket personApi() {
 		return new Docket(DocumentationType.SWAGGER_2).groupName("person-api").apiInfo(apiInfo()).select()
@@ -114,5 +104,4 @@ public class SwaggerConfiguration {
 		builder.contact(contact);
 		return builder.build();
 	}
-}
 }

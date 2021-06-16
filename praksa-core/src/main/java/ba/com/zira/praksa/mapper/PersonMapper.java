@@ -5,7 +5,6 @@ import java.util.List;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 import ba.com.zira.praksa.api.model.person.Person;
 import ba.com.zira.praksa.api.model.person.PersonCreateRequest;
@@ -21,8 +20,6 @@ import ba.com.zira.praksa.dao.model.PersonEntity;
 
 @Mapper(componentModel = "spring")
 public interface PersonMapper {
-
-	PersonMapper INSTANCE = Mappers.getMapper(PersonMapper.class);
 
 	@Mapping(target = "modified", ignore = true)
 	@Mapping(target = "modifiedBy", ignore = true)
@@ -40,10 +37,10 @@ public interface PersonMapper {
 
 	PersonCreateRequest personEntityToPersonCreate(PersonEntity personEntity);
 
-	PersonEntity dtoToEntity(Person person);
+	PersonEntity dtoToEntity(Person dto);
 
 	@InheritInverseConfiguration(name = "dtoToEntity")
-	Person entityToDto(PersonEntity personEntity);
+	Person entityToDto(PersonEntity entity);
 
-	List<Person> entityListToPersonList(List<PersonEntity> personEntityList);
+	List<Person> entityListToDtoList(List<PersonEntity> entityList);
 }

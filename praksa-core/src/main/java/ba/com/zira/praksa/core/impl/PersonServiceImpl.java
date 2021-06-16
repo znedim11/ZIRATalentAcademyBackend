@@ -41,7 +41,7 @@ public class PersonServiceImpl implements PersonService {
 		PagedData<PersonEntity> personModelEntities = personDAO.findAll(request.getFilter());
 		final List<PersonEntity> personEntityList = personModelEntities.getRecords();
 
-		final List<Person> personList = personMapper.entityListToPersonList(personEntityList);
+		final List<Person> personList = personMapper.entityListToDtoList(personEntityList);
 
 		PagedData<Person> data = new PagedData<>();
 		data.setNumberOfPages(personModelEntities.getNumberOfPages());
