@@ -88,6 +88,13 @@ public class SwaggerConfiguration {
                 .globalOperationParameters(operationParameters);
     }
 
+    @Bean
+    public Docket mediastoreApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("mediastore-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.mediastore")).build()
+                .tags(new Tag("mediastore", "MediaStore APIs")).globalOperationParameters(operationParameters);
+    }
+
     private static ApiInfo apiInfo() {
         final Contact contact = new Contact("ZIRA", "http://www.zira.com.ba", "info@zira.com.ba");
         ApiInfoBuilder builder = new ApiInfoBuilder();
