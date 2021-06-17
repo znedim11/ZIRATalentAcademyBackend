@@ -21,6 +21,9 @@ public interface CompanyMapper {
     @Mapping(source = "name", target = "name")
     CompanyEntity companyToCompanyEntity(CompanyCreateRequest sampleModel);
 
+    @Mapping(source = "name", target = "name")
+    CompanyEntity companyResToCompanyEntity(CompanyCreateRequest sampleModel);
+
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     void updateForCompanyUpdate(CompanyUpdateRequest companyModel, @MappingTarget CompanyEntity companyEntity);

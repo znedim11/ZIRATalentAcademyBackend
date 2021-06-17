@@ -24,7 +24,7 @@ import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
-import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.person.Person;
 import ba.com.zira.praksa.core.validation.ConceptRequestValidation;
 import ba.com.zira.praksa.dao.ConceptDAO;
@@ -151,9 +151,9 @@ public class ConceptServiceImpl implements ConceptService {
     }
 
     @Override
-    public ListPayloadResponse<Game> getGamesByConcept(final EntityRequest<Long> request) throws ApiException {
+    public ListPayloadResponse<GameResponse> getGamesByConcept(final EntityRequest<Long> request) throws ApiException {
         List<GameEntity> entityList = conceptDAO.getGamesByConcept(request.getEntity());
-        List<Game> gameList = gameMapper.entityListToDtoList(entityList);
+        List<GameResponse> gameList = gameMapper.gameEntitesToGames(entityList);
 
         return new ListPayloadResponse<>(request, ResponseCode.OK, gameList);
     }

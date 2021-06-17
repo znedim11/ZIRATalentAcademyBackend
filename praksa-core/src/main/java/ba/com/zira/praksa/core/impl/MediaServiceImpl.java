@@ -37,10 +37,10 @@ public class MediaServiceImpl implements MediaService {
     public PagedPayloadResponse<Media> find(final SearchRequest<String> request) throws ApiException {
         requestValidator.validate(request);
 
-        PagedData<MediaEntity> MediaModelEntities = mediaDAO.findAll(request.getFilter());
+        PagedData<MediaEntity> mediaModelEntities = mediaDAO.findAll(request.getFilter());
         final List<Media> mediaList = new ArrayList<>();
 
-        for (final MediaEntity MediaEntity : MediaModelEntities.getRecords()) {
+        for (final MediaEntity MediaEntity : mediaModelEntities.getRecords()) {
             mediaList.add(mediaMapper.entityToDto(MediaEntity));
         }
         return new PagedPayloadResponse<>(request, ResponseCode.OK, mediaList.size(), 1, 1, mediaList.size(), mediaList);

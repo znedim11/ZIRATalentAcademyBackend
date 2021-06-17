@@ -20,7 +20,7 @@ import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.GameService;
 import ba.com.zira.praksa.api.ReleaseService;
 import ba.com.zira.praksa.api.model.enums.ReleaseType;
-import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.api.model.game.GameCreateRequest;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
 import ba.com.zira.praksa.api.model.release.ReleaseRequest;
@@ -36,11 +36,10 @@ public class GameRestService {
     private GameService sampleService;
     @Autowired
     private ReleaseService releaseService;
-    private ReleaseType releaseType;
 
     @ApiOperation(value = "Find Games", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")
-    public PagedPayloadResponse<Game> find(@RequestParam(required = false) final String pagination) throws ApiException {
+    public PagedPayloadResponse<GameResponse> find(@RequestParam(required = false) final String pagination) throws ApiException {
 
         SearchRequest<String> request = new SearchRequest<>();
         request.setPagination(pagination);
@@ -49,7 +48,7 @@ public class GameRestService {
 
     @ApiOperation(value = "Get Game by Id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}")
-    public PayloadResponse<Game> findById(@PathVariable final Long id) throws ApiException {
+    public PayloadResponse<GameResponse> findById(@PathVariable final Long id) throws ApiException {
 
         final SearchRequest<Long> request = new SearchRequest<>();
         request.setEntity(id);
@@ -59,7 +58,7 @@ public class GameRestService {
 
     @ApiOperation(value = "Create Game", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/create")
-    public PayloadResponse<Game> createGame(@RequestBody EntityRequest<Game> request) throws ApiException {
+    public PayloadResponse<GameResponse> createGame(@RequestBody EntityRequest<GameCreateRequest> request) throws ApiException {
         return sampleService.create(request);
     }
 
@@ -87,7 +86,7 @@ public class GameRestService {
     @PostMapping(value = "/release/add")
     public PayloadResponse<String> addReleaseGame(@RequestBody final EntityRequest<ReleaseRequest> request) throws ApiException {
         final ReleaseRequest addReleaseRequest = request.getEntity();
-        addReleaseRequest.setType(releaseType.Game.getValue());
+        addReleaseRequest.setType(ReleaseType.Game.getValue());
         return releaseService.addRelease(request);
     }
 

@@ -23,18 +23,22 @@ import ba.com.zira.praksa.core.validation.PlatformRequestValidation;
 import ba.com.zira.praksa.dao.PlatformDAO;
 import ba.com.zira.praksa.dao.model.PlatformEntity;
 import ba.com.zira.praksa.mapper.PlatformMapper;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
 @Service
-@AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class PlatformServiceImpl implements PlatformService {
     PlatformRequestValidation platformRequestValidation;
     RequestValidator requestValidator;
     PlatformDAO platformDAO;
     PlatformMapper platformMapper;
+
+    public PlatformServiceImpl(PlatformRequestValidation platformRequestValidation, RequestValidator requestValidator,
+            PlatformDAO platformDAO, PlatformMapper platformMapper) {
+        super();
+        this.platformRequestValidation = platformRequestValidation;
+        this.requestValidator = requestValidator;
+        this.platformDAO = platformDAO;
+        this.platformMapper = platformMapper;
+    }
 
     @Override
     public PagedPayloadResponse<PlatformResponse> find(final SearchRequest<String> request) throws ApiException {

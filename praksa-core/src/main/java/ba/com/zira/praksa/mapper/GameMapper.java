@@ -1,5 +1,7 @@
 package ba.com.zira.praksa.mapper;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -34,5 +36,7 @@ public interface GameMapper {
     GameEntity responseToEntity(GameResponse gameResponse);
 
     GameEntity dtoToEntity(GameCreateRequest gameRequest);
+
+    List<GameResponse> gameEntitesToGames(List<GameEntity> gameEnts);
 
 }
