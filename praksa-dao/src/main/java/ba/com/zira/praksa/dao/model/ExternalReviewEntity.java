@@ -45,6 +45,9 @@ public class ExternalReviewEntity implements Serializable {
 
     private String origin;
 
+    @Column(name = "game_name")
+    private String gameName;
+
     // bi-directional one-to-one association to RssFeedEntity
     @ManyToOne
     @JoinColumn(name = "rss_feed_id")

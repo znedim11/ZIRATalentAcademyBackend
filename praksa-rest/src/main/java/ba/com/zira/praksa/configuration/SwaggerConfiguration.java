@@ -67,12 +67,21 @@ public class SwaggerConfiguration {
 				.tags(new Tag("feature", "Feature APIs")).globalOperationParameters(operationParameters);
 	}
 
+<<<<<<< praksa-rest/src/main/java/ba/com/zira/praksa/configuration/SwaggerConfiguration.java
+    @Bean
+    public Docket reviewApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("externalReview-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.externalreview")).build()
+                .tags(new Tag("externalReview", "ExternalReview APIs")).globalOperationParameters(operationParameters);
+    }
+=======
 	@Bean
 	public Docket reviewApi() {
 		return new Docket(DocumentationType.SWAGGER_2).groupName("externalReview-api").apiInfo(apiInfo()).select()
 				.apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.externalReview")).build()
 				.tags(new Tag("externalReview", "ExternalReview APIs")).globalOperationParameters(operationParameters);
 	}
+>>>>>>> praksa-rest/src/main/java/ba/com/zira/praksa/configuration/SwaggerConfiguration.java
 
 	@Bean
 	public Docket conceptApi() {
@@ -95,6 +104,13 @@ public class SwaggerConfiguration {
                 .tags(new Tag("mediastore", "MediaStore APIs")).globalOperationParameters(operationParameters);
     }
 
+    @Bean
+    public Docket rssFeedApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("rss-feed-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.rssfeed")).build()
+                .tags(new Tag("rssfeed", "RssFeedAPIs")).globalOperationParameters(operationParameters);
+    }
+    
 	@Bean
 	public Docket personApi() {
 		return new Docket(DocumentationType.SWAGGER_2).groupName("person-api").apiInfo(apiInfo()).select()
