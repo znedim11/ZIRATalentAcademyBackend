@@ -2,7 +2,7 @@ package ba.com.zira.praksa.api.release;
 
 public enum ReleaseType
 {
-	Game("Game"), Platform("Platform");
+	Game("GAME"), Platform("PLATFORM");
 
 	private String releaseType;
 

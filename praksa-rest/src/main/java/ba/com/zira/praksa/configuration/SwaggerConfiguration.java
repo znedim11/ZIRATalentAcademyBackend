@@ -80,6 +80,13 @@ public class SwaggerConfiguration {
                 .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.franchise")).build()
                 .tags(new Tag("franchise", "Franchise APIs")).globalOperationParameters(operationParameters);
     }
+	@Bean
+	public Docket regionApi()
+	{
+		return new Docket(DocumentationType.SWAGGER_2).groupName("region-api").apiInfo(apiInfo()).select()
+				.apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.region")).build().tags(new Tag("region", "Region APIs"))
+				.globalOperationParameters(operationParameters);
+	}
 
     @Bean
     public Docket reviewApi() {

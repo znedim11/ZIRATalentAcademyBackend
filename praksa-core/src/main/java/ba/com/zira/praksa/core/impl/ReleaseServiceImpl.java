@@ -20,7 +20,6 @@ import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.platform.PlatformResponse;
 import ba.com.zira.praksa.api.model.region.RegionResponse;
 import ba.com.zira.praksa.api.model.release.ReleaseRequest;
-import ba.com.zira.praksa.core.validation.ReleaseRequestValidation;
 import ba.com.zira.praksa.dao.ReleaseDAO;
 import ba.com.zira.praksa.dao.model.ReleaseEntity;
 import ba.com.zira.praksa.mapper.CompanyMapper;
@@ -37,10 +36,10 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ReleaseServiceImpl implements ReleaseService
 {
+	final static String DEV = "DEV";
+	final static String PUB = "PUB";
 	RequestValidator requestValidator;
-	ReleaseDAO releaseDAO;
 	ReleaseMapper releaseMapper;
-	ReleaseRequestValidation releaseRequestValidation;
 	GameMapper gameMapper;
 	PlatformMapper platformMapper;
 	CompanyMapper companyMapper;
@@ -49,6 +48,7 @@ public class ReleaseServiceImpl implements ReleaseService
 	CompanyService companyService;
 	PlatformService platformService;
 	RegionService regionService;
+	ReleaseDAO releaseDAO;
 
     @Override
     public PayloadResponse<String> addRelease(final EntityRequest<ReleaseRequest> request) throws ApiException {
@@ -89,16 +89,18 @@ public class ReleaseServiceImpl implements ReleaseService
 		PlatformResponse platformResponse = responsePlatformPayload.getPayload();
 		entity.setPlatform(platformMapper.responseToEntity(platformResponse));
 
+		String companyType = request.getEntity().getCompanyType();
+
 		SearchRequest<Long> requestCompany = new SearchRequest<>();
 		PayloadResponse<CompanyResponse> responseCompanyPayload = new PayloadResponse<>();
-		if (request.getEntity().getType() == "DEV")
+		if (DEV.equalsIgnoreCase(companyType))
 		{
 			requestCompany.setEntity(request.getEntity().getDeveloperId());
 			responseCompanyPayload = companyService.findById(requestCompany);
 			CompanyResponse companyResponse = responseCompanyPayload.getPayload();
 			entity.setDeveloper(companyMapper.responseToEntity(companyResponse));
 		}
-		else if (request.getEntity().getType() == "PUB")
+		else if (PUB.equalsIgnoreCase(companyType))
 		{
 			requestCompany.setEntity(request.getEntity().getPublisherId());
 			responseCompanyPayload = companyService.findById(requestCompany);
@@ -106,6 +108,7 @@ public class ReleaseServiceImpl implements ReleaseService
 			entity.setPublisher(companyMapper.responseToEntity(companyResponse));
 		}
 
+		releaseDAO.persist(entity);
 		return new PayloadResponse<>(request, ResponseCode.OK, "Release Added Successfully");
 	}
 
