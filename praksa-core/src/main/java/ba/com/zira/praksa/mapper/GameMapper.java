@@ -14,12 +14,23 @@ import ba.com.zira.praksa.dao.model.GameEntity;
  *
  */
 @Mapper(componentModel = "spring")
-public interface GameMapper {
+public interface GameMapper
+{
 
-    GameEntity dtoToEntity(Game dto);
+	GameMapper INSTANCE = Mappers.getMapper(GameMapper.class);
 
-    Game entityToDto(GameEntity entity);
+	@Mapping(source = "fullName", target = "fullName")
+	GameResponse gameEntityToGame(GameEntity gameModelEntity);
 
-    List<Game> entityListToDtoList(List<GameEntity> entityList);
+	@Mapping(source = "fullName", target = "fullName")
+	GameEntity gameToGameEntity(GameCreateRequest gameModel);
+
+	@Mapping(target = "created", ignore = true)
+	@Mapping(target = "createdBy", ignore = true)
+	void updateForGameUpdate(GameUpdateRequest gameModel, @MappingTarget GameEntity gameEntity);
+
+	GameEntity responseToEntity(GameResponse gameResponse);
+
+	GameEntity dtoToEntity(GameCreateRequest gameRequest);
 
 }

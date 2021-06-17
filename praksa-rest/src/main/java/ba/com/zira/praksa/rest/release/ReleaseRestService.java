@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.response.PayloadResponse;
+import ba.com.zira.praksa.api.CompanyService;
+import ba.com.zira.praksa.api.GameService;
+import ba.com.zira.praksa.api.PlatformService;
+import ba.com.zira.praksa.api.RegionService;
 import ba.com.zira.praksa.api.ReleaseService;
 import ba.com.zira.praksa.api.model.release.ReleaseRequest;
 import ba.com.zira.praksa.api.release.ReleaseType;
@@ -25,10 +29,14 @@ public class ReleaseRestService
 {
 	@Autowired
 	private ReleaseService releaseService;
+	private GameService gameService;
+	private PlatformService platformService;
+	private RegionService regionService;
+	private CompanyService companyService;
 	// private ReleaseType releaseType;
 
 	@ApiOperation(value = "Add Release", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@PostMapping(value = "/{relaeseType}/release/add")
+	@PostMapping(value = "/{releaseType}/release/add")
 	public PayloadResponse<String> addRelease(@PathVariable("releaseType") ReleaseType releaseType,
 			@RequestBody final EntityRequest<ReleaseRequest> request) throws ApiException
 	{
