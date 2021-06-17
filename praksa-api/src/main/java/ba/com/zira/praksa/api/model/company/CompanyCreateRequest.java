@@ -7,10 +7,10 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
-public class CompanyRequest implements Serializable {
+public class CompanyCreateRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private Long id;
+    //private Long id;
     private String address;
     private String city;
     private String country;

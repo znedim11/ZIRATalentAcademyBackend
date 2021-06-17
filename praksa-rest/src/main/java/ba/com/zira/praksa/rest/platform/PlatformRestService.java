@@ -30,13 +30,12 @@ import io.swagger.annotations.ApiOperation;
 @Api(tags = "platform")
 @RestController
 @RequestMapping(value = "platform")
-public class PlatformRestService
-{
-	@Autowired
-	private PlatformService platformService;
-	@Autowired
-	private ReleaseService releaseService;
-	private ReleaseType releaseType;
+public class PlatformRestService {
+    @Autowired
+    private PlatformService platformService;
+    @Autowired
+    private ReleaseService releaseService;
+    private ReleaseType releaseType;
 
     @ApiOperation(value = "Find Platforms", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")
@@ -80,15 +79,14 @@ public class PlatformRestService
         final EntityRequest<Long> request = new EntityRequest<>();
         request.setEntity(id);
 
-		return platformService.delete(request);
-	}
+        return platformService.delete(request);
+    }
 
-	@ApiOperation(value = "Add Release", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@PostMapping(value = "/release/add")
-	public PayloadResponse<String> addReleasePlatform(@RequestBody EntityRequest<ReleaseRequest> request) throws ApiException
-	{
-		final ReleaseRequest addReleaseRequest = request.getEntity();
-		addReleaseRequest.setType(releaseType.Platform.getValue());
-		return releaseService.addRelease(request);
-	}
+    @ApiOperation(value = "Add Release", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/release/add")
+    public PayloadResponse<String> addReleasePlatform(@RequestBody EntityRequest<ReleaseRequest> request) throws ApiException {
+        final ReleaseRequest addReleaseRequest = request.getEntity();
+        addReleaseRequest.setType(releaseType.Platform.getValue());
+        return releaseService.addRelease(request);
+    }
 }
