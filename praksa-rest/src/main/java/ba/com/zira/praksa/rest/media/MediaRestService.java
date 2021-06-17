@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
@@ -17,11 +19,16 @@ import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.MediaService;
 import ba.com.zira.praksa.api.model.media.Media;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
+@Api(tags = "media")
+@RestController
+@RequestMapping(value = "media")
 
 public class MediaRestService {
     @Autowired
-    private MediaService sampleService;
+    private MediaService mediaService;
 
     @ApiOperation(value = "Find Media", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")
@@ -29,41 +36,42 @@ public class MediaRestService {
 
         SearchRequest<String> request = new SearchRequest<>();
         request.setPagination(pagination);
-        return sampleService.find(request);
+        return mediaService.find(request);
     }
 
-    @ApiOperation(value = "Get Game by Id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Media by Id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}")
-    public PayloadResponse<Game> findById(@PathVariable final Long id) throws ApiException {
+    public PayloadResponse<Media> findById(@PathVariable final Long id) throws ApiException {
 
         final SearchRequest<Long> request = new SearchRequest<>();
         request.setEntity(id);
 
-        return sampleService.findById(request);
+        return mediaService.findById(request);
     }
 
-    @ApiOperation(value = "Create Game", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Create Media", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/create")
-    public PayloadResponse<Game> createGame(@RequestBody EntityRequest<Game> request) throws ApiException {
-        return sampleService.create(request);
+    public PayloadResponse<Media> createMedia(@RequestBody EntityRequest<Media> request) throws ApiException {
+        return mediaService.create(request);
     }
 
-    @ApiOperation(value = "Update Game", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Update Media", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PutMapping(value = "/{id}")
-    public PayloadResponse<Game> update(@PathVariable final String id, @RequestBody final EntityRequest<Game> request) throws ApiException {
+    public PayloadResponse<Media> update(@PathVariable final String id, @RequestBody final EntityRequest<Media> request)
+            throws ApiException {
 
-        final Game sample = request.getEntity();
+        final Media sample = request.getEntity();
         sample.setId(Long.decode(id));
 
-        return sampleService.update(request);
+        return mediaService.update(request);
     }
 
-    @ApiOperation(value = "Delete Game by Id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Delete Media by Id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @DeleteMapping(value = "/{id}")
     public void delete(@PathVariable final Long id) throws ApiException {
         final EntityRequest<Long> request = new EntityRequest<>();
         request.setEntity(id);
 
-        sampleService.delete(request);
+        mediaService.delete(request);
     }
 }
