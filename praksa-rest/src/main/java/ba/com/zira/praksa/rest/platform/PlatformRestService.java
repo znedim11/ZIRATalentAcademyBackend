@@ -18,18 +18,25 @@ import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.PlatformService;
+import ba.com.zira.praksa.api.ReleaseService;
+import ba.com.zira.praksa.api.model.enums.Release;
 import ba.com.zira.praksa.api.model.platform.PlatformCreateRequest;
 import ba.com.zira.praksa.api.model.platform.PlatformResponse;
 import ba.com.zira.praksa.api.model.platform.PlatformUpdateRequest;
+import ba.com.zira.praksa.api.model.release.ReleaseRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 @Api(tags = "platform")
 @RestController
 @RequestMapping(value = "platform")
-public class PlatformRestService {
-    @Autowired
-    private PlatformService platformService;
+public class PlatformRestService
+{
+	@Autowired
+	private PlatformService platformService;
+	@Autowired
+	private ReleaseService releaseService;
+	private Release releaseType;
 
     @ApiOperation(value = "Find Platforms", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")
@@ -73,6 +80,15 @@ public class PlatformRestService {
         final EntityRequest<Long> request = new EntityRequest<>();
         request.setEntity(id);
 
-        return platformService.delete(request);
-    }
+		return platformService.delete(request);
+	}
+
+	@ApiOperation(value = "Add Release", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/release/add")
+	public PayloadResponse<String> addReleasePlatform(@RequestBody EntityRequest<ReleaseRequest> request) throws ApiException
+	{
+		final ReleaseRequest addReleaseRequest = request.getEntity();
+		addReleaseRequest.setType(releaseType.Platform.getValue());
+		return releaseService.addRelease(request);
+	}
 }
