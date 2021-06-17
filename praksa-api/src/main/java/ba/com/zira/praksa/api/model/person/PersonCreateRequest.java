@@ -6,11 +6,10 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
-public class Person implements Serializable {
+public class PersonCreateRequest implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Long id;
 	private String firstName;
 	private String lastName;
 	private String information;
@@ -23,11 +22,5 @@ public class Person implements Serializable {
 	private String website;
 	private String twitter;
 	private String aliases;
-	private LocalDateTime created;
-	private String createdBy;
-	private LocalDateTime modified;
-	private String modifiedBy;
-
-	// TODO: Add other POJOs connected once they are all made
 
 }
