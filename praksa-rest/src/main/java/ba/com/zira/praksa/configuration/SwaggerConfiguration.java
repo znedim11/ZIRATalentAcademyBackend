@@ -61,6 +61,12 @@ public class SwaggerConfiguration {
     }
 
     @Bean
+    public Docket mediaApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("media-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.media")).build().tags(new Tag("media", "Media APIs"))
+    }
+    
+    @Bean
     public Docket featureApi() {
         return new Docket(DocumentationType.SWAGGER_2).groupName("feature-api").apiInfo(apiInfo()).select()
                 .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.feature")).build()
