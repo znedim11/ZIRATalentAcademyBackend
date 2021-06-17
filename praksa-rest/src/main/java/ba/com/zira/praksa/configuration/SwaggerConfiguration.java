@@ -61,6 +61,13 @@ public class SwaggerConfiguration {
     }
 
     @Bean
+    public Docket objectApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("object-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.object")).build().tags(new Tag("object", "Object APIs"))
+                .globalOperationParameters(operationParameters);
+    }
+
+    @Bean
     public Docket mediaApi() {
         return new Docket(DocumentationType.SWAGGER_2).groupName("media-api").apiInfo(apiInfo()).select()
                 .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.media")).build().tags(new Tag("media", "Media APIs"))
