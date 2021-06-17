@@ -88,6 +88,13 @@ public class SwaggerConfiguration {
 				.tags(new Tag("link", "LinkMap APIs")).globalOperationParameters(operationParameters);
 	}
 
+    @Bean
+    public Docket mediastoreApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("mediastore-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.mediastore")).build()
+                .tags(new Tag("mediastore", "MediaStore APIs")).globalOperationParameters(operationParameters);
+    }
+
 	@Bean
 	public Docket personApi() {
 		return new Docket(DocumentationType.SWAGGER_2).groupName("person-api").apiInfo(apiInfo()).select()
