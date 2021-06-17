@@ -124,31 +124,10 @@ public class SwaggerConfiguration {
     }
 
     @Bean
-    public Docket mediastoreApi() {
-        return new Docket(DocumentationType.SWAGGER_2).groupName("mediastore-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.mediastore")).build()
-                .tags(new Tag("mediastore", "MediaStore APIs")).globalOperationParameters(operationParameters);
-    }
-
-    @Bean
-    public Docket rssFeedApi() {
-        return new Docket(DocumentationType.SWAGGER_2).groupName("rss-feed-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.rssfeed")).build()
-                .tags(new Tag("rssfeed", "RssFeedAPIs")).globalOperationParameters(operationParameters);
-    }
-
-    @Bean
-    public Docket personApi() {
-        return new Docket(DocumentationType.SWAGGER_2).groupName("person-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.person")).build().tags(new Tag("person", "Person APIs"))
-                .globalOperationParameters(operationParameters);
-    }
-
-    @Bean
-    public Docket releaseApi() {
-        return new Docket(DocumentationType.SWAGGER_2).groupName("release-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.release")).build()
-                .tags(new Tag("release", "Release APIs")).globalOperationParameters(operationParameters);
+    public Docket platformApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("platform-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.platform")).build()
+                .tags(new Tag("platform", "Platform APIs")).globalOperationParameters(operationParameters);
     }
 
     private static ApiInfo apiInfo() {
