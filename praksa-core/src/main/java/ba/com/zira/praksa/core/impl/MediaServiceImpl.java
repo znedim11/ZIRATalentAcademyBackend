@@ -21,7 +21,7 @@ import ba.com.zira.praksa.dao.model.MediaEntity;
 import ba.com.zira.praksa.mapper.MediaMapper;
 
 @Service
-public abstract class MediaServiceImpl implements MediaService {
+public class MediaServiceImpl implements MediaService {
 
     private RequestValidator requestValidator;
     private MediaDAO mediaDAO;
@@ -37,13 +37,13 @@ public abstract class MediaServiceImpl implements MediaService {
     public PagedPayloadResponse<Media> find(final SearchRequest<String> request) throws ApiException {
         requestValidator.validate(request);
 
-        PagedData<MediaEntity> gameModelEntities = mediaDAO.findAll(request.getFilter());
-        final List<Media> gameList = new ArrayList<>();
+        PagedData<MediaEntity> MediaModelEntities = mediaDAO.findAll(request.getFilter());
+        final List<Media> mediaList = new ArrayList<>();
 
-        for (final MediaEntity MediaEntity : gameModelEntities.getRecords()) {
-            gameList.add(mediaMapper.entityToDto(MediaEntity));
+        for (final MediaEntity MediaEntity : MediaModelEntities.getRecords()) {
+            mediaList.add(mediaMapper.entityToDto(MediaEntity));
         }
-        return new PagedPayloadResponse<>(request, ResponseCode.OK, gameList.size(), 1, 1, gameList.size(), gameList);
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, mediaList.size(), 1, 1, mediaList.size(), mediaList);
     }
 
     @Override
