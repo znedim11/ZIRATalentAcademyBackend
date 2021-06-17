@@ -2,7 +2,6 @@ package ba.com.zira.praksa.rest.release;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,15 +32,23 @@ public class ReleaseRestService
 	private PlatformService platformService;
 	private RegionService regionService;
 	private CompanyService companyService;
-	// private ReleaseType releaseType;
+	private ReleaseType releaseType;
 
 	@ApiOperation(value = "Add Release", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@PostMapping(value = "/{releaseType}/release/add")
-	public PayloadResponse<String> addRelease(@PathVariable("releaseType") ReleaseType releaseType,
-			@RequestBody final EntityRequest<ReleaseRequest> request) throws ApiException
+	@PostMapping(value = "/game/release/add")
+	public PayloadResponse<String> addReleaseGame(@RequestBody final EntityRequest<ReleaseRequest> request) throws ApiException
 	{
 		final ReleaseRequest addReleaseRequest = request.getEntity();
-		addReleaseRequest.setType(releaseType.toString());
+		addReleaseRequest.setType(releaseType.Game.toString());
+		return releaseService.addRelease(request);
+	}
+
+	@ApiOperation(value = "Add Release", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/platform/release/add")
+	public PayloadResponse<String> addReleasePlatform(@RequestBody final EntityRequest<ReleaseRequest> request) throws ApiException
+	{
+		final ReleaseRequest addReleaseRequest = request.getEntity();
+		addReleaseRequest.setType(releaseType.Platform.toString());
 		return releaseService.addRelease(request);
 	}
 
