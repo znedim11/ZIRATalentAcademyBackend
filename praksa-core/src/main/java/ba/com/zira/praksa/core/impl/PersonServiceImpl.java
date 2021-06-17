@@ -22,85 +22,92 @@ import ba.com.zira.praksa.core.validation.PersonRequestValidation;
 import ba.com.zira.praksa.dao.PersonDAO;
 import ba.com.zira.praksa.dao.model.PersonEntity;
 import ba.com.zira.praksa.mapper.PersonMapper;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class PersonServiceImpl implements PersonService {
 
-	private RequestValidator requestValidator;
-	private PersonRequestValidation personRequestValidation;
-	private PersonDAO personDAO;
-	private PersonMapper personMapper;
-	private static final String VALIDATION_RULE = "validateAbstractRequest";
+    RequestValidator requestValidator;
+    PersonRequestValidation personRequestValidation;
+    PersonDAO personDAO;
+    PersonMapper personMapper;
+    static final String VALIDATION_RULE = "validateAbstractRequest";
 
-	@Override
-	public PagedPayloadResponse<Person> find(final SearchRequest<String> request) throws ApiException {
-		requestValidator.validate(request);
+    public PersonServiceImpl(RequestValidator requestValidator, PersonRequestValidation personRequestValidation, PersonDAO personDAO,
+            PersonMapper personMapper) {
+        super();
+        this.requestValidator = requestValidator;
+        this.personRequestValidation = personRequestValidation;
+        this.personDAO = personDAO;
+        this.personMapper = personMapper;
+    }
 
-		PagedData<PersonEntity> personModelEntities = personDAO.findAll(request.getFilter());
-		final List<PersonEntity> personEntityList = personModelEntities.getRecords();
+    @Override
+    public PagedPayloadResponse<Person> find(final SearchRequest<String> request) throws ApiException {
+        requestValidator.validate(request);
 
-		final List<Person> personList = personMapper.entityListToDtoList(personEntityList);
+        PagedData<PersonEntity> personModelEntities = personDAO.findAll(request.getFilter());
+        final List<PersonEntity> personEntityList = personModelEntities.getRecords();
 
-		PagedData<Person> data = new PagedData<>();
-		data.setNumberOfPages(personModelEntities.getNumberOfPages());
-		data.setRecords(personList);
-		data.setNumberOfRecords(personModelEntities.getNumberOfRecords());
-		data.setPage(personModelEntities.getPage());
-		data.setRecordsPerPage(personModelEntities.getRecordsPerPage());
-		data.setHasMoreRecords(personModelEntities.hasMoreRecords());
+        final List<Person> personList = personMapper.entityListToDtoList(personEntityList);
 
-		return new PagedPayloadResponse<>(request, ResponseCode.OK, data);
-	}
+        PagedData<Person> data = new PagedData<>();
+        data.setNumberOfPages(personModelEntities.getNumberOfPages());
+        data.setRecords(personList);
+        data.setNumberOfRecords(personModelEntities.getNumberOfRecords());
+        data.setPage(personModelEntities.getPage());
+        data.setRecordsPerPage(personModelEntities.getRecordsPerPage());
+        data.setHasMoreRecords(personModelEntities.hasMoreRecords());
 
-	@Override
-	public PayloadResponse<Person> findById(final SearchRequest<Long> request) throws ApiException {
-		EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
-		personRequestValidation.validatePersonRequest(entityRequest, VALIDATION_RULE);
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, data);
+    }
 
-		final PersonEntity personEntity = personDAO.findByPK(request.getEntity());
+    @Override
+    public PayloadResponse<Person> findById(final SearchRequest<Long> request) throws ApiException {
+        EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
+        personRequestValidation.validatePersonRequest(entityRequest, VALIDATION_RULE);
 
-		return new PayloadResponse<>(request, ResponseCode.OK, personMapper.entityToDto(personEntity));
-	}
+        final PersonEntity personEntity = personDAO.findByPK(request.getEntity());
 
-	@Override
-	@Transactional(rollbackFor = ApiException.class)
-	public PayloadResponse<Person> create(EntityRequest<PersonCreateRequest> request) throws ApiException {
-		personRequestValidation.validatePersonLastName(request, VALIDATION_RULE);
+        return new PayloadResponse<>(request, ResponseCode.OK, personMapper.entityToDto(personEntity));
+    }
 
-		PersonEntity personEntity = personMapper.personCreateToPersonEntity(request.getEntity());
-		personEntity.setCreated(LocalDateTime.now());
-		personEntity.setCreatedBy(request.getUserId());
+    @Override
+    @Transactional(rollbackFor = ApiException.class)
+    public PayloadResponse<Person> create(EntityRequest<PersonCreateRequest> request) throws ApiException {
+        personRequestValidation.validatePersonLastName(request, VALIDATION_RULE);
 
-		personDAO.persist(personEntity);
-		return new PayloadResponse<>(request, ResponseCode.OK, personMapper.entityToDto(personEntity));
-	}
+        PersonEntity personEntity = personMapper.personCreateToPersonEntity(request.getEntity());
+        personEntity.setCreated(LocalDateTime.now());
+        personEntity.setCreatedBy(request.getUserId());
 
-	@Override
-	@Transactional(rollbackFor = ApiException.class)
-	public PayloadResponse<Person> update(final EntityRequest<PersonUpdateRequest> request) throws ApiException {
-		EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity().getId(), request);
-		personRequestValidation.validatePersonRequest(entityRequest, VALIDATION_RULE);
+        personDAO.persist(personEntity);
+        return new PayloadResponse<>(request, ResponseCode.OK, personMapper.entityToDto(personEntity));
+    }
 
-		final PersonUpdateRequest requestEntity = request.getEntity();
-		final PersonEntity personEntity = personMapper.personUpdateToPersonEntity(requestEntity);
-		personEntity.setModified(LocalDateTime.now());
-		personEntity.setModifiedBy(request.getUserId());
+    @Override
+    @Transactional(rollbackFor = ApiException.class)
+    public PayloadResponse<Person> update(final EntityRequest<PersonUpdateRequest> request) throws ApiException {
+        EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity().getId(), request);
+        personRequestValidation.validatePersonRequest(entityRequest, VALIDATION_RULE);
 
-		personDAO.merge(personEntity);
+        final PersonUpdateRequest requestEntity = request.getEntity();
+        final PersonEntity personEntity = personMapper.personUpdateToPersonEntity(requestEntity);
+        personEntity.setModified(LocalDateTime.now());
+        personEntity.setModifiedBy(request.getUserId());
 
-		return new PayloadResponse<>(request, ResponseCode.OK, personMapper.entityToDto(personEntity));
-	}
+        personDAO.merge(personEntity);
 
-	@Override
-	@Transactional(rollbackFor = ApiException.class)
-	public PayloadResponse<String> delete(final EntityRequest<Long> request) throws ApiException {
-		EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
-		personRequestValidation.validatePersonRequest(entityRequest, VALIDATION_RULE);
+        return new PayloadResponse<>(request, ResponseCode.OK, personMapper.entityToDto(personEntity));
+    }
 
-		personDAO.removeByPK(request.getEntity());
-		return new PayloadResponse<>(request, ResponseCode.OK, "Person deleted!");
-	}
+    @Override
+    @Transactional(rollbackFor = ApiException.class)
+    public PayloadResponse<String> delete(final EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
+        personRequestValidation.validatePersonRequest(entityRequest, VALIDATION_RULE);
+
+        personDAO.removeByPK(request.getEntity());
+        return new PayloadResponse<>(request, ResponseCode.OK, "Person deleted!");
+    }
 
 }

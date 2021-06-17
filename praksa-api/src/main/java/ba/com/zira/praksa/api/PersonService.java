@@ -49,7 +49,7 @@ public interface PersonService {
 	 *                      {@link ApiException} will be generated/returned with
 	 *                      corresponding error message and {@link ResponseCode}.
 	 */
-	PayloadResponse<Person> findById(SearchRequest<Long> reguest) throws ApiException;
+	PayloadResponse<Person> findById(SearchRequest<Long> request) throws ApiException;
 
 	/**
 	 * Create {@link Person}. <br>

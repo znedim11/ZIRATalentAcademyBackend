@@ -25,49 +25,48 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class PersonRequestValidation {
 
-	private RequestValidator requestValidator;
-	private PersonDAO personDAO;
+    private RequestValidator requestValidator;
+    private PersonDAO personDAO;
 
-	/**
-	 * Validates findById, create, update, delete Person plan from
-	 * {@link PersonService}.
-	 *
-	 * @param request               the {@link EntityRequest} to validate.
-	 * @param validationRuleMessage name of the validation rule that is going to be
-	 *                              used for validating {@link Person}
-	 *
-	 * @return {@link ValidationResponse}
-	 */
+    /**
+     * Validates findById, create, update, delete Person plan from
+     * {@link PersonService}.
+     *
+     * @param request
+     *            the {@link EntityRequest} to validate.
+     * @param validationRuleMessage
+     *            name of the validation rule that is going to be used for
+     *            validating {@link Person}
+     *
+     * @return {@link ValidationResponse}
+     */
 
-	public ValidationResponse validatePersonRequest(final EntityRequest<Long> request,
-			final String validationRuleMessage) {
-		ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
-		if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-			StringBuilder errorDescription = new StringBuilder();
-			if (!personDAO.existsByPK(request.getEntity())) {
-				errorDescription.append(String.format("Person with id: %d does not exist!", request.getEntity()));
+    public ValidationResponse validatePersonRequest(final EntityRequest<Long> request, final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (!personDAO.existsByPK(request.getEntity())) {
+                errorDescription.append(String.format("Person with id: %d does not exist!", request.getEntity()));
 
-			}
-			validationResponse = requestValidator.createResponse(request, errorDescription);
-		}
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
 
-		return validationResponse;
-	}
+        return validationResponse;
+    }
 
-	public ValidationResponse validatePersonLastName(final EntityRequest<PersonCreateRequest> request,
-			final String validationRuleMessage) {
-		ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
-		if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-			StringBuilder errorDescription = new StringBuilder();
-			if ((request != null)
-					&& ((request.getEntity().getLastName() == null) || (request.getEntity().getLastName().isEmpty()))) {
-				errorDescription.append("Person's last name must be entered!");
+    public ValidationResponse validatePersonLastName(final EntityRequest<PersonCreateRequest> request, final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if ((request != null) && ((request.getEntity().getLastName() == null) || (request.getEntity().getLastName().isEmpty()))) {
+                errorDescription.append("Person's last name must be entered!");
 
-			}
-			validationResponse = requestValidator.createResponse(request, errorDescription);
-		}
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
 
-		return validationResponse;
-	}
+        return validationResponse;
+    }
 
 }

@@ -14,9 +14,9 @@ import ba.com.zira.praksa.api.RssFeedService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-@Api(tags = "rssFeed")
+@Api(tags = "rss-feed")
 @RestController
-@RequestMapping(value = "rssFeed")
+@RequestMapping(value = "rss-feed")
 public class RssFeedRestService {
     @Autowired
     RssFeedService rssFeedService;

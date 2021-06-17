@@ -2,7 +2,6 @@ package ba.com.zira.praksa.mapper;
 
 import java.util.List;
 
-import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -21,21 +20,21 @@ import ba.com.zira.praksa.dao.model.PersonEntity;
 @Mapper(componentModel = "spring")
 public interface PersonMapper {
 
-	@Mapping(target = "modified", ignore = true)
-	@Mapping(target = "modifiedBy", ignore = true)
-	@Mapping(target = "created", ignore = true)
-	@Mapping(target = "createdBy", ignore = true)
-	PersonEntity personUpdateToPersonEntity(PersonUpdateRequest personUpdateModel);
+    @Mapping(target = "modified", ignore = true)
+    @Mapping(target = "modifiedBy", ignore = true)
+    @Mapping(target = "created", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    PersonEntity personUpdateToPersonEntity(PersonUpdateRequest personUpdateModel);
 
-	PersonUpdateRequest personEntityToPersonUpdate(PersonEntity personEntity);
+    PersonUpdateRequest personEntityToPersonUpdate(PersonEntity personEntity);
 
-	@Mapping(target = "created", ignore = true)
-	@Mapping(target = "createdBy", ignore = true)
-	@Mapping(target = "modified", ignore = true)
-	@Mapping(target = "modifiedBy", ignore = true)
-	PersonEntity personCreateToPersonEntity(PersonCreateRequest personCreateModel);
+    @Mapping(target = "created", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "modified", ignore = true)
+    @Mapping(target = "modifiedBy", ignore = true)
+    PersonEntity personCreateToPersonEntity(PersonCreateRequest personCreateModel);
 
-	PersonCreateRequest personEntityToPersonCreate(PersonEntity personEntity);
+    PersonCreateRequest personEntityToPersonCreate(PersonEntity personEntity);
 
     PersonEntity dtoToEntity(Person dto);
 

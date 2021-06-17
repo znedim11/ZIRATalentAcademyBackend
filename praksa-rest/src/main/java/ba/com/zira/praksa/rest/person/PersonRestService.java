@@ -29,57 +29,55 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping(value = "person")
 public class PersonRestService {
 
-	@Autowired
-	private PersonService personService;
+    @Autowired
+    private PersonService personService;
 
-	@ApiOperation(value = "Find Person", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@GetMapping(value = "/find")
-	public PagedPayloadResponse<Person> find(@RequestParam(required = false) final String pagination,
-			@RequestParam(required = false) final String sorting, @RequestParam(required = false) final String filter)
-			throws ApiException {
+    @ApiOperation(value = "Find Person", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/find")
+    public PagedPayloadResponse<Person> find(@RequestParam(required = false) final String pagination,
+            @RequestParam(required = false) final String sorting, @RequestParam(required = false) final String filter) throws ApiException {
 
-		SearchRequest<String> request = new SearchRequest<>();
-		request.setPagination(pagination);
-		request.setFilterExpression(filter);
-		request.setSorting(sorting);
-		return personService.find(request);
-	}
+        SearchRequest<String> request = new SearchRequest<>();
+        request.setPagination(pagination);
+        request.setFilterExpression(filter);
+        request.setSorting(sorting);
+        return personService.find(request);
+    }
 
-	@ApiOperation(value = "Get Person by Id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@GetMapping(value = "/{id}")
-	public PayloadResponse<Person> findById(@PathVariable final Long id) throws ApiException {
+    @ApiOperation(value = "Get Person by Id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}")
+    public PayloadResponse<Person> findById(@PathVariable final Long id) throws ApiException {
 
-		final SearchRequest<Long> request = new SearchRequest<>();
-		request.setEntity(id);
+        final SearchRequest<Long> request = new SearchRequest<>();
+        request.setEntity(id);
 
-		return personService.findById(request);
-	}
+        return personService.findById(request);
+    }
 
-	@ApiOperation(value = "Create Person", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@PostMapping(value = "/create")
-	public PayloadResponse<Person> createPerson(@RequestBody EntityRequest<PersonCreateRequest> request)
-			throws ApiException {
-		return personService.create(request);
-	}
+    @ApiOperation(value = "Create Person", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/create")
+    public PayloadResponse<Person> createPerson(@RequestBody EntityRequest<PersonCreateRequest> request) throws ApiException {
+        return personService.create(request);
+    }
 
-	@ApiOperation(value = "Update Person", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@PutMapping(value = "/{id}")
-	public PayloadResponse<Person> update(@PathVariable final String id,
-			@RequestBody final EntityRequest<PersonUpdateRequest> request) throws ApiException {
+    @ApiOperation(value = "Update Person", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}")
+    public PayloadResponse<Person> update(@PathVariable final String id, @RequestBody final EntityRequest<PersonUpdateRequest> request)
+            throws ApiException {
 
-		final PersonUpdateRequest person = request.getEntity();
-		person.setId(Long.decode(id));
+        final PersonUpdateRequest person = request.getEntity();
+        person.setId(Long.decode(id));
 
-		return personService.update(request);
-	}
+        return personService.update(request);
+    }
 
-	@ApiOperation(value = "Delete Person by Id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@DeleteMapping(value = "/{id}")
-	public void delete(@PathVariable final Long id) throws ApiException {
-		final EntityRequest<Long> request = new EntityRequest<>();
-		request.setEntity(id);
+    @ApiOperation(value = "Delete Person by Id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{id}")
+    public void delete(@PathVariable final Long id) throws ApiException {
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
 
-		personService.delete(request);
-	}
+        personService.delete(request);
+    }
 
 }
