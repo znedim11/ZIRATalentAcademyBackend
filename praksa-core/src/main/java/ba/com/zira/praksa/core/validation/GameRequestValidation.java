@@ -9,6 +9,7 @@ import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.GameService;
 import ba.com.zira.praksa.api.model.game.Game;
 import ba.com.zira.praksa.dao.GameDAO;
+import lombok.AllArgsConstructor;
 
 /**
  * SampleRequestValidation is used for validation of {@link GameService}
@@ -19,15 +20,11 @@ import ba.com.zira.praksa.dao.GameDAO;
  *
  */
 @Component("gameRequestValidation")
+@AllArgsConstructor
 public class GameRequestValidation {
 
-    private RequestValidator requestValidator;
-    private GameDAO gameDAO;
-
-    public GameRequestValidation(final RequestValidator requestValidator, GameDAO gameDAO) {
-        this.requestValidator = requestValidator;
-        this.gameDAO = gameDAO;
-    }
+    RequestValidator requestValidator;
+    GameDAO gameDAO;
 
     /**
      * Validates update Game plan from {@link GameService}.

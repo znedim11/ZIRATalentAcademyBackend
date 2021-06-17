@@ -9,28 +9,15 @@ import lombok.Data;
 public class Game implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
     private Long id;
-
     private String abbriviation;
-
     private LocalDateTime created;
-
     private String createdBy;
-
     private String dlc;
-
     private String fullName;
-
     private String genre;
-
     private String information;
-
     private LocalDateTime modified;
-
     private String modifiedBy;
-
     private String outlineText;
-
-    // TODO: Add other POJOs connected once they are all made
 }

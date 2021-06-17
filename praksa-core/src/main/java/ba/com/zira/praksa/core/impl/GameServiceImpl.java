@@ -1,6 +1,5 @@
 package ba.com.zira.praksa.core.impl;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,11 +23,12 @@ import ba.com.zira.praksa.mapper.GameMapper;
 @Service
 public class GameServiceImpl implements GameService {
 
-    private RequestValidator requestValidator;
-    private GameDAO gameDAO;
-    private GameMapper gameMapper;
+    RequestValidator requestValidator;
+    GameDAO gameDAO;
+    GameMapper gameMapper;
 
-    public GameServiceImpl(final RequestValidator requestValidator, GameDAO gameDAO, GameMapper gameMapper) {
+    public GameServiceImpl(RequestValidator requestValidator, GameDAO gameDAO, GameMapper gameMapper) {
+        super();
         this.requestValidator = requestValidator;
         this.gameDAO = gameDAO;
         this.gameMapper = gameMapper;
@@ -71,7 +71,6 @@ public class GameServiceImpl implements GameService {
     public PayloadResponse<Game> update(final EntityRequest<Game> request) throws ApiException {
         requestValidator.validate(request);
 
-        final LocalDateTime date = LocalDateTime.now();
         final Game game = request.getEntity();
         final GameEntity gameEntity = gameMapper.dtoToEntity(game);
 

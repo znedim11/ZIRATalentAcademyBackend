@@ -1,9 +1,8 @@
 package ba.com.zira.praksa.mapper;
 
-import org.mapstruct.InheritInverseConfiguration;
+import java.util.List;
+
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 import ba.com.zira.praksa.api.model.game.Game;
 import ba.com.zira.praksa.dao.model.GameEntity;
@@ -17,17 +16,10 @@ import ba.com.zira.praksa.dao.model.GameEntity;
 @Mapper(componentModel = "spring")
 public interface GameMapper {
 
-    GameMapper INSTANCE = Mappers.getMapper(GameMapper.class);
+    GameEntity dtoToEntity(Game dto);
 
-    @Mapping(source = "fullName", target = "fullName")
-    Game gameEntityToGame(GameEntity sampleModelEntity);
+    Game entityToDto(GameEntity entity);
 
-    @Mapping(source = "fullName", target = "fullName")
-    GameEntity gameToGameEntity(Game sampleModel);
-
-    GameEntity dtoToEntity(Game sample);
-
-    @InheritInverseConfiguration(name = "dtoToEntity")
-    Game entityToDto(GameEntity billingPeriodEntity);
+    List<Game> entityListToDtoList(List<GameEntity> entityList);
 
 }
