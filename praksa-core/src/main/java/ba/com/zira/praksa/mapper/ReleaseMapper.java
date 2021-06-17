@@ -15,8 +15,9 @@ public interface ReleaseMapper {
 
     ReleaseMapper INSTANCE = Mappers.getMapper(ReleaseMapper.class);
 
-	@Mapping(source = "type", target = "type")
-	ReleaseResponse releaseEntityToRelease(ReleaseEntity sampleModelEntity);
+    @Mapping(source = "type", target = "type")
+    ReleaseResponse releaseEntityToRelease(ReleaseEntity sampleModelEntity);
+
     @Mapping(source = "type", target = "type")
     ReleaseResponseLight releaseEntityToRelease(ReleaseEntity sampleModelEntity);
 
@@ -31,7 +32,8 @@ public interface ReleaseMapper {
 
     @InheritInverseConfiguration(name = "dtoToEntity")
     ReleaseResponseLight entityToDto(ReleaseEntity billingPeriodEntity);
-	@InheritInverseConfiguration(name = "dtoToEntity")
-	ReleaseResponse entityToDto(ReleaseEntity billingPeriodEntity);
+
+    @InheritInverseConfiguration(name = "dtoToEntity")
+    ReleaseResponse entityToDto(ReleaseEntity billingPeriodEntity);
 
 }

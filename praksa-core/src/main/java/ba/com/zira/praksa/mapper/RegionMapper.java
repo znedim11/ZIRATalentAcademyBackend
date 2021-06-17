@@ -12,24 +12,23 @@ import ba.com.zira.praksa.api.model.region.RegionUpdateRequest;
 import ba.com.zira.praksa.dao.model.RegionEntity;
 
 @Mapper(componentModel = "spring")
-public interface RegionMapper
-{
+public interface RegionMapper {
 
-	RegionMapper INSTANCE = Mappers.getMapper(RegionMapper.class);
+    RegionMapper INSTANCE = Mappers.getMapper(RegionMapper.class);
 
-	@Mapping(source = "name", target = "name")
-	RegionResponse regionEntityToRegion(RegionEntity sampleModelEntity);
+    @Mapping(source = "name", target = "name")
+    RegionResponse regionEntityToRegion(RegionEntity sampleModelEntity);
 
-	@Mapping(source = "name", target = "name")
-	RegionEntity regionToRegionEntity(RegionCreateRequest sampleModel);
+    @Mapping(source = "name", target = "name")
+    RegionEntity regionToRegionEntity(RegionCreateRequest sampleModel);
 
-	@Mapping(target = "created", ignore = true)
-	@Mapping(target = "createdBy", ignore = true)
-	void updateForRegionUpdate(RegionUpdateRequest regionModel, @MappingTarget RegionEntity regionEntity);
+    @Mapping(target = "created", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    void updateForRegionUpdate(RegionUpdateRequest regionModel, @MappingTarget RegionEntity regionEntity);
 
-	RegionEntity dtoToEntity(RegionCreateRequest sample);
+    RegionEntity dtoToEntity(RegionCreateRequest sample);
 
-	@InheritInverseConfiguration(name = "dtoToEntity")
-	RegionResponse entityToDto(RegionEntity billingPeriodEntity);
+    @InheritInverseConfiguration(name = "dtoToEntity")
+    RegionResponse entityToDto(RegionEntity billingPeriodEntity);
 
 }
