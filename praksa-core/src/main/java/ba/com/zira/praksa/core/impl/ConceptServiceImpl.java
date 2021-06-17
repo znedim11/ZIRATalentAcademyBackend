@@ -11,20 +11,29 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.ConceptService;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
+import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.api.model.person.Person;
 import ba.com.zira.praksa.core.validation.ConceptRequestValidation;
 import ba.com.zira.praksa.dao.ConceptDAO;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
+import ba.com.zira.praksa.dao.model.GameEntity;
+import ba.com.zira.praksa.dao.model.PersonEntity;
 import ba.com.zira.praksa.mapper.ConceptMapper;
+import ba.com.zira.praksa.mapper.GameMapper;
+import ba.com.zira.praksa.mapper.PersonMapper;
 
 /**
  * @author zira
@@ -41,14 +50,18 @@ public class ConceptServiceImpl implements ConceptService {
     ConceptRequestValidation conceptRequestValidation;
     ConceptDAO conceptDAO;
     ConceptMapper conceptMapper;
+    GameMapper gameMapper;
+    PersonMapper personMapper;
 
     public ConceptServiceImpl(RequestValidator requestValidator, ConceptRequestValidation conceptRequestValidation, ConceptDAO conceptDAO,
-            ConceptMapper conceptMapper) {
+            ConceptMapper conceptMapper, GameMapper gameMapper, PersonMapper personMapper) {
         super();
         this.requestValidator = requestValidator;
         this.conceptRequestValidation = conceptRequestValidation;
         this.conceptDAO = conceptDAO;
         this.conceptMapper = conceptMapper;
+        this.gameMapper = gameMapper;
+        this.personMapper = personMapper;
     }
 
     @Override
@@ -135,6 +148,29 @@ public class ConceptServiceImpl implements ConceptService {
         conceptDAO.removeByPK(request.getEntity());
 
         return new PayloadResponse<>(request, ResponseCode.OK, "Concept deleted!");
+    }
+
+    @Override
+    public ListPayloadResponse<Game> getGamesByConcept(final EntityRequest<Long> request) throws ApiException {
+        List<GameEntity> entityList = conceptDAO.getGamesByConcept(request.getEntity());
+        List<Game> gameList = gameMapper.entityListToDtoList(entityList);
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, gameList);
+    }
+
+    @Override
+    public ListPayloadResponse<Person> getPersonsByConcept(final EntityRequest<Long> request) throws ApiException {
+        List<PersonEntity> entityList = conceptDAO.getPersonsByConcept(request.getEntity());
+        List<Person> personList = personMapper.entityListToDtoList(entityList);
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, personList);
+    }
+
+    @Override
+    public ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException {
+        List<LoV> loVs = conceptDAO.getLoVs(request.getList());
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
     }
 
 }

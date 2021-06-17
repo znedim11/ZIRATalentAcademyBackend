@@ -2,13 +2,18 @@ package ba.com.zira.praksa.api;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
+import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.api.model.person.Person;
 
 /**
  * * Methods used to manipulate {@link ConceptResponse} data. <br>
@@ -93,4 +98,11 @@ public interface ConceptService {
      *             corresponding error message and {@link ResponseCode}.
      */
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<Game> getGamesByConcept(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<Person> getPersonsByConcept(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException;
+
 }
