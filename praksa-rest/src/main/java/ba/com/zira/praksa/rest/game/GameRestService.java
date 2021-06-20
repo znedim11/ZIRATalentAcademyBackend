@@ -15,10 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.GameService;
+import ba.com.zira.praksa.api.model.feature.FeatureResponse;
 import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
+import ba.com.zira.praksa.api.model.gamefeature.GameFeatureResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -74,4 +78,29 @@ public class GameRestService {
         sampleService.delete(request);
     }
 
+    @ApiOperation(value = "Get Features by Game Id.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/get-features/{id}")
+    public ListPayloadResponse<FeatureResponse> getFeatures(@PathVariable final Long id) throws ApiException {
+        final SearchRequest<Long> request = new SearchRequest<>();
+        request.setEntity(id);
+
+        return sampleService.getFeaturesByGame(request);
+    }
+
+    @ApiOperation(value = "Add Feature", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/add-feature")
+    public PayloadResponse<GameFeatureResponse> addFeature(@RequestBody EntityRequest<GameFeatureCreateRequest> request)
+            throws ApiException {
+        return sampleService.addFeature(request);
+    }
+
+    @ApiOperation(value = "Remove Feature", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/remove-feature/{Uuid}")
+    public void removeFeature(@PathVariable final String Uuid) throws ApiException {
+        final EntityRequest<String> request = new EntityRequest<>();
+        request.setEntity(Uuid);
+
+        sampleService.removeFeature(request);
+    }
 }

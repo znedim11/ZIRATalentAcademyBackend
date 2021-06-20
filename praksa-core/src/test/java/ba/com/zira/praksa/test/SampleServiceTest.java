@@ -36,7 +36,8 @@ public class SampleServiceTest extends BasicTestConfiguration {
         this.requestValidator = Mockito.mock(RequestValidator.class);
         this.gameDAO = Mockito.mock(GameDAO.class);
         this.sampleRequestValidation = Mockito.mock(GameRequestValidation.class);
-        this.gameService = new GameServiceImpl(requestValidator, gameDAO, sampleMapper);
+        this.gameService = new GameServiceImpl(requestValidator, sampleRequestValidation, null, gameDAO, null, null, sampleMapper, null,
+                null);
     }
 
     @Test

@@ -3,10 +3,14 @@ package ba.com.zira.praksa.api;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
+import ba.com.zira.praksa.api.model.feature.FeatureResponse;
 import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
+import ba.com.zira.praksa.api.model.gamefeature.GameFeatureResponse;
 
 /**
  * * Methods used to manipulate {@link Game} data. <br>
@@ -91,4 +95,10 @@ public interface GameService {
      *             corresponding error message and {@link ResponseCode}.
      */
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<FeatureResponse> getFeaturesByGame(final SearchRequest<Long> request) throws ApiException;
+
+    PayloadResponse<GameFeatureResponse> addFeature(EntityRequest<GameFeatureCreateRequest> request) throws ApiException;
+
+    PayloadResponse<String> removeFeature(EntityRequest<String> request) throws ApiException;
 }

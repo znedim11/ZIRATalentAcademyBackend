@@ -1,5 +1,7 @@
 package ba.com.zira.praksa.mapper;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -20,7 +22,7 @@ import ba.com.zira.praksa.dao.model.FeatureEntity;
 @Mapper(componentModel = "spring")
 public interface FeatureMapper {
 
-    FeatureEntity dtoToEntity(FeatureResponse featureDto);
+    // FeatureEntity dtoToEntity(FeatureResponse featureDto);
 
     FeatureEntity dtoToEntity(FeatureCreateRequest featureDto);
 
@@ -29,6 +31,8 @@ public interface FeatureMapper {
     void updateDtoToEntity(FeatureUpdateRequest featureDto, @MappingTarget FeatureEntity featureEntity);
 
     FeatureResponse entityToDto(FeatureEntity featureEntity);
+
+    List<FeatureResponse> entitiesToDtos(List<FeatureEntity> featureEntities);
 
     PagedData<FeatureResponse> entitiesToDtos(PagedData<FeatureEntity> featureEntities);
 

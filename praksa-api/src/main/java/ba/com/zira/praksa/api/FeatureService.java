@@ -1,14 +1,20 @@
 package ba.com.zira.praksa.api;
 
+import java.util.Map;
+import java.util.Set;
+
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.praksa.api.model.feature.FeatureCreateRequest;
 import ba.com.zira.praksa.api.model.feature.FeatureResponse;
 import ba.com.zira.praksa.api.model.feature.FeatureUpdateRequest;
+import ba.com.zira.praksa.api.model.game.Game;
 
 /**
  * * Methods used to manipulate Feature data. <br>
@@ -19,8 +25,9 @@ import ba.com.zira.praksa.api.model.feature.FeatureUpdateRequest;
  * <li>{@link #create}</li>
  * <li>{@link #update}</li>
  * <li>{@link #delete}</li>
+ * <li>{@link #getGamesByFeature}</li>
  * </ul>
- *
+ * 
  * @author zira
  *
  */
@@ -98,4 +105,18 @@ public interface FeatureService {
      */
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
 
+    /**
+     * Retrieve list of {@link Game}s from database.
+     *
+     * @param request
+     *            {@link EntityRequest} containing feature id.
+     * @return {@link ListPayloadResponse} for {@link Game}.
+     * @throws ApiException
+     *             If there was a problem during API invocation then.
+     *             {@link ApiException} will be generated/returned with
+     *             corresponding error message and {@link ResponseCode}.
+     */
+    public ListPayloadResponse<Game> getGamesByFeature(final EntityRequest<Long> request) throws ApiException;
+
+    PayloadResponse<Map<String, Set<Game>>> getSetOfGames(ListRequest<Long> request) throws ApiException;
 }
