@@ -59,6 +59,12 @@ public class SwaggerConfiguration {
                 .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.game")).build().tags(new Tag("game", "Game APIs"))
                 .globalOperationParameters(operationParameters);
     }
+    @Bean
+    public Docket locationApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("location-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.game")).build().tags(new Tag("location", "Location APIs"))
+                .globalOperationParameters(operationParameters);
+    }
 
     @Bean
     public Docket mediaApi() {
