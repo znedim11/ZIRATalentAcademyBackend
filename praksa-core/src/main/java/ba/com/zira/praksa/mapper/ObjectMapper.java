@@ -1,5 +1,7 @@
 package ba.com.zira.praksa.mapper;
 
+import java.util.List;
+
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -22,5 +24,7 @@ public interface ObjectMapper {
 
     @InheritInverseConfiguration(name = "dtoToEntity")
     ObjectResponse entityToDto(ObjectEntity sample);
+
+    List<ObjectResponse> entityListToDtoList(List<ObjectEntity> entityList);
 
 }

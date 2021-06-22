@@ -1,13 +1,11 @@
 package ba.com.zira.praksa.core.impl;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import javax.transaction.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Service;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
@@ -22,6 +20,7 @@ import ba.com.zira.praksa.api.model.object.ObjectRequest;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.dao.ObjectDAO;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
+import ba.com.zira.praksa.mapper.ObjectMapper;
 
 @Service
 public class ObjectServiceImpl implements ObjectService {
@@ -41,22 +40,30 @@ public class ObjectServiceImpl implements ObjectService {
         requestValidator.validate(request);
 
         PagedData<ObjectEntity> objectModelEntities = objectDAO.findAll(request.getFilter());
-        final List<ObjectResponse> objectList = new ArrayList<>();
+        final List<ObjectEntity> objectList = objectModelEntities.getRecords();
 
-        // todo
+        final List<ObjectResponse> objectResList = objectMapper.entityListToDtoList(objectList);
 
-        return new PagedPayloadResponse<>(request, ResponseCode.OK, objectList.size(), 1, 1, objectList.size(), objectList);
+        PagedData<ObjectResponse> pagedData = new PagedData<>();
+        pagedData.setNumberOfPages(objectModelEntities.getNumberOfPages());
+        pagedData.setNumberOfRecords(objectModelEntities.getNumberOfRecords());
+        pagedData.setPage(objectModelEntities.getPage());
+        pagedData.setRecords(objectResList);
+        pagedData.setRecordsPerPage(objectModelEntities.getRecordsPerPage());
+
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, pagedData);
     }
 
     @Override
     public PayloadResponse<ObjectResponse> create(EntityRequest<ObjectRequest> request) throws ApiException {
         requestValidator.validate(request);
 
-        // todo
+        ObjectEntity objectEntity = objectMapper.dtoToEntity(request.getEntity());
+        objectEntity.setCreated(LocalDateTime.now());
+        objectEntity.setCreatedBy(request.getUserId());
 
-        ObjectResponse response = new ObjectResponse();
-
-        return new PayloadResponse<>(request, ResponseCode.OK, response);
+        objectDAO.persist(objectEntity);
+        return new PayloadResponse<>(request, ResponseCode.OK, objectMapper.entityToDto(objectEntity));
     }
 
     @Override
@@ -65,10 +72,8 @@ public class ObjectServiceImpl implements ObjectService {
 
         final ObjectEntity objectEntity = objectDAO.findByPK(request.getEntity());
 
-        // todo
-        // final ObjectResponse object = objectMapper.entityToDto(objectEntity);
-        final ObjectResponse object = new ObjectResponse();
-        return new PayloadResponse<>(request, ResponseCode.OK, object);
+        return new PayloadResponse<>(request, ResponseCode.OK, objectMapper.entityToDto(objectEntity));
+
     }
 
     @Transactional(rollbackFor = ApiException.class)
@@ -79,9 +84,17 @@ public class ObjectServiceImpl implements ObjectService {
         final LocalDateTime date = LocalDateTime.now();
         final ObjectRequest object = request.getEntity();
 
+        ObjectEntity entity = objectMapper.dtoToEntity(request.getEntity());
+        entity.setCreated(LocalDateTime.now());
+        entity.setCreatedBy(request.getUserId());
+
+        objectDAO.persist(entity);
+
+        ObjectResponse response = objectMapper.entityToDto(entity);
+
         // todo
-        // final ObjectEntity objectEntity = objectMapper.dtoToEntity(object);
-        final ObjectEntity objectEntity = new ObjectEntity();
+        final ObjectEntity objectEntity = objectMapper.dtoToEntity(object);
+        // final ObjectEntity objectEntity = new ObjectEntity();
 
         objectDAO.merge(objectEntity);
 

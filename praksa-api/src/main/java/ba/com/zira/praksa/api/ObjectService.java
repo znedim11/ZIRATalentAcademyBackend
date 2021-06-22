@@ -84,7 +84,7 @@ public interface ObjectService {
      * exception will be thrown.
      *
      * @param request
-     *            {@link ObjectRequest} for Game Id.
+     *            {@link ObjectRequest} for Object Id.
      * @return {@link PayloadResponse} confirming deletion.
      * @throws ApiException
      *             If there was a problem during API invocation then
