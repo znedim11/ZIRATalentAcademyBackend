@@ -15,9 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.PersonService;
+import ba.com.zira.praksa.api.model.character.CharacterResponse;
+import ba.com.zira.praksa.api.model.concept.ConceptResponse;
+import ba.com.zira.praksa.api.model.game.GameResponse;
+import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
 import ba.com.zira.praksa.api.model.person.PersonCreateRequest;
 import ba.com.zira.praksa.api.model.person.PersonUpdateRequest;
@@ -78,6 +83,45 @@ public class PersonRestService {
         request.setEntity(id);
 
         personService.delete(request);
+    }
+
+    @ApiOperation(value = "Get Games for Person", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/games")
+    public ListPayloadResponse<GameResponse> getGamesForPerson(@PathVariable final Long id) throws ApiException {
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return personService.getGamesForPerson(request);
+    }
+
+    @ApiOperation(value = "Get Concepts for Person", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/concepts")
+    public ListPayloadResponse<ConceptResponse> getConceptsForPerson(@PathVariable final Long id) throws ApiException {
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return personService.getConceptsForPerson(request);
+    }
+
+    @ApiOperation(value = "Get Characters for Person", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/characters")
+    public ListPayloadResponse<CharacterResponse> getCharactersForPerson(@PathVariable final Long id) throws ApiException {
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return personService.getCharactersForPerson(request);
+    }
+
+    @ApiOperation(value = "Get Objects for Person", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/objects")
+    public ListPayloadResponse<ObjectResponse> getObjectsForPerson(@PathVariable final Long id) throws ApiException {
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return personService.getObjectsForPerson(request);
     }
 
 }

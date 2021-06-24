@@ -129,6 +129,20 @@ public class SwaggerConfiguration {
                 .tags(new Tag("platform", "Platform APIs")).globalOperationParameters(operationParameters);
     }
 
+    @Bean
+    public Docket personApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("person-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.person")).build().tags(new Tag("person", "Person APIs"))
+                .globalOperationParameters(operationParameters);
+    }
+
+    @Bean
+    public Docket releaseApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("release-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.release")).build()
+                .tags(new Tag("release", "Release APIs")).globalOperationParameters(operationParameters);
+    }
+
     private static ApiInfo apiInfo() {
         final Contact contact = new Contact("ZIRA", "http://www.zira.com.ba", "info@zira.com.ba");
         ApiInfoBuilder builder = new ApiInfoBuilder();
