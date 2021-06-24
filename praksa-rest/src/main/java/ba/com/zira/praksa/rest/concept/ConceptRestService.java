@@ -166,4 +166,15 @@ public class ConceptRestService {
 
         return conceptService.getLocationsByConcept(request);
     }
+
+    @ApiOperation(value = "Get number of Games by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/gamecount")
+    public PayloadResponse<Long> getNumberOfGamesForConcept(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return conceptService.getNumberOfGamesByConcept(request);
+    }
 }

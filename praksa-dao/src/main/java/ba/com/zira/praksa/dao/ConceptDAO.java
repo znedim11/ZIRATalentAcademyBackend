@@ -81,4 +81,14 @@ public class ConceptDAO extends AbstractDAO<ConceptEntity, Long> {
 
         return query.getResultList();
     }
+
+    public Long getNumberOfGamesByConcept(Long conceptId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT COUNT(g) FROM GameEntity g, LinkMapEntity lm WHERE lm.concept.id = :cId AND lm.game.id = g.id");
+
+        TypedQuery<Long> query = entityManager.createQuery(stringBuilder.toString(), Long.class);
+        query.setParameter("cId", conceptId);
+
+        return query.getSingleResult();
+    }
 }

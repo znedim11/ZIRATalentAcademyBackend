@@ -168,6 +168,9 @@ public class ConceptServiceImpl implements ConceptService {
 
     @Override
     public ListPayloadResponse<GameResponse> getGamesByConcept(final EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
+        conceptRequestValidation.validateConceptExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+
         List<GameEntity> entityList = conceptDAO.getGamesByConcept(request.getEntity());
         List<GameResponse> gameList = gameMapper.gameEntitesToGames(entityList);
 
@@ -176,6 +179,9 @@ public class ConceptServiceImpl implements ConceptService {
 
     @Override
     public ListPayloadResponse<Person> getPersonsByConcept(final EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
+        conceptRequestValidation.validateConceptExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+
         List<PersonEntity> entityList = conceptDAO.getPersonsByConcept(request.getEntity());
         List<Person> personList = personMapper.entityListToDtoList(entityList);
 
@@ -184,6 +190,11 @@ public class ConceptServiceImpl implements ConceptService {
 
     @Override
     public ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException {
+        for (Long item : request.getList()) {
+            EntityRequest<Long> longRequest = new EntityRequest<>(item, request);
+            conceptRequestValidation.validateConceptExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+        }
+
         List<LoV> loVs = conceptDAO.getLoVs(request.getList());
 
         return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
@@ -191,6 +202,9 @@ public class ConceptServiceImpl implements ConceptService {
 
     @Override
     public ListPayloadResponse<ObjectResponse> getObjectsByConcept(EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
+        conceptRequestValidation.validateConceptExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+
         List<ObjectEntity> entityList = conceptDAO.getObjectsByConcept(request.getEntity());
         List<ObjectResponse> objectList = objectMapper.entityListToDtoList(entityList);
 
@@ -199,6 +213,9 @@ public class ConceptServiceImpl implements ConceptService {
 
     @Override
     public ListPayloadResponse<CharacterResponse> getCharactersByConcept(EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
+        conceptRequestValidation.validateConceptExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+
         List<CharacterEntity> entityList = conceptDAO.getCharactersByConcept(request.getEntity());
         List<CharacterResponse> characterList = characterMapper.entityListToDtoList(entityList);
 
@@ -207,10 +224,23 @@ public class ConceptServiceImpl implements ConceptService {
 
     @Override
     public ListPayloadResponse<Location> getLocationsByConcept(EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
+        conceptRequestValidation.validateConceptExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+
         List<LocationEntity> entityList = conceptDAO.getLocationsByConcept(request.getEntity());
         List<Location> locationList = locationMapper.entityListToDtoList(entityList);
 
         return new ListPayloadResponse<>(request, ResponseCode.OK, locationList);
+    }
+
+    @Override
+    public PayloadResponse<Long> getNumberOfGamesByConcept(EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
+        conceptRequestValidation.validateConceptExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+
+        Long numberofGames = conceptDAO.getNumberOfGamesByConcept(request.getEntity());
+
+        return new PayloadResponse<>(request, ResponseCode.OK, numberofGames);
     }
 
 }

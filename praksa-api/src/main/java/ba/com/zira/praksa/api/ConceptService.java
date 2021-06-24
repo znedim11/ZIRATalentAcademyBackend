@@ -114,4 +114,6 @@ public interface ConceptService {
 
     ListPayloadResponse<Location> getLocationsByConcept(final EntityRequest<Long> request) throws ApiException;
 
+    PayloadResponse<Long> getNumberOfGamesByConcept(final EntityRequest<Long> request) throws ApiException;
+
 }
