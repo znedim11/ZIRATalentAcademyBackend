@@ -24,4 +24,8 @@ public class ConceptResponse implements Serializable {
     private String modifiedBy;
 
     private String name;
+
+    private String imageUrl;
+
+    private String outlineString;
 }
