@@ -27,5 +27,5 @@ public class ConceptResponse implements Serializable {
 
     private String imageUrl;
 
-    private String outlineString;
+    private String outline;
 }
