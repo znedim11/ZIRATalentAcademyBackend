@@ -7,6 +7,9 @@ import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.api.model.game.GameCreateRequest;
+import ba.com.zira.praksa.api.model.game.GameResponse;
+import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
 
 /**
  * * Methods used to manipulate {@link Game} data. <br>
@@ -32,7 +35,7 @@ public interface GameService {
      *             {@link ApiException} will be generated/returned with
      *             corresponding error message and {@link ResponseCode}.
      */
-    public PagedPayloadResponse<Game> find(final SearchRequest<String> request) throws ApiException;
+    public PagedPayloadResponse<GameResponse> find(final SearchRequest<String> request) throws ApiException;
 
     /**
      * Retrieve {@link Game} by Id.
@@ -46,21 +49,21 @@ public interface GameService {
      *             {@link ApiException} will be generated/returned with
      *             corresponding error message and {@link ResponseCode}.
      */
-    PayloadResponse<Game> findById(SearchRequest<Long> request) throws ApiException;
+    PayloadResponse<GameResponse> findById(SearchRequest<Long> request) throws ApiException;
 
     /**
      * Create {@link Game}. <br>
      * Method creates Sample if the request is valid.
      *
      * @param request
-     *            {@link EntityRequest} for {@link Game}
-     * @return {@link PayloadResponse} holding created {@link Game}.
+     *            {@link EntityRequest} for {@link GameCreateRequest}
+     * @return {@link PayloadResponse} holding created {@link GameResponse}.
      * @throws ApiException
      *             If there was a problem during API invocation then.
      *             {@link ApiException} will be generated/returned with
      *             corresponding error message and {@link ResponseCode}.
      */
-    PayloadResponse<Game> create(EntityRequest<Game> request) throws ApiException;
+    PayloadResponse<GameResponse> create(EntityRequest<GameCreateRequest> request) throws ApiException;
 
     /**
      * Update existing {@link Game}. <br>
@@ -68,14 +71,14 @@ public interface GameService {
      * database.
      *
      * @param request
-     *            {@link EntityRequest} for {@link Game}
-     * @return {@link PayloadResponse} holding created {@link Game}.
+     *            {@link EntityRequest} for {@link GameUpdateRequest}
+     * @return {@link PayloadResponse} holding created {@link GameResponse}.
      * @throws ApiException
      *             If there was a problem during API invocation then.
      *             {@link ApiException} will be generated/returned with
      *             corresponding error message and {@link ResponseCode}.
      */
-    PayloadResponse<Game> update(final EntityRequest<Game> request) throws ApiException;
+    PayloadResponse<GameResponse> update(final EntityRequest<GameUpdateRequest> request) throws ApiException;
 
     /**
      * Delete {@link Game} from the database. <br>

@@ -9,21 +9,22 @@ import lombok.Data;
 public class Person implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     private Long id;
-    private String aliases;
-    private String city;
-    private String country;
-    private LocalDateTime created;
-    private String createdBy;
+    private String firstName;
+    private String lastName;
+    private String information;
+    private String gender;
     private LocalDateTime dob;
     private LocalDateTime dod;
+    private String city;
+    private String country;
     private String email;
-    private String firstName;
-    private String gender;
-    private String information;
-    private String lastName;
+    private String website;
+    private String twitter;
+    private String aliases;
+    private LocalDateTime created;
+    private String createdBy;
     private LocalDateTime modified;
     private String modifiedBy;
-    private String twitter;
-    private String website;
 }
