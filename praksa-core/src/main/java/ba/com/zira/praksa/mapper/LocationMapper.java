@@ -2,7 +2,6 @@ package ba.com.zira.praksa.mapper;
 
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import ba.com.zira.praksa.api.model.location.Location;
@@ -24,10 +23,8 @@ public interface LocationMapper {
     @InheritInverseConfiguration(name = "dtoToEntity")
     Location entityToDto(LocationEntity billingPeriodEntity);
 
-    @Mapping(source = "fullName", target = "fullName")
     Location locationEntityToLocation(LocationEntity sampleModelEntity);
 
-    @Mapping(source = "fullName", target = "fullName")
     LocationEntity locationToLocationEntity(Location sampleModel);
 
 }
