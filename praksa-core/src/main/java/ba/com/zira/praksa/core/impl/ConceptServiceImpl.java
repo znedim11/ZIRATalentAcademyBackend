@@ -21,18 +21,27 @@ import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.ConceptService;
 import ba.com.zira.praksa.api.model.LoV;
+import ba.com.zira.praksa.api.model.character.CharacterResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
 import ba.com.zira.praksa.api.model.game.GameResponse;
+import ba.com.zira.praksa.api.model.location.Location;
+import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
 import ba.com.zira.praksa.core.validation.ConceptRequestValidation;
 import ba.com.zira.praksa.dao.ConceptDAO;
+import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
+import ba.com.zira.praksa.dao.model.LocationEntity;
+import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
+import ba.com.zira.praksa.mapper.CharacterMapper;
 import ba.com.zira.praksa.mapper.ConceptMapper;
 import ba.com.zira.praksa.mapper.GameMapper;
+import ba.com.zira.praksa.mapper.LocationMapper;
+import ba.com.zira.praksa.mapper.ObjectMapper;
 import ba.com.zira.praksa.mapper.PersonMapper;
 
 /**
@@ -52,9 +61,13 @@ public class ConceptServiceImpl implements ConceptService {
     ConceptMapper conceptMapper;
     GameMapper gameMapper;
     PersonMapper personMapper;
+    ObjectMapper objectMapper;
+    CharacterMapper characterMapper;
+    LocationMapper locationMapper;
 
     public ConceptServiceImpl(RequestValidator requestValidator, ConceptRequestValidation conceptRequestValidation, ConceptDAO conceptDAO,
-            ConceptMapper conceptMapper, GameMapper gameMapper, PersonMapper personMapper) {
+            ConceptMapper conceptMapper, GameMapper gameMapper, PersonMapper personMapper, ObjectMapper objectMapper,
+            CharacterMapper characterMapper, LocationMapper locationMapper) {
         super();
         this.requestValidator = requestValidator;
         this.conceptRequestValidation = conceptRequestValidation;
@@ -62,6 +75,9 @@ public class ConceptServiceImpl implements ConceptService {
         this.conceptMapper = conceptMapper;
         this.gameMapper = gameMapper;
         this.personMapper = personMapper;
+        this.objectMapper = objectMapper;
+        this.characterMapper = characterMapper;
+        this.locationMapper = locationMapper;
     }
 
     @Override
@@ -171,6 +187,30 @@ public class ConceptServiceImpl implements ConceptService {
         List<LoV> loVs = conceptDAO.getLoVs(request.getList());
 
         return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
+    }
+
+    @Override
+    public ListPayloadResponse<ObjectResponse> getObjectsByConcept(EntityRequest<Long> request) throws ApiException {
+        List<ObjectEntity> entityList = conceptDAO.getObjectsByConcept(request.getEntity());
+        List<ObjectResponse> objectList = objectMapper.entityListToDtoList(entityList);
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, objectList);
+    }
+
+    @Override
+    public ListPayloadResponse<CharacterResponse> getCharactersByConcept(EntityRequest<Long> request) throws ApiException {
+        List<CharacterEntity> entityList = conceptDAO.getCharactersByConcept(request.getEntity());
+        List<CharacterResponse> characterList = characterMapper.entityListToDtoList(entityList);
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, characterList);
+    }
+
+    @Override
+    public ListPayloadResponse<Location> getLocationsByConcept(EntityRequest<Long> request) throws ApiException {
+        List<LocationEntity> entityList = conceptDAO.getLocationsByConcept(request.getEntity());
+        List<Location> locationList = locationMapper.entityListToDtoList(entityList);
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, locationList);
     }
 
 }

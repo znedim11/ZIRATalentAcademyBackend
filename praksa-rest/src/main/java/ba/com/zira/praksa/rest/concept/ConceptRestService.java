@@ -27,10 +27,13 @@ import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.ConceptService;
 import ba.com.zira.praksa.api.model.LoV;
+import ba.com.zira.praksa.api.model.character.CharacterResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
 import ba.com.zira.praksa.api.model.game.GameResponse;
+import ba.com.zira.praksa.api.model.location.Location;
+import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -131,4 +134,36 @@ public class ConceptRestService {
         return conceptService.getLoVs(request);
     }
 
+    @ApiOperation(value = "Get Objects by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/objects")
+    public ListPayloadResponse<ObjectResponse> getObjectsByConcept(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return conceptService.getObjectsByConcept(request);
+    }
+
+    @ApiOperation(value = "Get Characters by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/characters")
+    public ListPayloadResponse<CharacterResponse> getCharactersByConcept(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return conceptService.getCharactersByConcept(request);
+    }
+
+    @ApiOperation(value = "Get Locations by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/locations")
+    public ListPayloadResponse<Location> getLocationsByConcept(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return conceptService.getLocationsByConcept(request);
+    }
 }

@@ -1,6 +1,7 @@
 package ba.com.zira.praksa.mapper;
 
-import org.mapstruct.InheritInverseConfiguration;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -20,11 +21,8 @@ public interface LocationMapper {
 
     LocationEntity dtoToEntity(Location sample);
 
-    @InheritInverseConfiguration(name = "dtoToEntity")
     Location entityToDto(LocationEntity billingPeriodEntity);
 
-    Location locationEntityToLocation(LocationEntity sampleModelEntity);
-
-    LocationEntity locationToLocationEntity(Location sampleModel);
+    List<Location> entityListToDtoList(List<LocationEntity> entityList);
 
 }
