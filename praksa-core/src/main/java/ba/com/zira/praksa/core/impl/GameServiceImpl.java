@@ -18,7 +18,9 @@ import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.GameService;
 import ba.com.zira.praksa.api.model.feature.FeatureResponse;
-import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.api.model.game.GameCreateRequest;
+import ba.com.zira.praksa.api.model.game.GameResponse;
+import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureResponse;
 import ba.com.zira.praksa.core.validation.FeatureRequestValidation;
@@ -62,49 +64,49 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public PagedPayloadResponse<Game> find(final SearchRequest<String> request) throws ApiException {
+    public PagedPayloadResponse<GameResponse> find(final SearchRequest<String> request) throws ApiException {
         requestValidator.validate(request);
 
         PagedData<GameEntity> gameModelEntities = gameDAO.findAll(request.getFilter());
-        final List<Game> gameList = new ArrayList<>();
+        final List<GameResponse> gameList = new ArrayList<>();
 
         for (final GameEntity GameEntity : gameModelEntities.getRecords()) {
-            gameList.add(gameMapper.entityToDto(GameEntity));
+            gameList.add(gameMapper.gameEntityToGame(GameEntity));
         }
         return new PagedPayloadResponse<>(request, ResponseCode.OK, gameList.size(), 1, 1, gameList.size(), gameList);
     }
 
     @Override
-    @Transactional(rollbackFor = ApiException.class)
-    public PayloadResponse<Game> create(EntityRequest<Game> request) throws ApiException {
+    public PayloadResponse<GameResponse> create(EntityRequest<GameCreateRequest> request) throws ApiException {
         requestValidator.validate(request);
         GameEntity entity = gameMapper.dtoToEntity(request.getEntity());
         gameDAO.persist(entity);
-        Game response = gameMapper.entityToDto(entity);
+        GameResponse response = gameMapper.gameEntityToGame(entity);
         return new PayloadResponse<>(request, ResponseCode.OK, response);
     }
 
     @Override
-    public PayloadResponse<Game> findById(final SearchRequest<Long> request) throws ApiException {
+    public PayloadResponse<GameResponse> findById(final SearchRequest<Long> request) throws ApiException {
         requestValidator.validate(request);
 
         final GameEntity gameEntity = gameDAO.findByPK(request.getEntity());
 
-        final Game game = gameMapper.entityToDto(gameEntity);
+        final GameResponse game = gameMapper.gameEntityToGame(gameEntity);
         return new PayloadResponse<>(request, ResponseCode.OK, game);
     }
 
-    @Override
     @Transactional(rollbackFor = ApiException.class)
-    public PayloadResponse<Game> update(final EntityRequest<Game> request) throws ApiException {
+    @Override
+    public PayloadResponse<GameResponse> update(final EntityRequest<GameUpdateRequest> request) throws ApiException {
         requestValidator.validate(request);
 
-        final Game game = request.getEntity();
-        final GameEntity gameEntity = gameMapper.dtoToEntity(game);
+        final GameUpdateRequest game = request.getEntity();
+        GameEntity gameEntity = gameDAO.findByPK(game.getId());
+        gameMapper.updateForGameUpdate(game, gameEntity);
 
         gameDAO.merge(gameEntity);
 
-        return new PayloadResponse<>(request, ResponseCode.OK, game);
+        return new PayloadResponse<>(request, ResponseCode.OK, gameMapper.gameEntityToGame(gameEntity));
 
     }
 

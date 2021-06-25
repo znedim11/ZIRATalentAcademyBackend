@@ -59,6 +59,19 @@ public class SwaggerConfiguration {
                 .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.game")).build().tags(new Tag("game", "Game APIs"))
                 .globalOperationParameters(operationParameters);
     }
+    @Bean
+    public Docket locationApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("location-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.game")).build().tags(new Tag("location", "Location APIs"))
+                .globalOperationParameters(operationParameters);
+    }
+
+    @Bean
+    public Docket mediaApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("media-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.media")).build().tags(new Tag("media", "Media APIs"))
+                .globalOperationParameters(operationParameters);
+    }
 
     @Bean
     public Docket featureApi() {
@@ -68,10 +81,31 @@ public class SwaggerConfiguration {
     }
 
     @Bean
+    public Docket franchiseApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("franchise-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.franchise")).build()
+                .tags(new Tag("franchise", "Franchise APIs")).globalOperationParameters(operationParameters);
+    }
+
+    @Bean
+    public Docket regionApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("region-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.region")).build().tags(new Tag("region", "Region APIs"))
+                .globalOperationParameters(operationParameters);
+    }
+
+    @Bean
     public Docket reviewApi() {
         return new Docket(DocumentationType.SWAGGER_2).groupName("externalReview-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.externalReview")).build()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.externalreview")).build()
                 .tags(new Tag("externalReview", "ExternalReview APIs")).globalOperationParameters(operationParameters);
+    }
+
+    @Bean
+    public Docket companyApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("company-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.company")).build()
+                .tags(new Tag("company", "Company APIs")).globalOperationParameters(operationParameters);
     }
 
     @Bean
@@ -86,6 +120,27 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SWAGGER_2).groupName("link-map-api").apiInfo(apiInfo()).select()
                 .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.linkmap")).build().tags(new Tag("link", "LinkMap APIs"))
                 .globalOperationParameters(operationParameters);
+    }
+
+    @Bean
+    public Docket platformApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("platform-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.platform")).build()
+                .tags(new Tag("platform", "Platform APIs")).globalOperationParameters(operationParameters);
+    }
+
+    @Bean
+    public Docket personApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("person-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.person")).build().tags(new Tag("person", "Person APIs"))
+                .globalOperationParameters(operationParameters);
+    }
+
+    @Bean
+    public Docket releaseApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("release-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.release")).build()
+                .tags(new Tag("release", "Release APIs")).globalOperationParameters(operationParameters);
     }
 
     private static ApiInfo apiInfo() {

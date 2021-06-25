@@ -13,6 +13,7 @@ import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.GameService;
 import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.core.impl.GameServiceImpl;
 import ba.com.zira.praksa.core.validation.FeatureRequestValidation;
 import ba.com.zira.praksa.core.validation.GameRequestValidation;
@@ -60,7 +61,7 @@ public class SampleServiceTest extends BasicTestConfiguration {
         try {
             Game sampleModel = new Game();
             SearchRequest<String> request = new SearchRequest();
-            PagedPayloadResponse<Game> response = gameService.find(request);
+            PagedPayloadResponse<GameResponse> response = gameService.find(request);
 
             Mockito.verify(gameDAO).persist(Mockito.any());
             // assert
