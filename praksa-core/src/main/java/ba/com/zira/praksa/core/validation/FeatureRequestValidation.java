@@ -12,7 +12,6 @@ import ba.com.zira.praksa.api.model.feature.FeatureCreateRequest;
 import ba.com.zira.praksa.api.model.feature.FeatureUpdateRequest;
 import ba.com.zira.praksa.dao.FeatureDAO;
 import ba.com.zira.praksa.mapper.FeatureMapper;
-import lombok.AllArgsConstructor;
 
 /**
  * FeatureRequestValidation is used for validation of {@link FeatureService}
@@ -21,13 +20,19 @@ import lombok.AllArgsConstructor;
  * @author zira
  *
  */
-@AllArgsConstructor
 @Component("featureRequestValidation")
 public class FeatureRequestValidation {
 
     RequestValidator requestValidator;
     FeatureDAO featureDAO;
     FeatureMapper featureMapper;
+
+    public FeatureRequestValidation(RequestValidator requestValidator, FeatureDAO featureDAO, FeatureMapper featureMapper) {
+        super();
+        this.requestValidator = requestValidator;
+        this.featureDAO = featureDAO;
+        this.featureMapper = featureMapper;
+    }
 
     /**
      * Validates if Feature exists in database.
@@ -36,7 +41,7 @@ public class FeatureRequestValidation {
      *            the {@link EntityRequest} to validate.
      * @param validationRuleMessage
      *            name of the validation rule that is going to be used for
-     *            validating {@link FeatureCreateRequest}
+     *            validating Feature Id
      *
      * @return {@link ValidationResponse}
      */

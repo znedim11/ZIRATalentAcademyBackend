@@ -34,6 +34,10 @@ import ba.com.zira.praksa.api.model.location.Location;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
 import ba.com.zira.praksa.api.model.release.ReleaseRequest;
+import ba.com.zira.praksa.api.model.feature.FeatureResponse;
+import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
+import ba.com.zira.praksa.api.model.gamefeature.GameFeatureResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -92,6 +96,31 @@ public class GameRestService {
         gameService.delete(request);
     }
 
+    @ApiOperation(value = "Get Features by Game Id.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/get-features/{id}")
+    public PagedPayloadResponse<FeatureResponse> getFeatures(@PathVariable final Long id) throws ApiException {
+        final SearchRequest<Long> request = new SearchRequest<>();
+        request.setEntity(id);
+
+        return gameService.getFeaturesByGame(request);
+    }
+
+    @ApiOperation(value = "Add Feature", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/add-feature")
+    public PayloadResponse<GameFeatureResponse> addFeature(@RequestBody EntityRequest<GameFeatureCreateRequest> request)
+            throws ApiException {
+        return gameService.addFeature(request);
+    }
+
+    @ApiOperation(value = "Remove Feature", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/remove-feature/{uuid}")
+    public void removeFeature(@PathVariable final String uuid) throws ApiException {
+        final EntityRequest<String> request = new EntityRequest<>();
+        request.setEntity(uuid);
+
+        gameService.removeFeature(request);
+    }
     @ApiOperation(value = "Add Release", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/release/add")
     public PayloadResponse<String> addReleaseGame(@RequestBody final EntityRequest<ReleaseRequest> request) throws ApiException {
