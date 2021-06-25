@@ -7,6 +7,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import ba.com.zira.commons.model.PagedData;
+import ba.com.zira.praksa.api.model.game.Game;
 import ba.com.zira.praksa.api.model.game.GameCreateRequest;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
@@ -29,6 +31,8 @@ public interface GameMapper {
     @Mapping(source = "fullName", target = "fullName")
     GameEntity gameToGameEntity(GameCreateRequest gameModel);
 
+    PagedData<Game> entitiesToDtos(PagedData<GameEntity> gameEntities);
+
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     void updateForGameUpdate(GameUpdateRequest gameModel, @MappingTarget GameEntity gameEntity);
@@ -36,6 +40,8 @@ public interface GameMapper {
     GameEntity responseToEntity(GameResponse gameResponse);
 
     GameEntity dtoToEntity(GameCreateRequest gameRequest);
+
+    Game entityToDto(GameEntity gameEntity);
 
     List<GameResponse> gameEntitesToGames(List<GameEntity> gameEnts);
 
