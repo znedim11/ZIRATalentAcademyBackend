@@ -103,10 +103,10 @@ public class FeatureRestService {
 
     @ApiOperation(value = "Get Set of Games by Set of Features", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping(value = "/setofgames")
+    @GetMapping(value = "/set-of-games")
     public PayloadResponse<Map<String, Set<Game>>> getSetOfGamesByFeature(@RequestParam(required = false) final List<Long> ids)
             throws ApiException {
-        ListRequest<Long> request = new ListRequest<Long>();
+        ListRequest<Long> request = new ListRequest<>();
         request.setList(ids);
 
         return featureService.getSetOfGames(request);

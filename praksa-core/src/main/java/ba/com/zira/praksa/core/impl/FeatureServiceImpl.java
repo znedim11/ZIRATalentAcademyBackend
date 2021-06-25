@@ -148,10 +148,7 @@ public class FeatureServiceImpl implements FeatureService {
 
         List<LoV> featureLoVs = featureDAO.getLoVs(request.getList());
 
-        List<Long> featureIds = new ArrayList<Long>();
-        for (LoV f : featureLoVs) {
-            featureIds.add(f.getId());
-        }
+        List<Long> featureIds = featureLoVs.stream().map(LoV::getId).collect(Collectors.toList());
 
         List<GameFeatureEntity> gameFeatures = gameFeatureDAO.findbyFeatures(featureIds);
 
@@ -159,23 +156,23 @@ public class FeatureServiceImpl implements FeatureService {
 
         // Creates Map (Key = GameEntity, Entry = List of Features Names)
         // grouped by GameEntity
-        Map<GameEntity, List<String>> GFMapGame = gameFeatures.stream().flatMap(gf -> {
+        Map<GameEntity, List<String>> gfMapGame = gameFeatures.stream().flatMap(gf -> {
             Map<GameEntity, String> temp = new HashMap<>();
             temp.put(gf.getGame(), gf.getFeature().getName());
             return temp.entrySet().stream();
         }).collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
 
-        GFMapGame.forEach((game, features) -> features.sort(null));
+        gfMapGame.forEach((game, features) -> features.sort(null));
 
         // Converts Entries(List<Strign>) to String(Format: "name1#name2#nameN")
         // and adds it to corresponding game
-        Map<GameEntity, String> GFStringMap = new HashMap<GameEntity, String>();
-        for (GameEntity game : GFMapGame.keySet()) {
-            String temp = "";
-            for (String value : GFMapGame.get(game)) {
-                temp += value + "#";
+        Map<GameEntity, String> gfStringMap = new HashMap<>();
+        for (Map.Entry<GameEntity, List<String>> game : gfMapGame.entrySet()) {
+            StringBuilder temp = new StringBuilder();
+            for (String value : gfMapGame.get(game.getKey())) {
+                temp.append(value + "#");
             }
-            GFStringMap.put(game, temp.substring(0, temp.length() - 1));
+            gfStringMap.put(game.getKey(), temp.substring(0, temp.length() - 1));
         }
 
         Map<String, Set<Game>> gamesMap = new HashMap<>();
@@ -183,10 +180,10 @@ public class FeatureServiceImpl implements FeatureService {
             gamesMap.put(set, new HashSet<>());
         }
 
-        for (GameEntity game : GFStringMap.keySet()) {
-            for (String fetureSet : combinations) {
-                if (GFStringMap.get(game).contains(fetureSet)) {
-                    gamesMap.get(fetureSet).add(gameMapper.entityToDto(game));
+        for (Map.Entry<GameEntity, String> game : gfStringMap.entrySet()) {
+            for (String featureSet : combinations) {
+                if (gfStringMap.get(game.getKey()).contains(featureSet)) {
+                    gamesMap.get(featureSet).add(gameMapper.entityToDto(game.getKey()));
                 }
             }
         }
@@ -196,8 +193,8 @@ public class FeatureServiceImpl implements FeatureService {
 
     // Private Help Methods
     private List<String> getAllCombinations(List<LoV> sequence) {
-        List<String> result = new ArrayList<String>();
-        List<String> combinations = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
+        List<String> combinations = new ArrayList<>();
 
         String[] data = new String[sequence.size()];
         for (int r = 1; r <= sequence.size(); r++) {
@@ -211,11 +208,10 @@ public class FeatureServiceImpl implements FeatureService {
 
     private void getCombination(List<LoV> sequence, List<String> combinations, String[] data, int start, int end, int index, int r) {
         if (index == r) {
-            String temp = "";
+            StringBuilder temp = new StringBuilder();
             for (int j = 0; j < r; j++) {
-                temp += data[j] + "#";
+                temp.append(data[j] + "#");
             }
-
             combinations.add(temp.substring(0, temp.length() - 1));
         }
 
