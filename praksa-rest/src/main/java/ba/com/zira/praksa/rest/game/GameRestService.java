@@ -27,17 +27,16 @@ import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.character.CharacterResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.enums.ReleaseType;
+import ba.com.zira.praksa.api.model.feature.FeatureResponse;
 import ba.com.zira.praksa.api.model.game.GameCreateRequest;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
+import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
+import ba.com.zira.praksa.api.model.gamefeature.GameFeatureResponse;
 import ba.com.zira.praksa.api.model.location.Location;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
 import ba.com.zira.praksa.api.model.release.ReleaseRequest;
-import ba.com.zira.praksa.api.model.feature.FeatureResponse;
-import ba.com.zira.praksa.api.model.game.Game;
-import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
-import ba.com.zira.praksa.api.model.gamefeature.GameFeatureResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -121,6 +120,7 @@ public class GameRestService {
 
         gameService.removeFeature(request);
     }
+
     @ApiOperation(value = "Add Release", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/release/add")
     public PayloadResponse<String> addReleaseGame(@RequestBody final EntityRequest<ReleaseRequest> request) throws ApiException {
@@ -129,8 +129,8 @@ public class GameRestService {
         return releaseService.addRelease(request);
     }
 
-    @ApiOperation(value = "Get Games by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping(value = "/{id}/games")
+    @ApiOperation(value = "Get Concepts by Game", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/concepts")
     public ListPayloadResponse<ConceptResponse> getGamesByGame(@PathVariable final Long id) throws ApiException {
 
         final EntityRequest<Long> request = new EntityRequest<>();
@@ -139,8 +139,7 @@ public class GameRestService {
         return gameService.getConceptsByGame(request);
     }
 
-    @ApiOperation(value = "Get Persons by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Persons by Game", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}/persons")
     public ListPayloadResponse<Person> getPersonsByGame(@PathVariable final Long id) throws ApiException {
 
@@ -150,8 +149,7 @@ public class GameRestService {
         return gameService.getPersonsByGame(request);
     }
 
-    @ApiOperation(value = "Get Concept names by Ids.", consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Game names by Ids", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/lovs")
     public ListPayloadResponse<LoV> getLoVs(@RequestParam(required = false) final List<Long> ids) throws ApiException {
 
@@ -161,8 +159,7 @@ public class GameRestService {
         return gameService.getLoVs(request);
     }
 
-    @ApiOperation(value = "Get Objects by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Objects by Game", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}/objects")
     public ListPayloadResponse<ObjectResponse> getObjectsByGame(@PathVariable final Long id) throws ApiException {
 
@@ -172,7 +169,7 @@ public class GameRestService {
         return gameService.getObjectsByGame(request);
     }
 
-    @ApiOperation(value = "Get Characters by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
+    @ApiOperation(value = "Get Characters by Game", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}/characters")
     public ListPayloadResponse<CharacterResponse> getCharactersByGame(@PathVariable final Long id) throws ApiException {
@@ -183,8 +180,7 @@ public class GameRestService {
         return gameService.getCharactersByGame(request);
     }
 
-    @ApiOperation(value = "Get Locations by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Locations by Game", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}/locations")
     public ListPayloadResponse<Location> getLocationsByGame(@PathVariable final Long id) throws ApiException {
 
@@ -194,10 +190,10 @@ public class GameRestService {
         return gameService.getLocationsByGame(request);
     }
 
-    @ApiOperation(value = "Get number of Games by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
+    @ApiOperation(value = "Get number of Releases by Game", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping(value = "/{id}/gamecount")
-    public PayloadResponse<Long> getNumberOfGamesForConcept(@PathVariable final Long id) throws ApiException {
+    @GetMapping(value = "/{id}/releasecount")
+    public PayloadResponse<Long> getNumberOfReleasesByGame(@PathVariable final Long id) throws ApiException {
 
         final EntityRequest<Long> request = new EntityRequest<>();
         request.setEntity(id);

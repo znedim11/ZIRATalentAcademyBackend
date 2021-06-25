@@ -77,7 +77,8 @@ public class GameServiceImpl implements GameService {
 
     public GameServiceImpl(RequestValidator requestValidator, GameRequestValidation gameRequestValidation,
             FeatureRequestValidation featureRequestValidation, GameDAO gameDAO, FeatureDAO featureDAO, GameFeatureDAO gameFeatureDAO,
-            GameMapper gameMapper, FeatureMapper featureMapper, GameFeatureMapper gameFeatureMapper) {
+            GameMapper gameMapper, FeatureMapper featureMapper, GameFeatureMapper gameFeatureMapper, ConceptMapper conceptMapper,
+            PersonMapper personMapper, ObjectMapper objectMapper, CharacterMapper characterMapper, LocationMapper locationMapper) {
         super();
         this.requestValidator = requestValidator;
         this.gameRequestValidation = gameRequestValidation;
@@ -88,6 +89,11 @@ public class GameServiceImpl implements GameService {
         this.gameMapper = gameMapper;
         this.featureMapper = featureMapper;
         this.gameFeatureMapper = gameFeatureMapper;
+        this.conceptMapper = conceptMapper;
+        this.personMapper = personMapper;
+        this.objectMapper = objectMapper;
+        this.characterMapper = characterMapper;
+        this.locationMapper = locationMapper;
     }
 
     @Override

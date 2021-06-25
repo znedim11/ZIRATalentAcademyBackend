@@ -20,9 +20,14 @@ import ba.com.zira.praksa.core.validation.GameRequestValidation;
 import ba.com.zira.praksa.dao.FeatureDAO;
 import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.GameFeatureDAO;
+import ba.com.zira.praksa.mapper.CharacterMapper;
+import ba.com.zira.praksa.mapper.ConceptMapper;
 import ba.com.zira.praksa.mapper.FeatureMapper;
 import ba.com.zira.praksa.mapper.GameFeatureMapper;
 import ba.com.zira.praksa.mapper.GameMapper;
+import ba.com.zira.praksa.mapper.LocationMapper;
+import ba.com.zira.praksa.mapper.ObjectMapper;
+import ba.com.zira.praksa.mapper.PersonMapper;
 import ba.com.zira.praksa.test.configuration.ApplicationTestConfiguration;
 import ba.com.zira.praksa.test.configuration.BasicTestConfiguration;
 
@@ -44,6 +49,12 @@ public class SampleServiceTest extends BasicTestConfiguration {
     private FeatureRequestValidation featureRequestValidation;
     private GameService gameService;
 
+    private ConceptMapper conceptMapper;
+    private PersonMapper personMapper;
+    private ObjectMapper objectMapper;
+    private CharacterMapper characterMapper;
+    private LocationMapper locationMapper;
+
     @BeforeMethod
     public void beforeMethod() throws ApiException {
         this.requestValidator = Mockito.mock(RequestValidator.class);
@@ -52,8 +63,14 @@ public class SampleServiceTest extends BasicTestConfiguration {
         this.gameFeatureDAO = Mockito.mock(GameFeatureDAO.class);
         this.sampleRequestValidation = Mockito.mock(GameRequestValidation.class);
         this.featureRequestValidation = Mockito.mock(FeatureRequestValidation.class);
+        this.conceptMapper = Mockito.mock(ConceptMapper.class);
+        this.personMapper = Mockito.mock(PersonMapper.class);
+        this.objectMapper = Mockito.mock(ObjectMapper.class);
+        this.characterMapper = Mockito.mock(CharacterMapper.class);
+        this.locationMapper = Mockito.mock(LocationMapper.class);
         this.gameService = new GameServiceImpl(requestValidator, sampleRequestValidation, featureRequestValidation, gameDAO, featureDAO,
-                gameFeatureDAO, sampleMapper, featureMapper, gameFeatureMapper);
+                gameFeatureDAO, sampleMapper, featureMapper, gameFeatureMapper, conceptMapper, personMapper, objectMapper, characterMapper,
+                locationMapper);
     }
 
     @Test
