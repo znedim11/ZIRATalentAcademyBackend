@@ -50,4 +50,17 @@ public class GameRequestValidation {
         return validationResponse;
     }
 
+    public ValidationResponse validateGameExists(EntityRequest<Long> request, String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (!gameDAO.existsByPK(request.getEntity())) {
+                errorDescription.append("Game with id ").append(request.getEntity()).append(" does not exist !");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+
+        return validationResponse;
+    }
+
 }

@@ -2,14 +2,22 @@ package ba.com.zira.praksa.api;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
+import ba.com.zira.praksa.api.model.LoV;
+import ba.com.zira.praksa.api.model.character.CharacterResponse;
+import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.game.Game;
 import ba.com.zira.praksa.api.model.game.GameCreateRequest;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
+import ba.com.zira.praksa.api.model.location.Location;
+import ba.com.zira.praksa.api.model.object.ObjectResponse;
+import ba.com.zira.praksa.api.model.person.Person;
 
 /**
  * * Methods used to manipulate {@link Game} data. <br>
@@ -94,4 +102,18 @@ public interface GameService {
      *             corresponding error message and {@link ResponseCode}.
      */
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<ConceptResponse> getConceptsByGame(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<Person> getPersonsByGame(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<ObjectResponse> getObjectsByGame(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<CharacterResponse> getCharactersByGame(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<Location> getLocationsByGame(final EntityRequest<Long> request) throws ApiException;
+
+    PayloadResponse<Long> getNumberOfReleasesByGame(EntityRequest<Long> request) throws ApiException;
 }
