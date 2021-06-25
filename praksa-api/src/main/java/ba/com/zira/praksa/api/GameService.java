@@ -3,7 +3,6 @@ package ba.com.zira.praksa.api;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
-import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
@@ -42,7 +41,7 @@ public interface GameService {
      * Retrieve {@link Game} by Id.
      *
      * @param request
-     *            {@link SearchRequest} for Sample Id and additional pagination
+     *            {@link SearchRequest} for Game Id and additional pagination
      *            and sorting information.
      * @return {@link PayloadResponse} for {@link Game}.
      * @throws ApiException
@@ -54,7 +53,7 @@ public interface GameService {
 
     /**
      * Create {@link Game}. <br>
-     * Method creates Sample if the request is valid.
+     * Method creates Game if the request is valid.
      *
      * @param request
      *            {@link EntityRequest} for {@link Game}
@@ -68,7 +67,7 @@ public interface GameService {
 
     /**
      * Update existing {@link Game}. <br>
-     * Method validates if Sample exists and if the request is valid update
+     * Method validates if Game exists and if the request is valid update
      * database.
      *
      * @param request
@@ -96,9 +95,46 @@ public interface GameService {
      */
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
 
-    ListPayloadResponse<FeatureResponse> getFeaturesByGame(final SearchRequest<Long> request) throws ApiException;
+    /**
+     * Retrieve {@link FeatureResponse}s by Games Ids.
+     *
+     * @param request
+     *            {@link SearchRequest} for Games Ids and additional pagination
+     *            and sorting information.
+     * @return {@link PagedPayloadResponse} for {@link FeatureResponse}.
+     * @throws ApiException
+     *             If there was a problem during API invocation then.
+     *             {@link ApiException} will be generated/returned with
+     *             corresponding error message and {@link ResponseCode}.
+     */
+    PagedPayloadResponse<FeatureResponse> getFeaturesByGame(final SearchRequest<Long> request) throws ApiException;
 
+    /**
+     * Creates {@link GameFeatureResponse} relation. <br>
+     *
+     * @param request
+     *            {@link EntityRequest} for {@link GameFeatureCreateRequest}
+     * @return {@link PayloadResponse} holding created
+     *         {@link GameFeatureResponse}.
+     * @throws ApiException
+     *             If there was a problem during API invocation then.
+     *             {@link ApiException} will be generated/returned with
+     *             corresponding error message and {@link ResponseCode}.
+     */
     PayloadResponse<GameFeatureResponse> addFeature(EntityRequest<GameFeatureCreateRequest> request) throws ApiException;
 
+    /**
+     * Delete {@link GameFeatureResponse} relation from the database. <br>
+     * If {@link GameFeatureResponse} with the given Uuid does not exist a
+     * validation exception will be thrown.
+     *
+     * @param request
+     *            {@link String} for GameFeature relation Uuid.
+     * @return {@link PayloadResponse} confirming deletion.
+     * @throws ApiException
+     *             If there was a problem during API invocation then
+     *             {@link ApiException} will be generated/returned with
+     *             corresponding error message and {@link ResponseCode}.
+     */
     PayloadResponse<String> removeFeature(EntityRequest<String> request) throws ApiException;
 }

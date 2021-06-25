@@ -16,7 +16,6 @@ import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
-import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.PagedData;
@@ -126,76 +125,83 @@ public class FeatureServiceImpl implements FeatureService {
         EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
         featureRequestValidation.validateIfFeatureExists(entityRequest, "validateAbstractRequest");
 
+        featureDAO.DeleteRelations(request.getEntity());
         featureDAO.removeByPK(request.getEntity());
         return new PayloadResponse<>(request, ResponseCode.OK, "Feature deleted!");
     }
 
     @Override
-    public ListPayloadResponse<Game> getGamesByFeature(final EntityRequest<Long> request) throws ApiException {
+    public PagedPayloadResponse<Game> getGamesByFeature(final EntityRequest<Long> request) throws ApiException {
         EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
         featureRequestValidation.validateIfFeatureExists(entityRequest, "validateAbstractRequest");
 
-        List<GameEntity> entityList = gameDAO.getGamesByFeature(request.getEntity());
-        List<Game> gameList = gameMapper.entityListToDtoList(entityList);
+        PagedData<GameEntity> entityPagedData = gameDAO.getGamesByFeature(request.getEntity());
 
-        return new ListPayloadResponse<>(request, ResponseCode.OK, gameList);
+        PagedData<Game> gamePagedData = gameMapper.entitiesToDtos(entityPagedData);
+
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, gamePagedData);
     }
 
     @Override
     public PayloadResponse<Map<String, Set<Game>>> getSetOfGames(final ListRequest<Long> request) throws ApiException {
         requestValidator.validate(request);
 
-        // Dobije postojece feature-e
         List<LoV> featureLoVs = featureDAO.getLoVs(request.getList());
 
-        // Izvuce id-eve u zasebnu listu
         List<Long> featureIds = new ArrayList<Long>();
         for (LoV f : featureLoVs) {
             featureIds.add(f.getId());
         }
 
-        // Pokupi GemeFeature relacija na osnovu prethodne liste Feature id-eva
         List<GameFeatureEntity> gameFeatures = gameFeatureDAO.findbyFeatures(featureIds);
 
-        // Kreira sve moguce kombinacije na osnovi liste Feature LoV
-        // Format svake kombinacije je
-        // "[nazivFeture-a]#[nazivFeture-a]#[nazivFeture-a]"
-        List<String> combinations = GetAllCombinations(featureLoVs);
+        List<String> combinations = getAllCombinations(featureLoVs);
+
+        // Creates Map (Key = GameEntity, Entry = List of Features Names)
+        // grouped by GameEntity
+        Map<GameEntity, List<String>> GFMapGame = gameFeatures.stream().flatMap(gf -> {
+            Map<GameEntity, String> temp = new HashMap<>();
+            temp.put(gf.getGame(), gf.getFeature().getName());
+            return temp.entrySet().stream();
+        }).collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+
+        GFMapGame.forEach((game, features) -> features.sort(null));
+
+        // Converts Entries(List<Strign>) to String(Format: "name1#name2#nameN")
+        // and adds it to corresponding game
+        Map<GameEntity, String> GFStringMap = new HashMap<GameEntity, String>();
+        for (GameEntity game : GFMapGame.keySet()) {
+            String temp = "";
+            for (String value : GFMapGame.get(game)) {
+                temp += value + "#";
+            }
+            GFStringMap.put(game, temp.substring(0, temp.length() - 1));
+        }
 
         Map<String, Set<Game>> gamesMap = new HashMap<>();
-
-        // Kreira Map sa grupisanim GameFeature vezama po Game-ovima
-        Map<GameEntity, List<GameFeatureEntity>> GFMapGame = gameFeatures.stream()
-                .collect(Collectors.groupingBy(GameFeatureEntity::getGame));
-
-        // Kreira Set-ove za svaku kombinaciju
-        // Add grouping sets
         for (String set : combinations) {
             gamesMap.put(set, new HashSet<>());
         }
 
-        // Mapiranje ?
-        // String "Local Co-oP#Split screen#VR support"
-        // Games
-        // Game 1: GameFeatures as Features names [ Local Co-oP, VR support ]
-        // Game 2: GameFeatures as Features names [ Split screen, VR support ]
-        // Game 3: GameFeatures as Features names [ Local Co-oP, Split screen,
-        // VR support ]
-        // Game 4: GameFeatures as Features names [ Local Co-oP ]
+        for (GameEntity game : GFStringMap.keySet()) {
+            for (String fetureSet : combinations) {
+                if (GFStringMap.get(game).contains(fetureSet)) {
+                    gamesMap.get(fetureSet).add(gameMapper.entityToDto(game));
+                }
+            }
+        }
 
-        // Kako vratiti Map kao response, da se ispise npr. naziv set-a i
-        // njegovi pripadnici
         return new PayloadResponse<>(request, ResponseCode.OK, gamesMap);
     }
 
     // Private Help Methods
-    private List<String> GetAllCombinations(List<LoV> sequence) {
+    private List<String> getAllCombinations(List<LoV> sequence) {
         List<String> result = new ArrayList<String>();
         List<String> combinations = new ArrayList<String>();
 
         String[] data = new String[sequence.size()];
         for (int r = 1; r <= sequence.size(); r++) {
-            GetCombination(sequence, combinations, data, 0, sequence.size() - 1, 0, r);
+            getCombination(sequence, combinations, data, 0, sequence.size() - 1, 0, r);
             result.addAll(combinations);
             combinations.clear();
         }
@@ -203,7 +209,7 @@ public class FeatureServiceImpl implements FeatureService {
         return result;
     }
 
-    private void GetCombination(List<LoV> sequence, List<String> combinations, String[] data, int start, int end, int index, int r) {
+    private void getCombination(List<LoV> sequence, List<String> combinations, String[] data, int start, int end, int index, int r) {
         if (index == r) {
             String temp = "";
             for (int j = 0; j < r; j++) {
@@ -215,7 +221,7 @@ public class FeatureServiceImpl implements FeatureService {
 
         for (int i = start; i <= end && ((end - i + 1) >= (r - index)); i++) {
             data[index] = sequence.get(i).getName();
-            GetCombination(sequence, combinations, data, i + 1, end, index + 1, r);
+            getCombination(sequence, combinations, data, i + 1, end, index + 1, r);
         }
     }
 

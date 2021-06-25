@@ -3,12 +3,16 @@ package ba.com.zira.praksa.dao;
 import java.util.List;
 
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
 
 import ba.com.zira.commons.dao.AbstractDAO;
+import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.dao.model.FeatureEntity;
+import ba.com.zira.praksa.dao.model.GameFeatureEntity;
 
 @Repository
 public class FeatureDAO extends AbstractDAO<FeatureEntity, Long> {
@@ -21,18 +25,21 @@ public class FeatureDAO extends AbstractDAO<FeatureEntity, Long> {
         return query.getResultList();
     }
 
-    public List<FeatureEntity> getFeaturesByGame(final Long gameId) {
-        String jpql = "SELECT f FROM FeatureEntity f, GameFeatureEntity gf, GameEntity g WHERE gf.game.id = :gameId AND g.id = gf.game.id AND f.id = gf.feature.id";
+    public PagedData<FeatureEntity> getFeaturesByGame(final Long gameId) {
+        String jpql = "SELECT f FROM FeatureEntity f, GameFeatureEntity gf WHERE gf.game.id = :gameId AND gf.feature.id = f.id";
 
         TypedQuery<FeatureEntity> query = entityManager.createQuery(jpql, FeatureEntity.class).setParameter("gameId", gameId);
 
-        return query.getResultList();
+        PagedData<FeatureEntity> featuresPagedData = new PagedData<FeatureEntity>();
+        featuresPagedData.setRecords(query.getResultList());
+
+        return featuresPagedData;
     }
 
     public List<LoV> getLoVs(List<Long> list) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(String.format("SELECT new ba.com.zira.praksa.api.model.LoV(f.id, f.name) FROM FeatureEntity f %s",
-                list != null ? "WHERE f.id IN :list" : ""));
+                list != null ? "WHERE f.id IN :list ORDER BY f.name" : ""));
 
         TypedQuery<LoV> query = entityManager.createQuery(stringBuilder.toString(), LoV.class);
         if (list != null) {
@@ -40,5 +47,14 @@ public class FeatureDAO extends AbstractDAO<FeatureEntity, Long> {
         }
 
         return query.getResultList();
+    }
+
+    public void DeleteRelations(final Long featureId) {
+        CriteriaDelete<GameFeatureEntity> criteriaDelete = builder.createCriteriaDelete(GameFeatureEntity.class);
+        Root<GameFeatureEntity> root = criteriaDelete.from(GameFeatureEntity.class);
+
+        criteriaDelete.where(builder.equal(root.get("feature"), featureId));
+
+        entityManager.createQuery(criteriaDelete).executeUpdate();
     }
 }

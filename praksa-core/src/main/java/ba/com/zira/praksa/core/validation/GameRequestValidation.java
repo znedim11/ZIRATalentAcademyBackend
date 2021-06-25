@@ -8,6 +8,7 @@ import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.GameService;
 import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
 import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.GameFeatureDAO;
 
@@ -101,6 +102,34 @@ public class GameRequestValidation {
             StringBuilder errorDescription = new StringBuilder();
             if (!gameFeatureDAO.existsByPK(request.getEntity())) {
                 errorDescription.append("Game does not have chosen feature !");
+            }
+
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+
+        return validationResponse;
+    }
+
+    /**
+     * Validates if Game has a feature.
+     *
+     * @param request
+     *            the {@link EntityRequest} to validate.
+     * @param validationRuleMessage
+     *            name of the validation rule that is going to be used for
+     *            validating GameFeature Id
+     *
+     * @return {@link ValidationResponse}
+     */
+    public ValidationResponse validateIfGameAlreadyHasFeature(final EntityRequest<GameFeatureCreateRequest> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            GameFeatureCreateRequest gfEntity = request.getEntity();
+            if (gameFeatureDAO.CheckIfRelationExists(gfEntity.getGameId(), gfEntity.getFeatureId())) {
+                errorDescription.append("Game already has chosen feature !");
             }
 
             validationResponse = requestValidator.createResponse(request, errorDescription);

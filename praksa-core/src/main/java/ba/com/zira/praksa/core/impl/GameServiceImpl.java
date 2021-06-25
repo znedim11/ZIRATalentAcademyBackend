@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
-import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.PagedData;
@@ -119,13 +118,13 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public ListPayloadResponse<FeatureResponse> getFeaturesByGame(SearchRequest<Long> request) throws ApiException {
+    public PagedPayloadResponse<FeatureResponse> getFeaturesByGame(SearchRequest<Long> request) throws ApiException {
         gameRequestValidation.validateIfGameExists(new EntityRequest<>(request.getEntity(), request), "validateAbstractRequest");
 
-        List<FeatureEntity> entityList = featureDAO.getFeaturesByGame(request.getEntity());
-        List<FeatureResponse> featureList = featureMapper.entitiesToDtos(entityList);
+        PagedData<FeatureEntity> entityPagedData = featureDAO.getFeaturesByGame(request.getEntity());
+        PagedData<FeatureResponse> featurePagedData = featureMapper.entitiesToDtos(entityPagedData);
 
-        return new ListPayloadResponse<>(request, ResponseCode.OK, featureList);
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, featurePagedData);
     }
 
     @Override
@@ -137,8 +136,11 @@ public class GameServiceImpl implements GameService {
         gameRequestValidation.validateIfGameExists(new EntityRequest<>(request.getEntity().getGameId(), request),
                 "validateAbstractRequest");
 
+        gameRequestValidation.validateIfGameAlreadyHasFeature(request, "validateAbstractRequest");
+
         GameFeatureEntity entity = new GameFeatureEntity();
-        entity.setUuid(UUID.randomUUID().toString());
+        final String uuid = UUID.randomUUID().toString();
+        entity.setUuid(uuid);
         entity.setGame(gameDAO.findByPK(request.getEntity().getGameId()));
         entity.setFeature(featureDAO.findByPK(request.getEntity().getFeatureId()));
         entity.setCreated(LocalDateTime.now());

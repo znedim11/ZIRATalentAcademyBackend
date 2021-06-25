@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 
+import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.praksa.api.model.game.Game;
 import ba.com.zira.praksa.dao.model.GameEntity;
 
@@ -22,4 +23,5 @@ public interface GameMapper {
 
     List<Game> entityListToDtoList(List<GameEntity> entityList);
 
+    PagedData<Game> entitiesToDtos(PagedData<GameEntity> gameEntities);
 }
