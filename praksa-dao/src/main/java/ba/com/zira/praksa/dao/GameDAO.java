@@ -41,7 +41,7 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
 
     public List<LoV> getLoVs(List<Long> list) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(String.format("SELECT new ba.com.zira.praksa.api.model.LoV(g.id, g.name) FROM GameEntity g %s",
+        stringBuilder.append(String.format("SELECT new ba.com.zira.praksa.api.model.LoV(g.id, g.fullName) FROM GameEntity g %s",
                 list != null ? "WHERE g.id IN :list" : ""));
 
         TypedQuery<LoV> query = entityManager.createQuery(stringBuilder.toString(), LoV.class);

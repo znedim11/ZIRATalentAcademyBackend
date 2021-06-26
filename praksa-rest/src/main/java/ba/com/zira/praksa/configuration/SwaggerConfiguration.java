@@ -59,11 +59,12 @@ public class SwaggerConfiguration {
                 .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.game")).build().tags(new Tag("game", "Game APIs"))
                 .globalOperationParameters(operationParameters);
     }
+
     @Bean
     public Docket locationApi() {
         return new Docket(DocumentationType.SWAGGER_2).groupName("location-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.game")).build().tags(new Tag("location", "Location APIs"))
-                .globalOperationParameters(operationParameters);
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.game")).build()
+                .tags(new Tag("location", "Location APIs")).globalOperationParameters(operationParameters);
     }
 
     @Bean
@@ -141,6 +142,13 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SWAGGER_2).groupName("release-api").apiInfo(apiInfo()).select()
                 .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.release")).build()
                 .tags(new Tag("release", "Release APIs")).globalOperationParameters(operationParameters);
+    }
+
+    @Bean
+    public Docket characterApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("character-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.character")).build()
+                .tags(new Tag("character", "Character APIs")).globalOperationParameters(operationParameters);
     }
 
     private static ApiInfo apiInfo() {

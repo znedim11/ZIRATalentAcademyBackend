@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import ba.com.zira.commons.dao.AbstractDAO;
 import ba.com.zira.praksa.api.model.LoV;
+import ba.com.zira.praksa.api.model.concept.ConceptSearchRequest;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
@@ -90,5 +91,48 @@ public class ConceptDAO extends AbstractDAO<ConceptEntity, Long> {
         query.setParameter("cId", conceptId);
 
         return query.getSingleResult();
+    }
+
+    public List<ConceptEntity> searchConcepts(final ConceptSearchRequest request) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT DISTINCT c FROM ConceptEntity c ");
+        stringBuilder.append("LEFT JOIN LinkMapEntity lm ON c.id = lm.concept.id ");
+        stringBuilder.append("LEFT JOIN GameEntity g ON lm.game.id = g.id ");
+        stringBuilder.append("LEFT JOIN CharacterEntity ch ON lm.character.id = ch.id ");
+        stringBuilder.append("WHERE 1 = 1 ");
+
+        if (request.getName() != null) {
+            stringBuilder.append("AND c.name LIKE :name ");
+        }
+        if (request.getGameIds() != null) {
+            stringBuilder.append("AND g.id IN :gameIds ");
+        }
+        if (request.getCharacterIds() != null) {
+            stringBuilder.append("AND ch.id IN :characterIds ");
+        }
+
+        if (request.getSortBy() != null && request.getSortBy().equals("Alphabetical")) {
+            stringBuilder.append("ORDER BY c.name");
+        } else if (request.getSortBy() != null && request.getSortBy().equals("Last edit")) {
+            stringBuilder.append("ORDER BY c.modified DESC");
+        } else if (request.getSortBy() != null && request.getSortBy().equals("Most games")) {
+            stringBuilder.append("");
+        }
+
+        TypedQuery<ConceptEntity> query = entityManager.createQuery(stringBuilder.toString(), ConceptEntity.class);
+
+        if (request.getName() != null) {
+            query.setParameter("name", request.getName());
+        }
+        if (request.getGameIds() != null) {
+            query.setParameter("gameIds", request.getGameIds());
+        }
+        if (request.getCharacterIds() != null) {
+            query.setParameter("characterIds", request.getCharacterIds());
+        }
+
+        return query.getResultList();
+
     }
 }

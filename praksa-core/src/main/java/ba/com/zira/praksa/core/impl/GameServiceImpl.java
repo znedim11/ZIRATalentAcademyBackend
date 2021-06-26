@@ -176,9 +176,11 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException {
-        for (Long item : request.getList()) {
-            EntityRequest<Long> longRequest = new EntityRequest<>(item, request);
-            gameRequestValidation.validateIfGameExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+        if (request.getList() != null) {
+            for (Long item : request.getList()) {
+                EntityRequest<Long> longRequest = new EntityRequest<>(item, request);
+                gameRequestValidation.validateIfGameExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+            }
         }
 
         List<LoV> loVs = gameDAO.getLoVs(request.getList());

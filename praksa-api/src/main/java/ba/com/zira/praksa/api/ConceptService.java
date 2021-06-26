@@ -12,6 +12,7 @@ import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.character.CharacterResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
+import ba.com.zira.praksa.api.model.concept.ConceptSearchRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.location.Location;
@@ -42,7 +43,7 @@ public interface ConceptService {
      *             {@link ApiException} will be generated/returned with
      *             corresponding error message and {@link ResponseCode}.
      */
-    public PagedPayloadResponse<ConceptResponse> find(final SearchRequest<String> request) throws ApiException;
+    PagedPayloadResponse<ConceptResponse> find(final SearchRequest<String> request) throws ApiException;
 
     /**
      * Retrieve {@link ConceptResponse} by Id.
@@ -115,5 +116,7 @@ public interface ConceptService {
     ListPayloadResponse<Location> getLocationsByConcept(final EntityRequest<Long> request) throws ApiException;
 
     PayloadResponse<Long> getNumberOfGamesByConcept(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<ConceptResponse> searchConcepts(EntityRequest<ConceptSearchRequest> request) throws ApiException;
 
 }

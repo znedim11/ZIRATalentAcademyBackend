@@ -24,6 +24,7 @@ import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.character.CharacterResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
+import ba.com.zira.praksa.api.model.concept.ConceptSearchRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.location.Location;
@@ -190,9 +191,11 @@ public class ConceptServiceImpl implements ConceptService {
 
     @Override
     public ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException {
-        for (Long item : request.getList()) {
-            EntityRequest<Long> longRequest = new EntityRequest<>(item, request);
-            conceptRequestValidation.validateConceptExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+        if (request.getList() != null) {
+            for (Long item : request.getList()) {
+                EntityRequest<Long> longRequest = new EntityRequest<>(item, request);
+                conceptRequestValidation.validateConceptExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+            }
         }
 
         List<LoV> loVs = conceptDAO.getLoVs(request.getList());
@@ -241,6 +244,16 @@ public class ConceptServiceImpl implements ConceptService {
         Long numberofGames = conceptDAO.getNumberOfGamesByConcept(request.getEntity());
 
         return new PayloadResponse<>(request, ResponseCode.OK, numberofGames);
+    }
+
+    @Override
+    public ListPayloadResponse<ConceptResponse> searchConcepts(EntityRequest<ConceptSearchRequest> request) throws ApiException {
+        requestValidator.validate(request);
+
+        List<ConceptEntity> conceptEntities = conceptDAO.searchConcepts(request.getEntity());
+        List<ConceptResponse> conceptList = conceptMapper.entityListToResponseList(conceptEntities);
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, conceptList);
     }
 
 }

@@ -30,6 +30,7 @@ import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.character.CharacterResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
+import ba.com.zira.praksa.api.model.concept.ConceptSearchRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.location.Location;
@@ -177,4 +178,23 @@ public class ConceptRestService {
 
         return conceptService.getNumberOfGamesByConcept(request);
     }
+
+    @ApiOperation(value = "Search Concepts.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/search")
+    public ListPayloadResponse<ConceptResponse> getPersonsByConcept(@RequestParam(required = false) final String name,
+            @RequestParam(required = false) final String sortBy, @RequestParam(required = false) final List<Long> gameIds,
+            @RequestParam(required = false) final List<Long> characterIds) throws ApiException {
+
+        final EntityRequest<ConceptSearchRequest> request = new EntityRequest<>();
+        final ConceptSearchRequest entity = new ConceptSearchRequest();
+        entity.setName(name);
+        entity.setGameIds(gameIds);
+        entity.setCharacterIds(characterIds);
+        entity.setSortBy(sortBy);
+
+        request.setEntity(entity);
+
+        return conceptService.searchConcepts(request);
+    }
+
 }
