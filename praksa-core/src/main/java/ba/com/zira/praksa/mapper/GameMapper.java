@@ -10,6 +10,7 @@ import org.mapstruct.factory.Mappers;
 import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.praksa.api.model.game.Game;
 import ba.com.zira.praksa.api.model.game.GameCreateRequest;
+import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
 import ba.com.zira.praksa.dao.model.GameEntity;
@@ -42,6 +43,8 @@ public interface GameMapper {
     GameEntity dtoToEntity(GameCreateRequest gameRequest);
 
     Game entityToDto(GameEntity gameEntity);
+
+    GameOverviewResponse entityToOverviewResponse(GameEntity entity);
 
     List<GameResponse> gameEntitesToGames(List<GameEntity> gameEnts);
 

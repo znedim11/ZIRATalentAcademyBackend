@@ -24,6 +24,7 @@ import ba.com.zira.praksa.api.model.character.CharacterResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.feature.FeatureResponse;
 import ba.com.zira.praksa.api.model.game.GameCreateRequest;
+import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
@@ -31,6 +32,8 @@ import ba.com.zira.praksa.api.model.gamefeature.GameFeatureResponse;
 import ba.com.zira.praksa.api.model.location.Location;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
+import ba.com.zira.praksa.api.model.platform.PlatformResponse;
+import ba.com.zira.praksa.api.model.release.ReleaseResponseLight;
 import ba.com.zira.praksa.core.validation.FeatureRequestValidation;
 import ba.com.zira.praksa.core.validation.GameRequestValidation;
 import ba.com.zira.praksa.dao.FeatureDAO;
@@ -44,6 +47,8 @@ import ba.com.zira.praksa.dao.model.GameFeatureEntity;
 import ba.com.zira.praksa.dao.model.LocationEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
+import ba.com.zira.praksa.dao.model.PlatformEntity;
+import ba.com.zira.praksa.dao.model.ReleaseEntity;
 import ba.com.zira.praksa.mapper.CharacterMapper;
 import ba.com.zira.praksa.mapper.ConceptMapper;
 import ba.com.zira.praksa.mapper.FeatureMapper;
@@ -52,6 +57,8 @@ import ba.com.zira.praksa.mapper.GameMapper;
 import ba.com.zira.praksa.mapper.LocationMapper;
 import ba.com.zira.praksa.mapper.ObjectMapper;
 import ba.com.zira.praksa.mapper.PersonMapper;
+import ba.com.zira.praksa.mapper.PlatformMapper;
+import ba.com.zira.praksa.mapper.ReleaseMapper;
 
 @Service
 public class GameServiceImpl implements GameService {
@@ -74,11 +81,14 @@ public class GameServiceImpl implements GameService {
     LocationMapper locationMapper;
     FeatureMapper featureMapper;
     GameFeatureMapper gameFeatureMapper;
+    ReleaseMapper releaseMapper;
+    PlatformMapper platformMapper;
 
     public GameServiceImpl(RequestValidator requestValidator, GameRequestValidation gameRequestValidation,
             FeatureRequestValidation featureRequestValidation, GameDAO gameDAO, FeatureDAO featureDAO, GameFeatureDAO gameFeatureDAO,
-            GameMapper gameMapper, FeatureMapper featureMapper, GameFeatureMapper gameFeatureMapper, ConceptMapper conceptMapper,
-            PersonMapper personMapper, ObjectMapper objectMapper, CharacterMapper characterMapper, LocationMapper locationMapper) {
+            GameMapper gameMapper, ConceptMapper conceptMapper, PersonMapper personMapper, ObjectMapper objectMapper,
+            CharacterMapper characterMapper, LocationMapper locationMapper, FeatureMapper featureMapper,
+            GameFeatureMapper gameFeatureMapper, ReleaseMapper releaseMapper, PlatformMapper platformMapper) {
         super();
         this.requestValidator = requestValidator;
         this.gameRequestValidation = gameRequestValidation;
@@ -87,16 +97,19 @@ public class GameServiceImpl implements GameService {
         this.featureDAO = featureDAO;
         this.gameFeatureDAO = gameFeatureDAO;
         this.gameMapper = gameMapper;
-        this.featureMapper = featureMapper;
-        this.gameFeatureMapper = gameFeatureMapper;
         this.conceptMapper = conceptMapper;
         this.personMapper = personMapper;
         this.objectMapper = objectMapper;
         this.characterMapper = characterMapper;
         this.locationMapper = locationMapper;
+        this.featureMapper = featureMapper;
+        this.gameFeatureMapper = gameFeatureMapper;
+        this.releaseMapper = releaseMapper;
+        this.platformMapper = platformMapper;
     }
 
     @Override
+
     public PagedPayloadResponse<GameResponse> find(final SearchRequest<String> request) throws ApiException {
         requestValidator.validate(request);
 
@@ -272,5 +285,48 @@ public class GameServiceImpl implements GameService {
         gameFeatureDAO.removeByPK(request.getEntity());
 
         return new PayloadResponse<>(request, ResponseCode.OK, "Feature removed!");
+    }
+
+    @Override
+    public PayloadResponse<ReleaseResponseLight> getFirstReleaseByGame(EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
+        gameRequestValidation.validateIfGameExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+
+        ReleaseEntity entity = gameDAO.getFirstReleaseByGame(request.getEntity());
+        ReleaseResponseLight release = releaseMapper.entityToDto(entity);
+        release.setDeveloperName(entity.getDeveloper().getName());
+        release.setPublisherName(entity.getPublisher().getName());
+
+        return new PayloadResponse<>(request, ResponseCode.OK, release);
+    }
+
+    @Override
+    public ListPayloadResponse<PlatformResponse> getPlatformsByGame(EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
+        gameRequestValidation.validateIfGameExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+
+        List<PlatformEntity> entityList = gameDAO.getPlatformsByGame(request.getEntity());
+        List<PlatformResponse> platformList = platformMapper.entityListToDtoList(entityList);
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, platformList);
+    }
+
+    @Override
+    public PayloadResponse<GameOverviewResponse> getOverview(EntityRequest<Long> request) throws ApiException {
+        GameOverviewResponse gameOverview = gameMapper.entityToOverviewResponse(gameDAO.findByPK(request.getEntity()));
+
+        List<PlatformResponse> platforms = platformMapper.entityListToDtoList(gameDAO.getPlatformsByGame(request.getEntity()));
+        ReleaseEntity entity = gameDAO.getFirstReleaseByGame(request.getEntity());
+        ReleaseResponseLight release = releaseMapper.entityToDto(entity);
+        release.setDeveloperName(entity.getDeveloper().getName());
+        release.setPublisherName(entity.getPublisher().getName());
+
+        gameOverview.setPlatformAbbreviations(platforms.stream().map(PlatformResponse::getAbbriviation).toArray(String[]::new));
+        gameOverview.setPlatformNames(platforms.stream().map(PlatformResponse::getFullName).toArray(String[]::new));
+        gameOverview.setFirstReleaseDate(release.getReleaseDate().toString());
+        gameOverview.setPublisher(release.getPublisherName());
+        gameOverview.setDeveloper(release.getDeveloperName());
+
+        return new PayloadResponse<>(request, ResponseCode.OK, gameOverview);
     }
 }

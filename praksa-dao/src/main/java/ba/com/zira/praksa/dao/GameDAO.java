@@ -15,6 +15,8 @@ import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.dao.model.LocationEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
+import ba.com.zira.praksa.dao.model.PlatformEntity;
+import ba.com.zira.praksa.dao.model.ReleaseEntity;
 
 @Repository
 public class GameDAO extends AbstractDAO<GameEntity, Long> {
@@ -107,6 +109,26 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         String jpql = "SELECT DISTINCT g FROM GameEntity g, GameFeatureEntity gf WHERE gf.feature.id IN :ids AND gf.game.id = game.id";
 
         TypedQuery<GameEntity> query = entityManager.createQuery(jpql, GameEntity.class).setParameter("ids", features);
+
+        return query.getResultList();
+    }
+
+    public ReleaseEntity getFirstReleaseByGame(Long gameId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT r FROM ReleaseEntity r WHERE r.game.id = :gId ORDER BY r.releaseDate");
+
+        TypedQuery<ReleaseEntity> query = entityManager.createQuery(stringBuilder.toString(), ReleaseEntity.class);
+        query.setParameter("gId", gameId);
+
+        return query.setMaxResults(1).getResultList().get(0);
+    }
+
+    public List<PlatformEntity> getPlatformsByGame(Long gameId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT DISTINCT p FROM ReleaseEntity r JOIN PlatformEntity p ON r.platform.id = p.id WHERE r.game.id = :gId");
+
+        TypedQuery<PlatformEntity> query = entityManager.createQuery(stringBuilder.toString(), PlatformEntity.class);
+        query.setParameter("gId", gameId);
 
         return query.getResultList();
     }

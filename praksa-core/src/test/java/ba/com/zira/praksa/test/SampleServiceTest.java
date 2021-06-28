@@ -28,6 +28,8 @@ import ba.com.zira.praksa.mapper.GameMapper;
 import ba.com.zira.praksa.mapper.LocationMapper;
 import ba.com.zira.praksa.mapper.ObjectMapper;
 import ba.com.zira.praksa.mapper.PersonMapper;
+import ba.com.zira.praksa.mapper.PlatformMapper;
+import ba.com.zira.praksa.mapper.ReleaseMapper;
 import ba.com.zira.praksa.test.configuration.ApplicationTestConfiguration;
 import ba.com.zira.praksa.test.configuration.BasicTestConfiguration;
 
@@ -54,6 +56,8 @@ public class SampleServiceTest extends BasicTestConfiguration {
     private ObjectMapper objectMapper;
     private CharacterMapper characterMapper;
     private LocationMapper locationMapper;
+    private PlatformMapper platformMapper;
+    private ReleaseMapper releaseMapper;
 
     @BeforeMethod
     public void beforeMethod() throws ApiException {
@@ -68,9 +72,11 @@ public class SampleServiceTest extends BasicTestConfiguration {
         this.objectMapper = Mockito.mock(ObjectMapper.class);
         this.characterMapper = Mockito.mock(CharacterMapper.class);
         this.locationMapper = Mockito.mock(LocationMapper.class);
+        this.platformMapper = Mockito.mock(PlatformMapper.class);
+        this.releaseMapper = Mockito.mock(ReleaseMapper.class);
         this.gameService = new GameServiceImpl(requestValidator, sampleRequestValidation, featureRequestValidation, gameDAO, featureDAO,
-                gameFeatureDAO, sampleMapper, featureMapper, gameFeatureMapper, conceptMapper, personMapper, objectMapper, characterMapper,
-                locationMapper);
+                gameFeatureDAO, sampleMapper, conceptMapper, personMapper, objectMapper, characterMapper, locationMapper, featureMapper,
+                gameFeatureMapper, releaseMapper, platformMapper);
     }
 
     @Test

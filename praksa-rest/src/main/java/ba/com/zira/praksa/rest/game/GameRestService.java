@@ -29,6 +29,7 @@ import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.enums.ReleaseType;
 import ba.com.zira.praksa.api.model.feature.FeatureResponse;
 import ba.com.zira.praksa.api.model.game.GameCreateRequest;
+import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
@@ -199,6 +200,16 @@ public class GameRestService {
         request.setEntity(id);
 
         return gameService.getNumberOfReleasesByGame(request);
+    }
+
+    @ApiOperation(value = "Get Game Overview", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/overview")
+    public PayloadResponse<GameOverviewResponse> getOverview(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return gameService.getOverview(request);
     }
 
 }
