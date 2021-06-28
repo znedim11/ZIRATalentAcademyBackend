@@ -1,5 +1,6 @@
 package ba.com.zira.praksa.core.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.context.annotation.ComponentScan;
@@ -15,6 +16,7 @@ import ba.com.zira.praksa.api.ReviewService;
 import ba.com.zira.praksa.api.model.review.CompleteReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewSearchRequest;
+import ba.com.zira.praksa.core.utils.LookupService;
 import ba.com.zira.praksa.dao.ReviewDAO;
 
 /**
@@ -23,15 +25,17 @@ import ba.com.zira.praksa.dao.ReviewDAO;
  */
 
 @Service
-@ComponentScan
+@ComponentScan("ba.com.zira.praksa.core.utils")
 public class ReviewServiceImpl implements ReviewService {
 
-    private RequestValidator requestValidator;
-    private ReviewDAO reviewDAO;
+    RequestValidator requestValidator;
+    ReviewDAO reviewDAO;
+    LookupService lookupService;
 
-    public ReviewServiceImpl(RequestValidator requestValidator, ReviewDAO reviewDAO) {
+    public ReviewServiceImpl(RequestValidator requestValidator, ReviewDAO reviewDAO, LookupService lookupService) {
         this.requestValidator = requestValidator;
         this.reviewDAO = reviewDAO;
+        this.lookupService = lookupService;
     }
 
     @Override
@@ -49,8 +53,6 @@ public class ReviewServiceImpl implements ReviewService {
         requestValidator.validate(request);
 
         CompleteReviewResponse completeReviewResponse = new CompleteReviewResponse();
-        List<ReviewResponse> reviewResponseList = reviewDAO.searchReviews(request.getEntity());
-        completeReviewResponse.setReviews(reviewResponseList);
 
         Long totalReviews = Long.valueOf(reviewDAO.searchReviews(request.getEntity()).size());
         completeReviewResponse.setTotalReviews(totalReviews);
@@ -62,16 +64,25 @@ public class ReviewServiceImpl implements ReviewService {
         completeReviewResponse.setAverageGrade(sum / totalReviews);
 
         if (!reviewDAO.getMostPopularPlatform(request.getEntity()).isEmpty()) {
-            completeReviewResponse.setTopPlatformName(reviewDAO.getMostPopularPlatform(request.getEntity()).get(0).getTopPlatformName());
+            completeReviewResponse.setTopPlatformId(reviewDAO.getMostPopularPlatform(request.getEntity()).get(0).getTopPlatformId());
         }
 
         if (!reviewDAO.getFlopGame(request.getEntity()).isEmpty()) {
-            completeReviewResponse.setFlopGameName(reviewDAO.getFlopGame(request.getEntity()).get(0).getFlopGameName());
+            completeReviewResponse.setFlopGameId(reviewDAO.getFlopGame(request.getEntity()).get(0).getFlopGameId());
         }
 
         if (!reviewDAO.getTopGame(request.getEntity()).isEmpty()) {
-            completeReviewResponse.setTopGameName(reviewDAO.getTopGame(request.getEntity()).get(0).getTopGameName());
+            completeReviewResponse.setTopGameId(reviewDAO.getTopGame(request.getEntity()).get(0).getTopGameId());
         }
+
+        lookupService.lookupPlatformName(Arrays.asList(completeReviewResponse), CompleteReviewResponse::getTopPlatformId,
+                CompleteReviewResponse::setTopPlatformName);
+
+        lookupService.lookupGameName(Arrays.asList(completeReviewResponse), CompleteReviewResponse::getTopGameId,
+                CompleteReviewResponse::setFlopGameName);
+
+        lookupService.lookupGameName(Arrays.asList(completeReviewResponse), CompleteReviewResponse::getTopGameId,
+                CompleteReviewResponse::setTopGameName);
 
         return new PayloadResponse<>(request, ResponseCode.OK, completeReviewResponse);
     }

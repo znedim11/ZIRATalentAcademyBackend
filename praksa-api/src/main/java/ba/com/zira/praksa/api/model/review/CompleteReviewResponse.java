@@ -1,7 +1,6 @@
 package ba.com.zira.praksa.api.model.review;
 
 import java.io.Serializable;
-import java.util.List;
 
 import lombok.Data;
 
@@ -10,28 +9,29 @@ public class CompleteReviewResponse implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long totalReviews;
     private String topPlatformName;
+    private Long topPlatformId;
     private Double averageGrade;
     private String topGameName;
+    private Long topGameId;
     private String flopGameName;
-    private List<ReviewResponse> reviews;
+    private Long flopGameId;
 
     public CompleteReviewResponse() {
     }
 
-    public CompleteReviewResponse(List<ReviewResponse> reviews) {
-        this.reviews = reviews;
-    }
-
-    public CompleteReviewResponse(final String plaformName, final Long totalReviews) {
+    public CompleteReviewResponse(final String plaformName, final Long platformId, final Long totalReviews) {
         this.totalReviews = totalReviews;
         this.topPlatformName = plaformName;
+        this.topPlatformId = platformId;
     }
 
-    public CompleteReviewResponse(final String gameName, final String gameType) {
+    public CompleteReviewResponse(final String gameName, final Long gameId, final String gameType) {
         if (gameType.equals("top")) {
             this.topGameName = gameName;
+            this.topGameId = gameId;
         } else if (gameType.equals("flop")) {
             this.flopGameName = gameName;
+            this.flopGameId = gameId;
         }
     }
 
