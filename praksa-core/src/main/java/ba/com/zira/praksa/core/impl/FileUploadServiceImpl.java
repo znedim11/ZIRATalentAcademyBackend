@@ -21,7 +21,7 @@ import ba.com.zira.praksa.api.model.utils.ImageUploadRequest;
 
 @Service
 public class FileUploadServiceImpl implements FileUploadService {
-    @Value("\"${image.folder.location://opt//zira//cdn//vigor//img}\"")
+    @Value("${image.folder.location://opt//zira//cdn//vigor//img}")
     private String imagePath;
 
     @Override
