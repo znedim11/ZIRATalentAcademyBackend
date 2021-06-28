@@ -3,8 +3,6 @@ package ba.com.zira.praksa.core.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.transaction.Transactional;
-
 import org.springframework.stereotype.Service;
 
 import ba.com.zira.commons.exception.ApiException;
@@ -76,7 +74,6 @@ public class ObjectServiceImpl implements ObjectService {
 
     }
 
-    @Transactional(rollbackFor = ApiException.class)
     @Override
     public PayloadResponse<ObjectRequest> update(final EntityRequest<ObjectRequest> request) throws ApiException {
         requestValidator.validate(request);
@@ -85,18 +82,11 @@ public class ObjectServiceImpl implements ObjectService {
         final ObjectRequest object = request.getEntity();
 
         ObjectEntity entity = objectMapper.dtoToEntity(request.getEntity());
-        entity.setCreated(LocalDateTime.now());
-        entity.setCreatedBy(request.getUserId());
 
-        objectDAO.persist(entity);
+        entity.setModified(date);
+        entity.setModifiedBy(request.getUserId());
 
-        ObjectResponse response = objectMapper.entityToDto(entity);
-
-        // todo
-        final ObjectEntity objectEntity = objectMapper.dtoToEntity(object);
-        // final ObjectEntity objectEntity = new ObjectEntity();
-
-        objectDAO.merge(objectEntity);
+        objectDAO.merge(entity);
 
         return new PayloadResponse<>(request, ResponseCode.OK, object);
 
