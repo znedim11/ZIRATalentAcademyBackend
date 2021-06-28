@@ -112,22 +112,28 @@ public class LinkMapServiceImpl implements LinkMapService {
     }
 
     private void setLinkId(LinkMapEntity entity, String objectType, Long objectId) {
-        if (ObjectType.CHARACTER.getValue().equalsIgnoreCase(objectType)) {
+        String type = objectType;
+
+        if (objectType.indexOf('#') > -1) {
+            type = objectType.substring(objectType.indexOf('#') + 1, objectType.length());
+        }
+
+        if (ObjectType.CHARACTER.getValue().equalsIgnoreCase(type)) {
             CharacterEntity objEntity = characterDAO.findByPK(objectId);
             entity.setCharacter(objEntity);
-        } else if (ObjectType.CONCEPT.getValue().equalsIgnoreCase(objectType)) {
+        } else if (ObjectType.CONCEPT.getValue().equalsIgnoreCase(type)) {
             ConceptEntity objEntity = conceptDAO.findByPK(objectId);
             entity.setConcept(objEntity);
-        } else if (ObjectType.GAME.getValue().equalsIgnoreCase(objectType)) {
+        } else if (ObjectType.GAME.getValue().equalsIgnoreCase(type)) {
             GameEntity objEntity = gameDAO.findByPK(objectId);
             entity.setGame(objEntity);
-        } else if (ObjectType.LOCATION.getValue().equalsIgnoreCase(objectType)) {
+        } else if (ObjectType.LOCATION.getValue().equalsIgnoreCase(type)) {
             LocationEntity objEntity = locationDAO.findByPK(objectId);
             entity.setLocation(objEntity);
-        } else if (ObjectType.OBJECT.getValue().equalsIgnoreCase(objectType)) {
+        } else if (ObjectType.OBJECT.getValue().equalsIgnoreCase(type)) {
             ObjectEntity objEntity = objectDAO.findByPK(objectId);
             entity.setObject(objEntity);
-        } else if (ObjectType.PERSON.getValue().equalsIgnoreCase(objectType)) {
+        } else if (ObjectType.PERSON.getValue().equalsIgnoreCase(type)) {
             PersonEntity objEntity = personDAO.findByPK(objectId);
             entity.setPerson(objEntity);
         }

@@ -102,7 +102,7 @@ public class ConceptDAO extends AbstractDAO<ConceptEntity, Long> {
         stringBuilder.append("LEFT JOIN CharacterEntity ch ON lm.character.id = ch.id ");
         stringBuilder.append("WHERE 1 = 1 ");
 
-        if (request.getName() != null) {
+        if (request.getName() != null && !request.getName().equals("")) {
             stringBuilder.append("AND c.name LIKE :name ");
         }
         if (request.getGameIds() != null) {
@@ -122,7 +122,7 @@ public class ConceptDAO extends AbstractDAO<ConceptEntity, Long> {
 
         TypedQuery<ConceptEntity> query = entityManager.createQuery(stringBuilder.toString(), ConceptEntity.class);
 
-        if (request.getName() != null) {
+        if (request.getName() != null && !request.getName().equals("")) {
             query.setParameter("name", request.getName());
         }
         if (request.getGameIds() != null) {
