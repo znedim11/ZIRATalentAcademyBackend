@@ -16,14 +16,12 @@ import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.CompanyService;
-import ba.com.zira.praksa.api.model.company.CompanyUpdateRequest;
 import ba.com.zira.praksa.api.model.company.CompanyCreateRequest;
 import ba.com.zira.praksa.api.model.company.CompanyResponse;
+import ba.com.zira.praksa.api.model.company.CompanyUpdateRequest;
 import ba.com.zira.praksa.dao.CompanyDAO;
 import ba.com.zira.praksa.dao.model.CompanyEntity;
 import ba.com.zira.praksa.mapper.CompanyMapper;
-
-
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
@@ -46,7 +44,7 @@ public class CompanyServiceImpl implements CompanyService {
         final List<CompanyResponse> companyList = new ArrayList<>();
 
         for (final CompanyEntity CompanyEntity : companyModelEntities.getRecords()) {
-        	companyList.add(companyMapper.entityToDto(CompanyEntity));
+            companyList.add(companyMapper.entityToDto(CompanyEntity));
         }
         return new PagedPayloadResponse<>(request, ResponseCode.OK, companyList.size(), 1, 1, companyList.size(), companyList);
     }
@@ -74,26 +72,21 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public PayloadResponse<CompanyResponse> update(final EntityRequest<CompanyUpdateRequest> request) throws ApiException {
         requestValidator.validate(request);
-   
-        CompanyEntity existingCompanyEntity=companyDAO.findByPK(request.getEntity().getId());
+
+        CompanyEntity existingCompanyEntity = companyDAO.findByPK(request.getEntity().getId());
 
         final LocalDateTime date = LocalDateTime.now();
         final CompanyUpdateRequest company = request.getEntity();
-        
-        
-        companyMapper.updateForCompanyUpdate(company, existingCompanyEntity);
 
+        companyMapper.updateForCompanyUpdate(company, existingCompanyEntity);
 
         existingCompanyEntity.setModified(date);
         existingCompanyEntity.setModifiedBy(request.getUserId());
-        
-        
+
         companyDAO.merge(existingCompanyEntity);
 
-        final CompanyResponse response=companyMapper.entityToDto(existingCompanyEntity);
-        return new PayloadResponse<>(request, ResponseCode.OK, response);        
-        
-        
+        final CompanyResponse response = companyMapper.entityToDto(existingCompanyEntity);
+        return new PayloadResponse<>(request, ResponseCode.OK, response);
 
     }
 
