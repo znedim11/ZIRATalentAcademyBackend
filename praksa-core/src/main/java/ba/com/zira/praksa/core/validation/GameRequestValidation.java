@@ -128,7 +128,7 @@ public class GameRequestValidation {
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
             StringBuilder errorDescription = new StringBuilder();
             GameFeatureCreateRequest gfEntity = request.getEntity();
-            if (gameFeatureDAO.CheckIfRelationExists(gfEntity.getGameId(), gfEntity.getFeatureId())) {
+            if (gameFeatureDAO.checkIfRelationExists(gfEntity.getGameId(), gfEntity.getFeatureId())) {
                 errorDescription.append("Game already has chosen feature !");
             }
 

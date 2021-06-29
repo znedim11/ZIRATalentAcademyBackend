@@ -14,6 +14,8 @@ import ba.com.zira.commons.model.FilterExpression.FilterOperation;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.model.enums.ObjectType;
+import ba.com.zira.praksa.api.model.linkmap.LinkMapCreate;
+import ba.com.zira.praksa.api.model.linkmap.LinkMapUpdate;
 import ba.com.zira.praksa.api.model.linkmap.LinkRequest;
 import ba.com.zira.praksa.api.model.linkmap.MultipleLinkRequest;
 import ba.com.zira.praksa.dao.CharacterDAO;
@@ -36,7 +38,7 @@ import ba.com.zira.praksa.dao.model.PersonEntity;
  *
  */
 
-@Component("linkMapRequestValidation")
+@Component
 public class LinkMapRequestValidation {
     LinkMapDAO linkMapDAO;
     RequestValidator requestValidator;
@@ -46,6 +48,8 @@ public class LinkMapRequestValidation {
     LocationDAO locationDAO;
     ObjectDAO objectDAO;
     PersonDAO personDAO;
+
+    static final String ENTITY_EXISTS = "Entity must exist in request!";
 
     public LinkMapRequestValidation(LinkMapDAO linkMapDAO, RequestValidator requestValidator, CharacterDAO characterDAO,
             ConceptDAO conceptDAO, GameDAO gameDAO, LocationDAO locationDAO, ObjectDAO objectDAO, PersonDAO personDAO) {
@@ -60,12 +64,50 @@ public class LinkMapRequestValidation {
         this.personDAO = personDAO;
     }
 
+    public ValidationResponse validateLinkMapExists(final EntityRequest<String> request, final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (!linkMapDAO.existsByPK(request.getEntity())) {
+                errorDescription.append("LinkMap with id ").append(request.getEntity()).append(" does not exist !");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateEntityExistsInCreateRequest(final EntityRequest<LinkMapCreate> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (request.getEntity() == null) {
+                errorDescription.append(ENTITY_EXISTS);
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateEntityExistsInUpdateRequest(final EntityRequest<LinkMapUpdate> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (request.getEntity() == null) {
+                errorDescription.append(ENTITY_EXISTS);
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
     public ValidationResponse validateEntityExistsInLinkRequest(final EntityRequest<?> request, final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
             StringBuilder errorDescription = new StringBuilder();
             if (request.getEntity() == null) {
-                errorDescription.append("Entity must exist in request!");
+                errorDescription.append(ENTITY_EXISTS);
             }
             validationResponse = requestValidator.createResponse(request, errorDescription);
         }
@@ -124,8 +166,8 @@ public class LinkMapRequestValidation {
 
             if (!filter.getFilterExpressions().isEmpty() && !linkMapDAO.findAll(filter).getRecords().isEmpty()) {
 
-                errorDescription.append(String.format("Objects %s#%d and %s#%d are already linked", requestEntity.getObjectAType(),
-                        requestEntity.getObjectAId(), requestEntity.getObjectBType(), requestEntity.getObjectBId()));
+                errorDescription.append(String.format("Objects %d#%s and %d#%s are already linked", requestEntity.getObjectAId(),
+                        requestEntity.getObjectAType(), requestEntity.getObjectBId(), requestEntity.getObjectBType()));
             }
 
             validationResponse = requestValidator.createResponse(request, errorDescription);
@@ -190,8 +232,8 @@ public class LinkMapRequestValidation {
 
                 if (!filter.getFilterExpressions().isEmpty() && !linkMapDAO.findAll(filter).getRecords().isEmpty()) {
 
-                    errorDescription.append(String.format("Objects %s#%d and %s#%d are already linked", requestEntity.getObjectAType(),
-                            requestEntity.getObjectAId(), requestMapEntry.getKey(), requestMapEntry.getValue()));
+                    errorDescription.append(String.format("Objects %d#%s and %s are already linked", requestEntity.getObjectAId(),
+                            requestEntity.getObjectAType(), requestMapEntry.getKey()));
                 }
             }
 
@@ -205,55 +247,69 @@ public class LinkMapRequestValidation {
      */
 
     private void checkKey(StringBuilder errorDescription, String objectType, Long objectId) {
-        if (ObjectType.CHARACTER.getValue().equalsIgnoreCase(objectType)) {
+        String type = getType(objectType);
+
+        if (ObjectType.CHARACTER.getValue().equalsIgnoreCase(type)) {
             if (!characterDAO.existsByPK(objectId)) {
                 errorDescription.append(String.format("Character with id %d does not exist!", objectId));
             }
-        } else if (ObjectType.CONCEPT.getValue().equalsIgnoreCase(objectType)) {
+        } else if (ObjectType.CONCEPT.getValue().equalsIgnoreCase(type)) {
             if (!conceptDAO.existsByPK(objectId)) {
                 errorDescription.append(String.format("Concept with id %d does not exist!", objectId));
             }
-        } else if (ObjectType.GAME.getValue().equalsIgnoreCase(objectType)) {
+        } else if (ObjectType.GAME.getValue().equalsIgnoreCase(type)) {
             if (!gameDAO.existsByPK(objectId)) {
                 errorDescription.append(String.format("Game with id %d does not exist!", objectId));
             }
-        } else if (ObjectType.LOCATION.getValue().equalsIgnoreCase(objectType)) {
+        } else if (ObjectType.LOCATION.getValue().equalsIgnoreCase(type)) {
             if (!locationDAO.existsByPK(objectId)) {
                 errorDescription.append(String.format("Location with id %d does not exist!", objectId));
             }
-        } else if (ObjectType.OBJECT.getValue().equalsIgnoreCase(objectType)) {
+        } else if (ObjectType.OBJECT.getValue().equalsIgnoreCase(type)) {
             if (!objectDAO.existsByPK(objectId)) {
                 errorDescription.append(String.format("Object with id %d does not exist!", objectId));
             }
-        } else if (ObjectType.PERSON.getValue().equalsIgnoreCase(objectType)) {
+        } else if (ObjectType.PERSON.getValue().equalsIgnoreCase(type)) {
             if (!personDAO.existsByPK(objectId)) {
                 errorDescription.append(String.format("Person with id %d does not exist!", objectId));
             }
         } else {
-            errorDescription.append(String.format("Type %s does not exist!", objectType));
+            errorDescription.append(String.format("Type %s does not exist!", type));
         }
     }
 
     private void createFilter(Filter filter, String objectType, Long objectId) {
-        if (ObjectType.CHARACTER.getValue().equalsIgnoreCase(objectType)) {
+        String type = getType(objectType);
+
+        if (ObjectType.CHARACTER.getValue().equalsIgnoreCase(type)) {
             CharacterEntity entity = characterDAO.findByPK(objectId);
             filter.addFilterExpression(new FilterExpression(LinkMapEntity_.character.getName(), FilterOperation.EQUALS, entity));
-        } else if (ObjectType.CONCEPT.getValue().equalsIgnoreCase(objectType)) {
+        } else if (ObjectType.CONCEPT.getValue().equalsIgnoreCase(type)) {
             ConceptEntity entity = conceptDAO.findByPK(objectId);
             filter.addFilterExpression(new FilterExpression(LinkMapEntity_.concept.getName(), FilterOperation.EQUALS, entity));
-        } else if (ObjectType.GAME.getValue().equalsIgnoreCase(objectType)) {
+        } else if (ObjectType.GAME.getValue().equalsIgnoreCase(type)) {
             GameEntity entity = gameDAO.findByPK(objectId);
             filter.addFilterExpression(new FilterExpression(LinkMapEntity_.game.getName(), FilterOperation.EQUALS, entity));
-        } else if (ObjectType.LOCATION.getValue().equalsIgnoreCase(objectType)) {
+        } else if (ObjectType.LOCATION.getValue().equalsIgnoreCase(type)) {
             LocationEntity entity = locationDAO.findByPK(objectId);
             filter.addFilterExpression(new FilterExpression(LinkMapEntity_.location.getName(), FilterOperation.EQUALS, entity));
-        } else if (ObjectType.OBJECT.getValue().equalsIgnoreCase(objectType)) {
+        } else if (ObjectType.OBJECT.getValue().equalsIgnoreCase(type)) {
             ObjectEntity entity = objectDAO.findByPK(objectId);
             filter.addFilterExpression(new FilterExpression(LinkMapEntity_.object.getName(), FilterOperation.EQUALS, entity));
-        } else if (ObjectType.PERSON.getValue().equalsIgnoreCase(objectType)) {
+        } else if (ObjectType.PERSON.getValue().equalsIgnoreCase(type)) {
             PersonEntity entity = personDAO.findByPK(objectId);
             filter.addFilterExpression(new FilterExpression(LinkMapEntity_.person.getName(), FilterOperation.EQUALS, entity));
         }
+    }
+
+    private String getType(String objectType) {
+        String type = objectType;
+
+        if (objectType.indexOf('#') > -1) {
+            type = objectType.substring(objectType.indexOf('#') + 1, objectType.length());
+        }
+
+        return type;
     }
 
 }

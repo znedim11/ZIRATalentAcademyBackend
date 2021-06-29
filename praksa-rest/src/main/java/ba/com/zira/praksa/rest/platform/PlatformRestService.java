@@ -35,7 +35,6 @@ public class PlatformRestService {
     private PlatformService platformService;
     @Autowired
     private ReleaseService releaseService;
-    private ReleaseType releaseType;
 
     @ApiOperation(value = "Find Platforms", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")
@@ -86,7 +85,7 @@ public class PlatformRestService {
     @PostMapping(value = "/release/add")
     public PayloadResponse<String> addReleasePlatform(@RequestBody EntityRequest<ReleaseRequest> request) throws ApiException {
         final ReleaseRequest addReleaseRequest = request.getEntity();
-        addReleaseRequest.setType(releaseType.Platform.getValue());
+        addReleaseRequest.setType(ReleaseType.PLATFORM.getValue());
         return releaseService.addRelease(request);
     }
 }

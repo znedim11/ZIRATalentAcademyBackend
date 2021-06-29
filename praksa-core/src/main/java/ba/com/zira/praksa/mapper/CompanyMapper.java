@@ -4,7 +4,6 @@ import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
 
 import ba.com.zira.praksa.api.model.company.CompanyCreateRequest;
 import ba.com.zira.praksa.api.model.company.CompanyResponse;
@@ -13,7 +12,6 @@ import ba.com.zira.praksa.dao.model.CompanyEntity;
 
 @Mapper(componentModel = "spring")
 public interface CompanyMapper {
-    CompanyMapper INSTANCE = Mappers.getMapper(CompanyMapper.class);
 
     @Mapping(source = "name", target = "name")
     CompanyResponse companyEntityToCompany(CompanyEntity sampleModelEntity);

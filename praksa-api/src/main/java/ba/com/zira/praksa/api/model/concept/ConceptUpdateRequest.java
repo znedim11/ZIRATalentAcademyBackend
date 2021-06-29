@@ -18,4 +18,6 @@ public class ConceptUpdateRequest implements Serializable {
     private String information;
 
     private String name;
+
+    private String outline;
 }

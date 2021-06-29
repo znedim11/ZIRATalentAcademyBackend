@@ -22,5 +22,4 @@ public class PlatformResponse implements Serializable {
     LocalDateTime modified;
     String modifiedBy;
     String outlineText;
-    // TODO private List<ReleaseResponse> releases;
 }

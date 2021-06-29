@@ -22,8 +22,6 @@ import ba.com.zira.praksa.dao.model.FeatureEntity;
 @Mapper(componentModel = "spring")
 public interface FeatureMapper {
 
-    // FeatureEntity dtoToEntity(FeatureResponse featureDto);
-
     FeatureEntity dtoToEntity(FeatureCreateRequest featureDto);
 
     @Mapping(target = "created", ignore = true)

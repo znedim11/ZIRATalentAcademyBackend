@@ -20,4 +20,5 @@ public class Game implements Serializable {
     private LocalDateTime modified;
     private String modifiedBy;
     private String outlineText;
+    private String imageUrl;
 }

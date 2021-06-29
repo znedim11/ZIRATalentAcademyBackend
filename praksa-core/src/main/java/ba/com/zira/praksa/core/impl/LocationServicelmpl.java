@@ -1,6 +1,5 @@
 package ba.com.zira.praksa.core.impl;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +78,6 @@ public class LocationServicelmpl implements LocationService {
     public PayloadResponse<Location> update(final EntityRequest<Location> request) throws ApiException {
         requestValidator.validate(request);
 
-        final LocalDateTime date = LocalDateTime.now();
         final Location location = request.getEntity();
         final LocationEntity locationEntity = locationMapper.dtoToEntity(location);
 

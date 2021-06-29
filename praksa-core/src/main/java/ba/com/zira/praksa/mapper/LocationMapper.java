@@ -1,8 +1,8 @@
 package ba.com.zira.praksa.mapper;
 
-import org.mapstruct.InheritInverseConfiguration;
+import java.util.List;
+
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
 import ba.com.zira.praksa.api.model.location.Location;
 import ba.com.zira.praksa.dao.model.LocationEntity;
@@ -16,15 +16,10 @@ import ba.com.zira.praksa.dao.model.LocationEntity;
 @Mapper(componentModel = "spring")
 public interface LocationMapper {
 
-    LocationMapper INSTANCE = Mappers.getMapper(LocationMapper.class);
-
     LocationEntity dtoToEntity(Location sample);
 
-    @InheritInverseConfiguration(name = "dtoToEntity")
     Location entityToDto(LocationEntity billingPeriodEntity);
 
-    Location locationEntityToLocation(LocationEntity sampleModelEntity);
-
-    LocationEntity locationToLocationEntity(Location sampleModel);
+    List<Location> entityListToDtoList(List<LocationEntity> entityList);
 
 }

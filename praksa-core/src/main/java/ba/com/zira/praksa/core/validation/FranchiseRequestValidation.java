@@ -6,12 +6,10 @@ import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.response.ValidationResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
-import ba.com.zira.praksa.api.FranchiseService;
 import ba.com.zira.praksa.api.model.franchise.FranchiseUpdateRequest;
 import ba.com.zira.praksa.dao.FranchiseDAO;
 
-
-@Component("franchiseRequestValidation")
+@Component
 public class FranchiseRequestValidation {
 
     private RequestValidator requestValidator;
@@ -22,7 +20,8 @@ public class FranchiseRequestValidation {
         this.franchiseDAO = franchiseDAO;
     }
 
-    public ValidationResponse validateUpdateFranchiseRequest(final EntityRequest<FranchiseUpdateRequest> request, final String validationRuleMessage) {
+    public ValidationResponse validateUpdateFranchiseRequest(final EntityRequest<FranchiseUpdateRequest> request,
+            final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
             StringBuilder errorDescription = new StringBuilder();
