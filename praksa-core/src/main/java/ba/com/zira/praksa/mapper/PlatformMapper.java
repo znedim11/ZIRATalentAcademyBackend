@@ -1,6 +1,7 @@
 package ba.com.zira.praksa.mapper;
 
-import org.mapstruct.InheritInverseConfiguration;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -16,18 +17,13 @@ public interface PlatformMapper {
 
     PlatformMapper INSTANCE = Mappers.getMapper(PlatformMapper.class);
 
-    @Mapping(source = "fullName", target = "fullName")
-    PlatformResponse platformEntityToPlatform(PlatformEntity platformEntity);
-
-    @Mapping(source = "fullName", target = "fullName")
-    PlatformEntity platformToPlatformEntity(PlatformCreateRequest request);
-
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     void updateForPlatformUpdate(PlatformUpdateRequest request, @MappingTarget PlatformEntity platformEntity);
 
     PlatformEntity dtoToEntity(PlatformCreateRequest request);
 
-    @InheritInverseConfiguration(name = "dtoToEntity")
     PlatformResponse entityToDto(PlatformEntity platformEntity);
+
+    List<PlatformResponse> entityListToDtoList(List<PlatformEntity> entityList);
 }

@@ -52,6 +52,8 @@ public class ConceptEntity implements Serializable {
 
     private String name;
 
+    private String outline;
+
     // bi-directional many-to-one association to LinkMapEntity
     @OneToMany(mappedBy = "concept")
     private List<LinkMapEntity> linkMaps;

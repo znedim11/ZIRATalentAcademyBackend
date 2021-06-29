@@ -13,4 +13,6 @@ public class ConceptCreateRequest implements Serializable {
     private String information;
 
     private String name;
+
+    private String outline;
 }

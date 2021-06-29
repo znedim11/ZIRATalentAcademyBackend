@@ -29,5 +29,4 @@ public interface ReleaseMapper {
 
     @InheritInverseConfiguration(name = "dtoToEntity")
     ReleaseResponseLight entityToDto(ReleaseEntity billingPeriodEntity);
-
 }
