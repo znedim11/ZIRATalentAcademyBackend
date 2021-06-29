@@ -6,12 +6,10 @@ import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.response.ValidationResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
-import ba.com.zira.praksa.api.CompanyService;
 import ba.com.zira.praksa.api.model.company.CompanyUpdateRequest;
 import ba.com.zira.praksa.dao.CompanyDAO;
 
-
-@Component("companyRequestValidation")
+@Component
 public class CompanyRequestValidation {
 
     private RequestValidator requestValidator;
@@ -22,7 +20,8 @@ public class CompanyRequestValidation {
         this.companyDAO = companyDAO;
     }
 
-    public ValidationResponse validateUpdateFranchiseRequest(final EntityRequest<CompanyUpdateRequest> request, final String validationRuleMessage) {
+    public ValidationResponse validateUpdateFranchiseRequest(final EntityRequest<CompanyUpdateRequest> request,
+            final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
             StringBuilder errorDescription = new StringBuilder();

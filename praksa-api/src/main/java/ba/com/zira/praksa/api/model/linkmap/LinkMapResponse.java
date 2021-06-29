@@ -11,19 +11,13 @@ public class LinkMapResponse implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String uuid;
-
-    private String TypeObjectA;
-    private long TypeObjectAId;
-
-    private String TypeObjectB;
-    private long TypeObjectBId;
-
+    private String typeObjectA;
+    private Long typeObjectAId;
+    private String typeObjectB;
+    private Long typeObjectBId;
     private LocalDateTime created;
-
-    private String created_by;
-
+    private String createdBy;
     private LocalDateTime modified;
-
-    private String modified_by;
+    private String modifiedBy;
 
 }

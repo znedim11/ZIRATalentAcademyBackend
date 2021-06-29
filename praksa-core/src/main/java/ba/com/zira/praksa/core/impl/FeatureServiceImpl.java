@@ -53,6 +53,8 @@ public class FeatureServiceImpl implements FeatureService {
     private FeatureMapper featureMapper;
     private GameMapper gameMapper;
 
+    static final String VALIDATE_ABSTRACT_REQUEST = "validateAbstractRequest";
+
     public FeatureServiceImpl(RequestValidator requestValidator, FeatureRequestValidation featureRequestValidation, FeatureDAO featureDAO,
             GameDAO gameDAO, GameFeatureDAO gameFeatureDAO, FeatureMapper featureMapper, GameMapper gameMapper) {
         super();
@@ -79,7 +81,7 @@ public class FeatureServiceImpl implements FeatureService {
     @Override
     public PayloadResponse<FeatureResponse> findById(final SearchRequest<Long> request) throws ApiException {
         EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
-        featureRequestValidation.validateIfFeatureExists(entityRequest, "validateAbstractRequest");
+        featureRequestValidation.validateIfFeatureExists(entityRequest, VALIDATE_ABSTRACT_REQUEST);
 
         final FeatureEntity featureEntity = featureDAO.findByPK(request.getEntity());
 
@@ -123,9 +125,9 @@ public class FeatureServiceImpl implements FeatureService {
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<String> delete(final EntityRequest<Long> request) throws ApiException {
         EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
-        featureRequestValidation.validateIfFeatureExists(entityRequest, "validateAbstractRequest");
+        featureRequestValidation.validateIfFeatureExists(entityRequest, VALIDATE_ABSTRACT_REQUEST);
 
-        featureDAO.DeleteRelations(request.getEntity());
+        featureDAO.deleteRelations(request.getEntity());
         featureDAO.removeByPK(request.getEntity());
         return new PayloadResponse<>(request, ResponseCode.OK, "Feature deleted!");
     }
@@ -133,7 +135,7 @@ public class FeatureServiceImpl implements FeatureService {
     @Override
     public PagedPayloadResponse<Game> getGamesByFeature(final EntityRequest<Long> request) throws ApiException {
         EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
-        featureRequestValidation.validateIfFeatureExists(entityRequest, "validateAbstractRequest");
+        featureRequestValidation.validateIfFeatureExists(entityRequest, VALIDATE_ABSTRACT_REQUEST);
 
         PagedData<GameEntity> entityPagedData = gameDAO.getGamesByFeature(request.getEntity());
 

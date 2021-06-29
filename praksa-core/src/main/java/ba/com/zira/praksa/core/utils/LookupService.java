@@ -32,7 +32,7 @@ public class LookupService {
 
     public static String getForString(final String key, final Map<String, String> lookup) {
         if (key != null) {
-            return lookup.get(key) == null ? key.toString() : lookup.get(key);
+            return lookup.get(key) == null ? key : lookup.get(key);
         }
         return null;
     }

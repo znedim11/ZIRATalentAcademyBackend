@@ -38,7 +38,7 @@ import ba.com.zira.praksa.dao.model.PersonEntity;
  *
  */
 
-@Component("linkMapRequestValidation")
+@Component
 public class LinkMapRequestValidation {
     LinkMapDAO linkMapDAO;
     RequestValidator requestValidator;
@@ -48,6 +48,8 @@ public class LinkMapRequestValidation {
     LocationDAO locationDAO;
     ObjectDAO objectDAO;
     PersonDAO personDAO;
+
+    static final String ENTITY_EXISTS = "Entity must exist in request!";
 
     public LinkMapRequestValidation(LinkMapDAO linkMapDAO, RequestValidator requestValidator, CharacterDAO characterDAO,
             ConceptDAO conceptDAO, GameDAO gameDAO, LocationDAO locationDAO, ObjectDAO objectDAO, PersonDAO personDAO) {
@@ -80,7 +82,7 @@ public class LinkMapRequestValidation {
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
             StringBuilder errorDescription = new StringBuilder();
             if (request.getEntity() == null) {
-                errorDescription.append("Entity must exist in request!");
+                errorDescription.append(ENTITY_EXISTS);
             }
             validationResponse = requestValidator.createResponse(request, errorDescription);
         }
@@ -93,7 +95,7 @@ public class LinkMapRequestValidation {
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
             StringBuilder errorDescription = new StringBuilder();
             if (request.getEntity() == null) {
-                errorDescription.append("Entity must exist in request!");
+                errorDescription.append(ENTITY_EXISTS);
             }
             validationResponse = requestValidator.createResponse(request, errorDescription);
         }
@@ -105,7 +107,7 @@ public class LinkMapRequestValidation {
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
             StringBuilder errorDescription = new StringBuilder();
             if (request.getEntity() == null) {
-                errorDescription.append("Entity must exist in request!");
+                errorDescription.append(ENTITY_EXISTS);
             }
             validationResponse = requestValidator.createResponse(request, errorDescription);
         }

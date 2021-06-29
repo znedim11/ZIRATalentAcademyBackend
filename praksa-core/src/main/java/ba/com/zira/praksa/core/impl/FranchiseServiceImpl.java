@@ -17,9 +17,8 @@ import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.FranchiseService;
 import ba.com.zira.praksa.api.model.franchise.FranchiseCreateRequest;
-import ba.com.zira.praksa.api.model.franchise.FranchiseUpdateRequest;
-import ba.com.zira.praksa.core.validation.FranchiseRequestValidation;
 import ba.com.zira.praksa.api.model.franchise.FranchiseResponse;
+import ba.com.zira.praksa.api.model.franchise.FranchiseUpdateRequest;
 import ba.com.zira.praksa.dao.FranchiseDAO;
 import ba.com.zira.praksa.dao.model.FranchiseEntity;
 import ba.com.zira.praksa.mapper.FranchiseMapper;
@@ -45,7 +44,7 @@ public class FranchiseServiceImpl implements FranchiseService {
         final List<FranchiseResponse> franchiseList = new ArrayList<>();
 
         for (final FranchiseEntity FranchiseEntity : franchiseModelEntities.getRecords()) {
-        	franchiseList.add(franchiseMapper.entityToDto(FranchiseEntity));
+            franchiseList.add(franchiseMapper.entityToDto(FranchiseEntity));
         }
         return new PagedPayloadResponse<>(request, ResponseCode.OK, franchiseList.size(), 1, 1, franchiseList.size(), franchiseList);
     }
@@ -72,24 +71,21 @@ public class FranchiseServiceImpl implements FranchiseService {
     @Transactional(rollbackFor = ApiException.class)
     @Override
     public PayloadResponse<FranchiseResponse> update(final EntityRequest<FranchiseUpdateRequest> request) throws ApiException {
-    	requestValidator.validate(request);
-    	
-        FranchiseEntity existingFranchiseEntity=franchiseDAO.findByPK(request.getEntity().getId());
+        requestValidator.validate(request);
+
+        FranchiseEntity existingFranchiseEntity = franchiseDAO.findByPK(request.getEntity().getId());
 
         final LocalDateTime date = LocalDateTime.now();
         final FranchiseUpdateRequest franchise = request.getEntity();
-        
-        
+
         franchiseMapper.updateForFranchiseUpdate(franchise, existingFranchiseEntity);
-  
 
         existingFranchiseEntity.setModified(date);
         existingFranchiseEntity.setModifiedBy(request.getUserId());
-        
-        
+
         franchiseDAO.merge(existingFranchiseEntity);
 
-        final FranchiseResponse response=franchiseMapper.entityToDto(existingFranchiseEntity);
+        final FranchiseResponse response = franchiseMapper.entityToDto(existingFranchiseEntity);
         return new PayloadResponse<>(request, ResponseCode.OK, response);
 
     }

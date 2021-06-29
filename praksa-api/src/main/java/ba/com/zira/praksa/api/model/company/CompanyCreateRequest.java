@@ -1,6 +1,5 @@
 package ba.com.zira.praksa.api.model.company;
 
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -10,7 +9,6 @@ import lombok.Data;
 public class CompanyCreateRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    //private Long id;
     private String address;
     private String city;
     private String country;
@@ -25,6 +23,6 @@ public class CompanyCreateRequest implements Serializable {
     private String outlineText;
     private LocalDateTime startDate;
     private String telNumber;
-    private String website;  
+    private String website;
 
 }

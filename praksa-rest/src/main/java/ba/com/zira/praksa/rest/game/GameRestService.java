@@ -126,7 +126,7 @@ public class GameRestService {
     @PostMapping(value = "/release/add")
     public PayloadResponse<String> addReleaseGame(@RequestBody final EntityRequest<ReleaseRequest> request) throws ApiException {
         final ReleaseRequest addReleaseRequest = request.getEntity();
-        addReleaseRequest.setType(ReleaseType.Game.getValue());
+        addReleaseRequest.setType(ReleaseType.GAME.getValue());
         return releaseService.addRelease(request);
     }
 

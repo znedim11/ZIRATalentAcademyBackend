@@ -5,7 +5,6 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
 
 import ba.com.zira.praksa.api.model.platform.PlatformCreateRequest;
 import ba.com.zira.praksa.api.model.platform.PlatformResponse;
@@ -14,8 +13,6 @@ import ba.com.zira.praksa.dao.model.PlatformEntity;
 
 @Mapper(componentModel = "spring")
 public interface PlatformMapper {
-
-    PlatformMapper INSTANCE = Mappers.getMapper(PlatformMapper.class);
 
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "createdBy", ignore = true)

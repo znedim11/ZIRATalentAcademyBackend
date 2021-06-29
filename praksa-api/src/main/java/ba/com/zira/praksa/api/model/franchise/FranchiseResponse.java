@@ -3,7 +3,6 @@ package ba.com.zira.praksa.api.model.franchise;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import ba.com.zira.praksa.api.model.game.GameResponse;
 import lombok.Data;
 
 @Data
@@ -19,7 +18,5 @@ public class FranchiseResponse implements Serializable {
     private String modifiedBy;
     private String name;
     private String outlineText;
-    //private Long gameId; 
-   // private FranchiseResponse dlcFranchise; 
 
 }

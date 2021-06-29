@@ -30,7 +30,7 @@ public class FeatureDAO extends AbstractDAO<FeatureEntity, Long> {
 
         TypedQuery<FeatureEntity> query = entityManager.createQuery(jpql, FeatureEntity.class).setParameter("gameId", gameId);
 
-        PagedData<FeatureEntity> featuresPagedData = new PagedData<FeatureEntity>();
+        PagedData<FeatureEntity> featuresPagedData = new PagedData<>();
         featuresPagedData.setRecords(query.getResultList());
 
         return featuresPagedData;
@@ -49,7 +49,7 @@ public class FeatureDAO extends AbstractDAO<FeatureEntity, Long> {
         return query.getResultList();
     }
 
-    public void DeleteRelations(final Long featureId) {
+    public void deleteRelations(final Long featureId) {
         CriteriaDelete<GameFeatureEntity> criteriaDelete = builder.createCriteriaDelete(GameFeatureEntity.class);
         Root<GameFeatureEntity> root = criteriaDelete.from(GameFeatureEntity.class);
 

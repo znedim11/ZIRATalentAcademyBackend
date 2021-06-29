@@ -170,7 +170,7 @@ public class LinkMapServiceImpl implements LinkMapService {
 
     @Override
     public PayloadResponse<LinkMapResponse> findByUuid(EntityRequest<String> request) throws ApiException {
-        linkMapRequestValidation.validateLinkMapExists(request, "validateAbstractRequest");
+        linkMapRequestValidation.validateLinkMapExists(request, VALIDATE_ABSTRACT_REQUEST);
 
         final LinkMapEntity linkMapEntity = linkMapDAO.findByPK(request.getEntity());
 
@@ -179,21 +179,10 @@ public class LinkMapServiceImpl implements LinkMapService {
         return new PayloadResponse<>(request, ResponseCode.OK, linkMapResponse);
     }
 
-    private LinkMapEntity updateLinkMapEntity(String objectAType, Long objectAId, String objectBType, Long objectBId, String userId) {
-        LinkMapEntity entity = new LinkMapEntity();
-        entity.setModified(LocalDateTime.now());
-        entity.setModifiedBy(userId);
-
-        setLinkId(entity, objectAType, objectAId);
-        setLinkId(entity, objectBType, objectBId);
-
-        return entity;
-    }
-
     @Override
     public PayloadResponse<String> delete(EntityRequest<String> request) throws ApiException {
         EntityRequest<String> entityRequest = new EntityRequest<>(request.getEntity(), request);
-        linkMapRequestValidation.validateLinkMapExists(entityRequest, "validateAbstractRequest");
+        linkMapRequestValidation.validateLinkMapExists(entityRequest, VALIDATE_ABSTRACT_REQUEST);
 
         linkMapDAO.removeByPK(request.getEntity());
 

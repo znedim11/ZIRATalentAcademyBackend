@@ -5,21 +5,18 @@ import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
-import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.praksa.api.model.franchise.FranchiseCreateRequest;
-import ba.com.zira.praksa.api.model.franchise.FranchiseUpdateRequest;
 import ba.com.zira.praksa.api.model.franchise.FranchiseResponse;
+import ba.com.zira.praksa.api.model.franchise.FranchiseUpdateRequest;
 
+public interface FranchiseService {
+    public PagedPayloadResponse<FranchiseResponse> find(final SearchRequest<String> request) throws ApiException;
 
-public interface FranchiseService
-{
-	  public PagedPayloadResponse<FranchiseResponse> find(final SearchRequest<String> request) throws ApiException;
-	  
-	   PayloadResponse<FranchiseResponse> findById(SearchRequest<Long> request) throws ApiException;
-	   
-	    PayloadResponse<FranchiseResponse> create(EntityRequest<FranchiseCreateRequest> request) throws ApiException;
-	    
-	    PayloadResponse<FranchiseResponse> update(final EntityRequest<FranchiseUpdateRequest> request) throws ApiException;
-	    
-	    PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
+    PayloadResponse<FranchiseResponse> findById(SearchRequest<Long> request) throws ApiException;
+
+    PayloadResponse<FranchiseResponse> create(EntityRequest<FranchiseCreateRequest> request) throws ApiException;
+
+    PayloadResponse<FranchiseResponse> update(final EntityRequest<FranchiseUpdateRequest> request) throws ApiException;
+
+    PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
 }

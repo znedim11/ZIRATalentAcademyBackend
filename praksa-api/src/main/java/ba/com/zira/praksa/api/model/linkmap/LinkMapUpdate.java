@@ -11,19 +11,13 @@ public class LinkMapUpdate implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String uuid;
-
-    private String ObjectAType;
-    private long ObjectAId;
-
-    private String ObjectBType;
-    private long ObjectBId;
-
+    private String objectAType;
+    private Long objectAId;
+    private String objectBType;
+    private Long objectBId;
     private LocalDateTime created;
-
-    private String created_by;
-
+    private String createdBy;
     private LocalDateTime modified;
-
-    private String modified_by;
+    private String modifiedBy;
 
 }

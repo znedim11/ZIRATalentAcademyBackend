@@ -20,7 +20,7 @@ public class GameFeatureDAO extends AbstractDAO<GameFeatureEntity, String> {
         return query.getResultList();
     }
 
-    public boolean CheckIfRelationExists(final Long gameId, final Long featureId) {
+    public boolean checkIfRelationExists(final Long gameId, final Long featureId) {
         String jpql = "SELECT gf FROM GameFeatureEntity gf WHERE gf.game.id = :gameId AND gf.feature.id = :featureId ";
 
         TypedQuery<GameFeatureEntity> query = entityManager.createQuery(jpql, GameFeatureEntity.class).setParameter("gameId", gameId)
