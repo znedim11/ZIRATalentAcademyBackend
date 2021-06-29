@@ -1,6 +1,8 @@
 package ba.com.zira.praksa.dao;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.persistence.TypedQuery;
 
@@ -131,5 +133,12 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         query.setParameter("gId", gameId);
 
         return query.getResultList();
+    }
+
+    public Map<Long, String> getGameName(final List<Long> ids) {
+        String jpql = "select new ba.com.zira.praksa.api.model.LoV(g.id, g.fullName) from GameEntity g where g.id in :ids";
+        TypedQuery<LoV> query = entityManager.createQuery(jpql, LoV.class).setParameter("ids", ids);
+        List<LoV> lovs = query.getResultList();
+        return lovs.stream().collect(Collectors.toMap(LoV::getId, LoV::getName));
     }
 }
