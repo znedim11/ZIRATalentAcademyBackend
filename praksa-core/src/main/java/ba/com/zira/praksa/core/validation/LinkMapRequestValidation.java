@@ -14,6 +14,8 @@ import ba.com.zira.commons.model.FilterExpression.FilterOperation;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.model.enums.ObjectType;
+import ba.com.zira.praksa.api.model.linkmap.LinkMapCreate;
+import ba.com.zira.praksa.api.model.linkmap.LinkMapUpdate;
 import ba.com.zira.praksa.api.model.linkmap.LinkRequest;
 import ba.com.zira.praksa.api.model.linkmap.MultipleLinkRequest;
 import ba.com.zira.praksa.dao.CharacterDAO;
@@ -58,6 +60,44 @@ public class LinkMapRequestValidation {
         this.locationDAO = locationDAO;
         this.objectDAO = objectDAO;
         this.personDAO = personDAO;
+    }
+
+    public ValidationResponse validateLinkMapExists(final EntityRequest<String> request, final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (!linkMapDAO.existsByPK(request.getEntity())) {
+                errorDescription.append("LinkMap with id ").append(request.getEntity()).append(" does not exist !");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateEntityExistsInCreateRequest(final EntityRequest<LinkMapCreate> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (request.getEntity() == null) {
+                errorDescription.append("Entity must exist in request!");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateEntityExistsInUpdateRequest(final EntityRequest<LinkMapUpdate> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (request.getEntity() == null) {
+                errorDescription.append("Entity must exist in request!");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
     }
 
     public ValidationResponse validateEntityExistsInLinkRequest(final EntityRequest<?> request, final String validationRuleMessage) {
