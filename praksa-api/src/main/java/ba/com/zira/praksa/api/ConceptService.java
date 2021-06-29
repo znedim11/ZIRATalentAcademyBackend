@@ -1,5 +1,7 @@
 package ba.com.zira.praksa.api;
 
+import java.time.LocalDateTime;
+
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.ListRequest;
@@ -14,7 +16,7 @@ import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptSearchRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
-import ba.com.zira.praksa.api.model.game.GameResponse;
+import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.location.Location;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
@@ -103,7 +105,7 @@ public interface ConceptService {
      */
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
 
-    ListPayloadResponse<GameResponse> getGamesByConcept(final EntityRequest<Long> request) throws ApiException;
+    ListPayloadResponse<GameOverviewResponse> getGamesByConcept(final EntityRequest<Long> request) throws ApiException;
 
     ListPayloadResponse<Person> getPersonsByConcept(final EntityRequest<Long> request) throws ApiException;
 
@@ -119,4 +121,5 @@ public interface ConceptService {
 
     ListPayloadResponse<ConceptResponse> searchConcepts(EntityRequest<ConceptSearchRequest> request) throws ApiException;
 
+    PayloadResponse<LocalDateTime> getOldestReleaseDateByConcept(final EntityRequest<Long> request) throws ApiException;
 }

@@ -3,6 +3,7 @@
  */
 package ba.com.zira.praksa.rest.concept;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,7 +33,7 @@ import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptSearchRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
-import ba.com.zira.praksa.api.model.game.GameResponse;
+import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.location.Location;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
@@ -105,7 +106,7 @@ public class ConceptRestService {
 
     @ApiOperation(value = "Get Games by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}/games")
-    public ListPayloadResponse<GameResponse> getGamesByConcept(@PathVariable final Long id) throws ApiException {
+    public ListPayloadResponse<GameOverviewResponse> getGamesByConcept(@PathVariable final Long id) throws ApiException {
 
         final EntityRequest<Long> request = new EntityRequest<>();
         request.setEntity(id);
@@ -195,6 +196,17 @@ public class ConceptRestService {
         request.setEntity(entity);
 
         return conceptService.searchConcepts(request);
+    }
+
+    @ApiOperation(value = "Get oldest release date by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/releasedate")
+    public PayloadResponse<LocalDateTime> getOldestReleaseDateByConcept(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return conceptService.getOldestReleaseDateByConcept(request);
     }
 
 }

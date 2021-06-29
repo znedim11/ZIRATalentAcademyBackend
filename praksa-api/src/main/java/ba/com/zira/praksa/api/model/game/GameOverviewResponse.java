@@ -15,7 +15,7 @@ public class GameOverviewResponse implements Serializable {
     private String outlineText;
     private String imageUrl;
     private String[] platformAbbreviations;
-    private String[] platformNames;
+    private String platformName;
     private String firstReleaseDate;
     private String developer;
     private String publisher;

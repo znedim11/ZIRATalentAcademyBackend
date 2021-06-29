@@ -4,7 +4,10 @@
 package ba.com.zira.praksa.core.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,24 +29,28 @@ import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptSearchRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
-import ba.com.zira.praksa.api.model.game.GameResponse;
+import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.location.Location;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
 import ba.com.zira.praksa.core.validation.ConceptRequestValidation;
 import ba.com.zira.praksa.dao.ConceptDAO;
+import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.dao.model.LocationEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
+import ba.com.zira.praksa.dao.model.ReleaseEntity;
 import ba.com.zira.praksa.mapper.CharacterMapper;
 import ba.com.zira.praksa.mapper.ConceptMapper;
 import ba.com.zira.praksa.mapper.GameMapper;
 import ba.com.zira.praksa.mapper.LocationMapper;
 import ba.com.zira.praksa.mapper.ObjectMapper;
 import ba.com.zira.praksa.mapper.PersonMapper;
+import ba.com.zira.praksa.mapper.PlatformMapper;
+import ba.com.zira.praksa.mapper.ReleaseMapper;
 
 /**
  * @author zira
@@ -65,10 +72,14 @@ public class ConceptServiceImpl implements ConceptService {
     ObjectMapper objectMapper;
     CharacterMapper characterMapper;
     LocationMapper locationMapper;
+    PlatformMapper platformMapper;
+    ReleaseMapper releaseMapper;
+    GameDAO gameDAO;
 
     public ConceptServiceImpl(RequestValidator requestValidator, ConceptRequestValidation conceptRequestValidation, ConceptDAO conceptDAO,
             ConceptMapper conceptMapper, GameMapper gameMapper, PersonMapper personMapper, ObjectMapper objectMapper,
-            CharacterMapper characterMapper, LocationMapper locationMapper) {
+            CharacterMapper characterMapper, LocationMapper locationMapper, PlatformMapper platformMapper, ReleaseMapper releaseMapper,
+            GameDAO gameDAO) {
         super();
         this.requestValidator = requestValidator;
         this.conceptRequestValidation = conceptRequestValidation;
@@ -79,6 +90,9 @@ public class ConceptServiceImpl implements ConceptService {
         this.objectMapper = objectMapper;
         this.characterMapper = characterMapper;
         this.locationMapper = locationMapper;
+        this.platformMapper = platformMapper;
+        this.releaseMapper = releaseMapper;
+        this.gameDAO = gameDAO;
     }
 
     @Override
@@ -168,12 +182,24 @@ public class ConceptServiceImpl implements ConceptService {
     }
 
     @Override
-    public ListPayloadResponse<GameResponse> getGamesByConcept(final EntityRequest<Long> request) throws ApiException {
+    public ListPayloadResponse<GameOverviewResponse> getGamesByConcept(final EntityRequest<Long> request) throws ApiException {
         EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
         conceptRequestValidation.validateConceptExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
 
         List<GameEntity> entityList = conceptDAO.getGamesByConcept(request.getEntity());
-        List<GameResponse> gameList = gameMapper.gameEntitesToGames(entityList);
+        List<GameOverviewResponse> gameList = new ArrayList<>();
+
+        for (GameEntity gameEntity : entityList) {
+            GameOverviewResponse game = gameMapper.entityToOverviewResponse(gameEntity);
+            List<ReleaseEntity> entity = gameDAO.getFirstReleaseByGame(game.getId());
+
+            if (!entity.isEmpty()) {
+                game.setFirstReleaseDate(entity.get(0).getReleaseDate().toString());
+                game.setPlatformName(entity.get(0).getPlatform().getAbbriviation());
+            }
+
+            gameList.add(game);
+        }
 
         return new ListPayloadResponse<>(request, ResponseCode.OK, gameList);
     }
@@ -252,8 +278,26 @@ public class ConceptServiceImpl implements ConceptService {
 
         List<ConceptEntity> conceptEntities = conceptDAO.searchConcepts(request.getEntity());
         List<ConceptResponse> conceptList = conceptMapper.entityListToResponseList(conceptEntities);
+        for (ConceptResponse conceptResponse : conceptList) {
+            conceptResponse.setNumberofGames(conceptDAO.getNumberOfGamesByConcept(conceptResponse.getId()));
+        }
+
+        if (request.getEntity().getSortBy() != null && request.getEntity().getSortBy().equals("Most games")) {
+            conceptList = conceptList.stream().sorted(Comparator.comparingLong(ConceptResponse::getNumberofGames).reversed())
+                    .collect(Collectors.toList());
+        }
 
         return new ListPayloadResponse<>(request, ResponseCode.OK, conceptList);
+    }
+
+    @Override
+    public PayloadResponse<LocalDateTime> getOldestReleaseDateByConcept(EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
+        conceptRequestValidation.validateConceptExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+
+        LocalDateTime releaseDate = conceptDAO.getFirstReleaseDateByConcept(request.getEntity());
+
+        return new PayloadResponse<>(request, ResponseCode.OK, releaseDate);
     }
 
 }

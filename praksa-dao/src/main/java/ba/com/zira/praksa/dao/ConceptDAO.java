@@ -1,5 +1,6 @@
 package ba.com.zira.praksa.dao;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.TypedQuery;
@@ -83,7 +84,7 @@ public class ConceptDAO extends AbstractDAO<ConceptEntity, Long> {
         return query.getResultList();
     }
 
-    public Long getNumberOfGamesByConcept(Long conceptId) {
+    public Long getNumberOfGamesByConcept(final Long conceptId) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("SELECT COUNT(g) FROM GameEntity g, LinkMapEntity lm WHERE lm.concept.id = :cId AND lm.game.id = g.id");
 
@@ -135,4 +136,16 @@ public class ConceptDAO extends AbstractDAO<ConceptEntity, Long> {
         return query.getResultList();
 
     }
+
+    public LocalDateTime getFirstReleaseDateByConcept(final Long conceptId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(
+                "SELECT r.releaseDate FROM LinkMapEntity lm JOIN GameEntity g ON lm.game.id = g.id JOIN ReleaseEntity r on g.id = r.game.id WHERE lm.concept.id = :cId ORDER BY r.releaseDate ASC");
+
+        TypedQuery<LocalDateTime> query = entityManager.createQuery(stringBuilder.toString(), LocalDateTime.class);
+        query.setParameter("cId", conceptId);
+
+        return query.getResultList().isEmpty() ? null : query.getResultList().get(0);
+    }
+
 }

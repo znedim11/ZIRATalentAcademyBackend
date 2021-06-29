@@ -28,4 +28,6 @@ public class ConceptResponse implements Serializable {
     private String imageUrl;
 
     private String outline;
+
+    private Long numberofGames;
 }

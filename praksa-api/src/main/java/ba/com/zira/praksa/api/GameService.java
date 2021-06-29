@@ -22,8 +22,6 @@ import ba.com.zira.praksa.api.model.gamefeature.GameFeatureResponse;
 import ba.com.zira.praksa.api.model.location.Location;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
-import ba.com.zira.praksa.api.model.platform.PlatformResponse;
-import ba.com.zira.praksa.api.model.release.ReleaseResponseLight;
 
 /**
  * * Methods used to manipulate {@link Game} data. <br>
@@ -165,10 +163,6 @@ public interface GameService {
      *             corresponding error message and {@link ResponseCode}.
      */
     PayloadResponse<String> removeFeature(EntityRequest<String> request) throws ApiException;
-
-    PayloadResponse<ReleaseResponseLight> getFirstReleaseByGame(final EntityRequest<Long> request) throws ApiException;
-
-    ListPayloadResponse<PlatformResponse> getPlatformsByGame(final EntityRequest<Long> request) throws ApiException;
 
     PayloadResponse<GameOverviewResponse> getOverview(final EntityRequest<Long> request) throws ApiException;
 

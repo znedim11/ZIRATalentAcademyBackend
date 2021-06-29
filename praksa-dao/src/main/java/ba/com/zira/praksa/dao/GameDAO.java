@@ -113,14 +113,14 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         return query.getResultList();
     }
 
-    public ReleaseEntity getFirstReleaseByGame(Long gameId) {
+    public List<ReleaseEntity> getFirstReleaseByGame(Long gameId) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("SELECT r FROM ReleaseEntity r WHERE r.game.id = :gId ORDER BY r.releaseDate");
 
         TypedQuery<ReleaseEntity> query = entityManager.createQuery(stringBuilder.toString(), ReleaseEntity.class);
         query.setParameter("gId", gameId);
 
-        return query.setMaxResults(1).getResultList().get(0);
+        return query.getResultList();
     }
 
     public List<PlatformEntity> getPlatformsByGame(Long gameId) {

@@ -48,4 +48,6 @@ public interface GameMapper {
 
     List<GameResponse> gameEntitesToGames(List<GameEntity> gameEnts);
 
+    List<GameOverviewResponse> entityListToOverviewResponseList(List<GameEntity> entityList);
+
 }

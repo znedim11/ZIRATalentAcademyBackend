@@ -47,7 +47,6 @@ import ba.com.zira.praksa.dao.model.GameFeatureEntity;
 import ba.com.zira.praksa.dao.model.LocationEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
-import ba.com.zira.praksa.dao.model.PlatformEntity;
 import ba.com.zira.praksa.dao.model.ReleaseEntity;
 import ba.com.zira.praksa.mapper.CharacterMapper;
 import ba.com.zira.praksa.mapper.ConceptMapper;
@@ -288,44 +287,23 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public PayloadResponse<ReleaseResponseLight> getFirstReleaseByGame(EntityRequest<Long> request) throws ApiException {
-        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
-        gameRequestValidation.validateIfGameExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
-
-        ReleaseEntity entity = gameDAO.getFirstReleaseByGame(request.getEntity());
-        ReleaseResponseLight release = releaseMapper.entityToDto(entity);
-        release.setDeveloperName(entity.getDeveloper().getName());
-        release.setPublisherName(entity.getPublisher().getName());
-
-        return new PayloadResponse<>(request, ResponseCode.OK, release);
-    }
-
-    @Override
-    public ListPayloadResponse<PlatformResponse> getPlatformsByGame(EntityRequest<Long> request) throws ApiException {
-        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
-        gameRequestValidation.validateIfGameExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
-
-        List<PlatformEntity> entityList = gameDAO.getPlatformsByGame(request.getEntity());
-        List<PlatformResponse> platformList = platformMapper.entityListToDtoList(entityList);
-
-        return new ListPayloadResponse<>(request, ResponseCode.OK, platformList);
-    }
-
-    @Override
     public PayloadResponse<GameOverviewResponse> getOverview(EntityRequest<Long> request) throws ApiException {
         GameOverviewResponse gameOverview = gameMapper.entityToOverviewResponse(gameDAO.findByPK(request.getEntity()));
 
         List<PlatformResponse> platforms = platformMapper.entityListToDtoList(gameDAO.getPlatformsByGame(request.getEntity()));
-        ReleaseEntity entity = gameDAO.getFirstReleaseByGame(request.getEntity());
-        ReleaseResponseLight release = releaseMapper.entityToDto(entity);
-        release.setDeveloperName(entity.getDeveloper().getName());
-        release.setPublisherName(entity.getPublisher().getName());
+        List<ReleaseEntity> entity = gameDAO.getFirstReleaseByGame(request.getEntity());
 
-        gameOverview.setPlatformAbbreviations(platforms.stream().map(PlatformResponse::getAbbriviation).toArray(String[]::new));
-        gameOverview.setPlatformNames(platforms.stream().map(PlatformResponse::getFullName).toArray(String[]::new));
-        gameOverview.setFirstReleaseDate(release.getReleaseDate().toString());
-        gameOverview.setPublisher(release.getPublisherName());
-        gameOverview.setDeveloper(release.getDeveloperName());
+        if (!entity.isEmpty()) {
+            ReleaseResponseLight release = releaseMapper.entityToDto(entity.get(0));
+            release.setDeveloperName(entity.get(0).getDeveloper().getName());
+            release.setPublisherName(entity.get(0).getPublisher().getName());
+            release.setPlatformName(entity.get(0).getPlatform().getFullName());
+            gameOverview.setPlatformAbbreviations(platforms.stream().map(PlatformResponse::getAbbriviation).toArray(String[]::new));
+            gameOverview.setFirstReleaseDate(release.getReleaseDate().toString());
+            gameOverview.setPublisher(release.getPublisherName());
+            gameOverview.setDeveloper(release.getDeveloperName());
+            gameOverview.setPlatformName(release.getPlatformName());
+        }
 
         return new PayloadResponse<>(request, ResponseCode.OK, gameOverview);
     }
