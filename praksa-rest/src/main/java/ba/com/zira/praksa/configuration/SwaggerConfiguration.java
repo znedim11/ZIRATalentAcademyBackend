@@ -152,13 +152,6 @@ public class SwaggerConfiguration {
     }
 
     @Bean
-    public Docket characterApi() {
-        return new Docket(DocumentationType.SWAGGER_2).groupName("character-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.character")).build()
-                .tags(new Tag("character", "Character APIs")).globalOperationParameters(operationParameters);
-    }
-
-    @Bean
     public Docket reviewApi() {
         return new Docket(DocumentationType.SWAGGER_2).groupName("review-api").apiInfo(apiInfo()).select()
                 .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.review")).build().tags(new Tag("review", "Review APIs"))
