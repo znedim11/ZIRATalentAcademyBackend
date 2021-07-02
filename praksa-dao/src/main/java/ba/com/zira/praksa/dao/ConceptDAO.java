@@ -1,5 +1,6 @@
 package ba.com.zira.praksa.dao;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.TypedQuery;
@@ -8,14 +9,17 @@ import org.springframework.stereotype.Repository;
 
 import ba.com.zira.commons.dao.AbstractDAO;
 import ba.com.zira.praksa.api.model.LoV;
+import ba.com.zira.praksa.api.model.concept.ConceptSearchRequest;
+import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
+import ba.com.zira.praksa.dao.model.LocationEntity;
+import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
 
 @Repository
 public class ConceptDAO extends AbstractDAO<ConceptEntity, Long> {
     public List<GameEntity> getGamesByConcept(final Long conceptId) {
-
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("SELECT g FROM GameEntity g, LinkMapEntity lm WHERE lm.concept.id = :cId AND lm.game.id = g.id");
 
@@ -27,7 +31,6 @@ public class ConceptDAO extends AbstractDAO<ConceptEntity, Long> {
     }
 
     public List<PersonEntity> getPersonsByConcept(final Long conceptId) {
-
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("SELECT p FROM PersonEntity p, LinkMapEntity lm WHERE lm.concept.id = :cId AND lm.person.id = p.id");
 
@@ -50,4 +53,99 @@ public class ConceptDAO extends AbstractDAO<ConceptEntity, Long> {
 
         return query.getResultList();
     }
+
+    public List<ObjectEntity> getObjectsByConcept(final Long conceptId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT o FROM ObjectEntity o, LinkMapEntity lm WHERE lm.concept.id = :cId AND lm.object.id = o.id");
+
+        TypedQuery<ObjectEntity> query = entityManager.createQuery(stringBuilder.toString(), ObjectEntity.class);
+        query.setParameter("cId", conceptId);
+
+        return query.getResultList();
+    }
+
+    public List<CharacterEntity> getCharactersByConcept(final Long conceptId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT c FROM CharacterEntity c, LinkMapEntity lm WHERE lm.concept.id = :cId AND lm.character.id = c.id");
+
+        TypedQuery<CharacterEntity> query = entityManager.createQuery(stringBuilder.toString(), CharacterEntity.class);
+        query.setParameter("cId", conceptId);
+
+        return query.getResultList();
+    }
+
+    public List<LocationEntity> getLocationsByConcept(final Long conceptId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT l FROM LocationEntity l, LinkMapEntity lm WHERE lm.concept.id = :cId AND lm.location.id = l.id");
+
+        TypedQuery<LocationEntity> query = entityManager.createQuery(stringBuilder.toString(), LocationEntity.class);
+        query.setParameter("cId", conceptId);
+
+        return query.getResultList();
+    }
+
+    public Long getNumberOfGamesByConcept(final Long conceptId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT COUNT(g) FROM GameEntity g, LinkMapEntity lm WHERE lm.concept.id = :cId AND lm.game.id = g.id");
+
+        TypedQuery<Long> query = entityManager.createQuery(stringBuilder.toString(), Long.class);
+        query.setParameter("cId", conceptId);
+
+        return query.getSingleResult();
+    }
+
+    public List<ConceptEntity> searchConcepts(final ConceptSearchRequest request) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT DISTINCT c FROM ConceptEntity c ");
+        stringBuilder.append("LEFT JOIN LinkMapEntity lm ON c.id = lm.concept.id ");
+        stringBuilder.append("LEFT JOIN GameEntity g ON lm.game.id = g.id ");
+        stringBuilder.append("LEFT JOIN CharacterEntity ch ON lm.character.id = ch.id ");
+        stringBuilder.append("WHERE 1 = 1 ");
+
+        if (request.getName() != null && !request.getName().equals("")) {
+            stringBuilder.append("AND c.name LIKE :name ");
+        }
+        if (request.getGameIds() != null) {
+            stringBuilder.append("AND g.id IN :gameIds ");
+        }
+        if (request.getCharacterIds() != null) {
+            stringBuilder.append("AND ch.id IN :characterIds ");
+        }
+
+        if (request.getSortBy() != null && request.getSortBy().equals("Alphabetical")) {
+            stringBuilder.append("ORDER BY c.name");
+        } else if (request.getSortBy() != null && request.getSortBy().equals("Last edit")) {
+            stringBuilder.append("ORDER BY c.modified DESC");
+        } else if (request.getSortBy() != null && request.getSortBy().equals("Most games")) {
+            stringBuilder.append("");
+        }
+
+        TypedQuery<ConceptEntity> query = entityManager.createQuery(stringBuilder.toString(), ConceptEntity.class);
+
+        if (request.getName() != null && !request.getName().equals("")) {
+            query.setParameter("name", request.getName());
+        }
+        if (request.getGameIds() != null) {
+            query.setParameter("gameIds", request.getGameIds());
+        }
+        if (request.getCharacterIds() != null) {
+            query.setParameter("characterIds", request.getCharacterIds());
+        }
+
+        return query.getResultList();
+
+    }
+
+    public LocalDateTime getFirstReleaseDateByConcept(final Long conceptId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(
+                "SELECT r.releaseDate FROM LinkMapEntity lm JOIN GameEntity g ON lm.game.id = g.id JOIN ReleaseEntity r on g.id = r.game.id WHERE lm.concept.id = :cId ORDER BY r.releaseDate ASC");
+
+        TypedQuery<LocalDateTime> query = entityManager.createQuery(stringBuilder.toString(), LocalDateTime.class);
+        query.setParameter("cId", conceptId);
+
+        return query.getResultList().isEmpty() ? null : query.getResultList().get(0);
+    }
+
 }

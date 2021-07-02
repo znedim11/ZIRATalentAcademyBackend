@@ -54,6 +54,13 @@ public class SwaggerConfiguration {
     }
 
     @Bean
+    public Docket characterApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("character-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.character")).build()
+                .tags(new Tag("character", "Character APIs")).globalOperationParameters(operationParameters);
+    }
+
+    @Bean
     public Docket gameApi() {
         return new Docket(DocumentationType.SWAGGER_2).groupName("game-api").apiInfo(apiInfo()).select()
                 .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.game")).build().tags(new Tag("game", "Game APIs"))
@@ -70,7 +77,8 @@ public class SwaggerConfiguration {
     @Bean
     public Docket mediaApi() {
         return new Docket(DocumentationType.SWAGGER_2).groupName("media-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.media")).build().tags(new Tag("media", "Media APIs"));
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.media")).build().tags(new Tag("media", "Media APIs"))
+                .globalOperationParameters(operationParameters);
     }
 
     @Bean
@@ -81,10 +89,31 @@ public class SwaggerConfiguration {
     }
 
     @Bean
-    public Docket reviewApi() {
+    public Docket franchiseApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("franchise-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.franchise")).build()
+                .tags(new Tag("franchise", "Franchise APIs")).globalOperationParameters(operationParameters);
+    }
+
+    @Bean
+    public Docket regionApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("region-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.region")).build().tags(new Tag("region", "Region APIs"))
+                .globalOperationParameters(operationParameters);
+    }
+
+    @Bean
+    public Docket externalReviewApi() {
         return new Docket(DocumentationType.SWAGGER_2).groupName("externalReview-api").apiInfo(apiInfo()).select()
                 .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.externalreview")).build()
                 .tags(new Tag("externalReview", "ExternalReview APIs")).globalOperationParameters(operationParameters);
+    }
+
+    @Bean
+    public Docket companyApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("company-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.company")).build()
+                .tags(new Tag("company", "Company APIs")).globalOperationParameters(operationParameters);
     }
 
     @Bean
@@ -102,17 +131,10 @@ public class SwaggerConfiguration {
     }
 
     @Bean
-    public Docket mediastoreApi() {
-        return new Docket(DocumentationType.SWAGGER_2).groupName("mediastore-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.mediastore")).build()
-                .tags(new Tag("mediastore", "MediaStore APIs")).globalOperationParameters(operationParameters);
-    }
-
-    @Bean
-    public Docket rssFeedApi() {
-        return new Docket(DocumentationType.SWAGGER_2).groupName("rss-feed-api").apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.rssfeed")).build()
-                .tags(new Tag("rssfeed", "RssFeedAPIs")).globalOperationParameters(operationParameters);
+    public Docket platformApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("platform-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.platform")).build()
+                .tags(new Tag("platform", "Platform APIs")).globalOperationParameters(operationParameters);
     }
 
     @Bean
@@ -120,6 +142,21 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SWAGGER_2).groupName("person-api").apiInfo(apiInfo()).select()
                 .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.person")).build().tags(new Tag("person", "Person APIs"))
                 .globalOperationParameters(operationParameters);
+    }
+
+    @Bean
+    public Docket releaseApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("release-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.release")).build()
+                .tags(new Tag("release", "Release APIs")).globalOperationParameters(operationParameters);
+    }
+
+    @Bean
+    public Docket reviewApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("review-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.review")).build().tags(new Tag("review", "Review APIs"))
+                .globalOperationParameters(operationParameters);
+
     }
 
     private static ApiInfo apiInfo() {
