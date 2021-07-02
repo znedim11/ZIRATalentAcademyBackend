@@ -23,14 +23,17 @@ import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.ConceptService;
+import ba.com.zira.praksa.api.MediaService;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.character.CharacterResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptSearchRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
+import ba.com.zira.praksa.api.model.enums.ObjectType;
 import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.location.Location;
+import ba.com.zira.praksa.api.model.media.CreateMediaRequest;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
 import ba.com.zira.praksa.core.validation.ConceptRequestValidation;
@@ -75,11 +78,12 @@ public class ConceptServiceImpl implements ConceptService {
     PlatformMapper platformMapper;
     ReleaseMapper releaseMapper;
     GameDAO gameDAO;
+    MediaService mediaService;
 
     public ConceptServiceImpl(RequestValidator requestValidator, ConceptRequestValidation conceptRequestValidation, ConceptDAO conceptDAO,
             ConceptMapper conceptMapper, GameMapper gameMapper, PersonMapper personMapper, ObjectMapper objectMapper,
             CharacterMapper characterMapper, LocationMapper locationMapper, PlatformMapper platformMapper, ReleaseMapper releaseMapper,
-            GameDAO gameDAO) {
+            GameDAO gameDAO, MediaService mediaService) {
         super();
         this.requestValidator = requestValidator;
         this.conceptRequestValidation = conceptRequestValidation;
@@ -93,6 +97,7 @@ public class ConceptServiceImpl implements ConceptService {
         this.platformMapper = platformMapper;
         this.releaseMapper = releaseMapper;
         this.gameDAO = gameDAO;
+        this.mediaService = mediaService;
     }
 
     @Override
@@ -130,15 +135,23 @@ public class ConceptServiceImpl implements ConceptService {
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ConceptResponse> create(EntityRequest<ConceptCreateRequest> request) throws ApiException {
         conceptRequestValidation.validateEntityExistsInCreateRequest(request, BASIC_NOT_NULL);
-
-        EntityRequest<String> entityRequest = new EntityRequest<>(request.getEntity().getName(), request);
+        ConceptCreateRequest requestEntity = request.getEntity();
+        EntityRequest<String> entityRequest = new EntityRequest<>(requestEntity.getName(), request);
         conceptRequestValidation.validateConceptNameExists(entityRequest, BASIC_NOT_NULL);
 
         ConceptEntity entity = conceptMapper.createRequestToEntity(request.getEntity());
         entity.setCreated(LocalDateTime.now());
         entity.setCreatedBy(request.getUserId());
 
-        conceptDAO.persist(entity);
+        ConceptEntity createdEntity = conceptDAO.persist(entity);
+
+        if (requestEntity.getImageCreateRequest() != null && requestEntity.getImageCreateRequest().getImageData() != null
+                && requestEntity.getImageCreateRequest().getImageName() != null) {
+            CreateMediaRequest mediaRequest = new CreateMediaRequest(ObjectType.CONCEPT.getValue(), createdEntity.getId(),
+                    requestEntity.getImageCreateRequest().getImageData(), requestEntity.getImageCreateRequest().getImageName(), "IMAGE");
+
+            mediaService.saveMedia(new EntityRequest<>(mediaRequest, request));
+        }
 
         ConceptResponse response = conceptMapper.entityToResponse(entity);
 
@@ -162,6 +175,14 @@ public class ConceptServiceImpl implements ConceptService {
         conceptEntity = conceptMapper.updateRequestToEntity(conceptRequest, conceptEntity);
         conceptEntity.setModified(LocalDateTime.now());
         conceptEntity.setModifiedBy(request.getUserId());
+
+        if (conceptRequest.getImageCreateRequest() != null && conceptRequest.getImageCreateRequest().getImageData() != null
+                && conceptRequest.getImageCreateRequest().getImageName() != null) {
+            CreateMediaRequest mediaRequest = new CreateMediaRequest(ObjectType.CONCEPT.getValue(), conceptEntity.getId(),
+                    conceptRequest.getImageCreateRequest().getImageData(), conceptRequest.getImageCreateRequest().getImageName(), "IMAGE");
+
+            mediaService.saveMedia(new EntityRequest<>(mediaRequest, request));
+        }
 
         conceptDAO.merge(conceptEntity);
 
