@@ -1,5 +1,7 @@
 package ba.com.zira.praksa.api;
 
+import java.time.LocalDateTime;
+
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.ListRequest;
@@ -9,10 +11,14 @@ import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.praksa.api.model.LoV;
+import ba.com.zira.praksa.api.model.character.CharacterResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
+import ba.com.zira.praksa.api.model.concept.ConceptSearchRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
-import ba.com.zira.praksa.api.model.game.GameResponse;
+import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
+import ba.com.zira.praksa.api.model.location.Location;
+import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
 
 /**
@@ -39,7 +45,7 @@ public interface ConceptService {
      *             {@link ApiException} will be generated/returned with
      *             corresponding error message and {@link ResponseCode}.
      */
-    public PagedPayloadResponse<ConceptResponse> find(final SearchRequest<String> request) throws ApiException;
+    PagedPayloadResponse<ConceptResponse> find(final SearchRequest<String> request) throws ApiException;
 
     /**
      * Retrieve {@link ConceptResponse} by Id.
@@ -99,10 +105,21 @@ public interface ConceptService {
      */
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
 
-    ListPayloadResponse<GameResponse> getGamesByConcept(final EntityRequest<Long> request) throws ApiException;
+    ListPayloadResponse<GameOverviewResponse> getGamesByConcept(final EntityRequest<Long> request) throws ApiException;
 
     ListPayloadResponse<Person> getPersonsByConcept(final EntityRequest<Long> request) throws ApiException;
 
     ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException;
 
+    ListPayloadResponse<ObjectResponse> getObjectsByConcept(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<CharacterResponse> getCharactersByConcept(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<Location> getLocationsByConcept(final EntityRequest<Long> request) throws ApiException;
+
+    PayloadResponse<Long> getNumberOfGamesByConcept(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<ConceptResponse> searchConcepts(EntityRequest<ConceptSearchRequest> request) throws ApiException;
+
+    PayloadResponse<LocalDateTime> getOldestReleaseDateByConcept(final EntityRequest<Long> request) throws ApiException;
 }

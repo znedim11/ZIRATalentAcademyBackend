@@ -1,7 +1,9 @@
 package ba.com.zira.praksa.core.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +16,15 @@ import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
+import ba.com.zira.praksa.api.FileUploadService;
 import ba.com.zira.praksa.api.MediaService;
+import ba.com.zira.praksa.api.model.media.CreateMediaRequest;
 import ba.com.zira.praksa.api.model.media.Media;
+import ba.com.zira.praksa.api.model.utils.ImageUploadRequest;
 import ba.com.zira.praksa.dao.MediaDAO;
+import ba.com.zira.praksa.dao.MediaStoreDAO;
 import ba.com.zira.praksa.dao.model.MediaEntity;
+import ba.com.zira.praksa.dao.model.MediaStoreEntity;
 import ba.com.zira.praksa.mapper.MediaMapper;
 
 @Service
@@ -26,11 +33,48 @@ public class MediaServiceImpl implements MediaService {
     private RequestValidator requestValidator;
     private MediaDAO mediaDAO;
     private MediaMapper mediaMapper;
+    private FileUploadService fileUploadService;
+    private MediaStoreDAO mediaStoreDAO;
 
-    public MediaServiceImpl(final RequestValidator requestValidator, MediaDAO mediaDAO, MediaMapper mediaMapper) {
+    public MediaServiceImpl(RequestValidator requestValidator, MediaDAO mediaDAO, MediaMapper mediaMapper,
+            FileUploadService fileUploadService, MediaStoreDAO mediaStoreDAO) {
+        super();
         this.requestValidator = requestValidator;
         this.mediaDAO = mediaDAO;
         this.mediaMapper = mediaMapper;
+        this.fileUploadService = fileUploadService;
+        this.mediaStoreDAO = mediaStoreDAO;
+    }
+
+    @Override
+    public PayloadResponse<String> saveMedia(EntityRequest<CreateMediaRequest> request) throws ApiException {
+        if ("IMAGE".equalsIgnoreCase(request.getEntity().getMediaObjectType())) {
+            ImageUploadRequest imageUploadRequest = new ImageUploadRequest();
+            imageUploadRequest.setImageData(request.getEntity().getMediaObjectData());
+            imageUploadRequest.setImageName(request.getEntity().getMediaObjectName());
+            EntityRequest<ImageUploadRequest> uploadRequest = new EntityRequest<>();
+            uploadRequest.setEntity(imageUploadRequest);
+            Map<String, String> imageInfo = fileUploadService.uploadImage(uploadRequest);
+            if (imageInfo != null) {
+                MediaEntity mediaEntity = new MediaEntity();
+                mediaEntity.setCreated(LocalDateTime.now());
+                mediaEntity.setCreatedBy(request.getUserId());
+                mediaEntity.setObjectId(request.getEntity().getObjectId());
+                mediaEntity.setObjectType(request.getEntity().getObjectType());
+                MediaEntity createdMediaEntity = mediaDAO.persist(mediaEntity);
+                MediaStoreEntity mediaStoreEntity = new MediaStoreEntity();
+                mediaStoreEntity.setCreated(LocalDateTime.now());
+                mediaStoreEntity.setCreatedBy(request.getUserId());
+                mediaStoreEntity.setName(imageInfo.get("baseName"));
+                mediaStoreEntity.setExtension(imageInfo.get("extension"));
+                mediaStoreEntity.setType(request.getEntity().getMediaStoreType());
+                mediaStoreEntity.setUrl(imageInfo.get("url"));
+                mediaStoreEntity.setMedia(createdMediaEntity);
+                mediaStoreDAO.persist(mediaStoreEntity);
+            }
+        }
+        return new PayloadResponse<>(request, ResponseCode.OK, "Media Saved!");
+
     }
 
     @Override

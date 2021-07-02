@@ -32,7 +32,7 @@ public class GameValidationTest extends BasicTestConfiguration {
     @BeforeMethod
     public void beforeMethod() throws ApiException {
         this.gameDAO = Mockito.mock(GameDAO.class);
-        this.validation = new GameRequestValidation(requestValidator, gameDAO);
+        this.validation = new GameRequestValidation(requestValidator, gameDAO, null);
     }
 
     @Test

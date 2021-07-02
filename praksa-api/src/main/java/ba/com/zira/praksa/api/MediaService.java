@@ -7,6 +7,7 @@ import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.praksa.api.model.game.Game;
+import ba.com.zira.praksa.api.model.media.CreateMediaRequest;
 import ba.com.zira.praksa.api.model.media.Media;
 
 public interface MediaService {
@@ -81,4 +82,6 @@ public interface MediaService {
      *             corresponding error message and {@link ResponseCode}.
      */
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
+
+    PayloadResponse<String> saveMedia(EntityRequest<CreateMediaRequest> request) throws ApiException;
 }

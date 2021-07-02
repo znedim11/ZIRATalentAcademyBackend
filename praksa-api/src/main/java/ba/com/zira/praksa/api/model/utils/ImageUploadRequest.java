@@ -9,4 +9,5 @@ public class ImageUploadRequest implements Serializable {
     private static final long serialVersionUID = 1L;
     private String imageData;
     private String imageName;
+    private String fileType;
 }

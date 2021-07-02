@@ -3,6 +3,7 @@
  */
 package ba.com.zira.praksa.rest.concept;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,10 +28,14 @@ import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.ConceptService;
 import ba.com.zira.praksa.api.model.LoV;
+import ba.com.zira.praksa.api.model.character.CharacterResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
+import ba.com.zira.praksa.api.model.concept.ConceptSearchRequest;
 import ba.com.zira.praksa.api.model.concept.ConceptUpdateRequest;
-import ba.com.zira.praksa.api.model.game.GameResponse;
+import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
+import ba.com.zira.praksa.api.model.location.Location;
+import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -101,7 +106,7 @@ public class ConceptRestService {
 
     @ApiOperation(value = "Get Games by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}/games")
-    public ListPayloadResponse<GameResponse> getGamesByConcept(@PathVariable final Long id) throws ApiException {
+    public ListPayloadResponse<GameOverviewResponse> getGamesByConcept(@PathVariable final Long id) throws ApiException {
 
         final EntityRequest<Long> request = new EntityRequest<>();
         request.setEntity(id);
@@ -129,6 +134,79 @@ public class ConceptRestService {
         request.setList(ids);
 
         return conceptService.getLoVs(request);
+    }
+
+    @ApiOperation(value = "Get Objects by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/objects")
+    public ListPayloadResponse<ObjectResponse> getObjectsByConcept(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return conceptService.getObjectsByConcept(request);
+    }
+
+    @ApiOperation(value = "Get Characters by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/characters")
+    public ListPayloadResponse<CharacterResponse> getCharactersByConcept(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return conceptService.getCharactersByConcept(request);
+    }
+
+    @ApiOperation(value = "Get Locations by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/locations")
+    public ListPayloadResponse<Location> getLocationsByConcept(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return conceptService.getLocationsByConcept(request);
+    }
+
+    @ApiOperation(value = "Get number of Games by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/gamecount")
+    public PayloadResponse<Long> getNumberOfGamesForConcept(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return conceptService.getNumberOfGamesByConcept(request);
+    }
+
+    @ApiOperation(value = "Search Concepts.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/search")
+    public ListPayloadResponse<ConceptResponse> getPersonsByConcept(@RequestParam(required = false) final String name,
+            @RequestParam(required = false) final String sortBy, @RequestParam(required = false) final List<Long> gameIds,
+            @RequestParam(required = false) final List<Long> characterIds) throws ApiException {
+
+        final EntityRequest<ConceptSearchRequest> request = new EntityRequest<>();
+        final ConceptSearchRequest entity = new ConceptSearchRequest();
+        entity.setName(name);
+        entity.setGameIds(gameIds);
+        entity.setCharacterIds(characterIds);
+        entity.setSortBy(sortBy);
+
+        request.setEntity(entity);
+
+        return conceptService.searchConcepts(request);
+    }
+
+    @ApiOperation(value = "Get oldest release date by Concept.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/releasedate")
+    public PayloadResponse<LocalDateTime> getOldestReleaseDateByConcept(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return conceptService.getOldestReleaseDateByConcept(request);
     }
 
 }
