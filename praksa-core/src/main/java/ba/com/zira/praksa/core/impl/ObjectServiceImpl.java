@@ -17,6 +17,7 @@ import ba.com.zira.praksa.api.ObjectService;
 import ba.com.zira.praksa.api.model.object.ObjectCreateRequest;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.object.ObjectUpdateRequest;
+import ba.com.zira.praksa.core.validation.ObjectRequestValidation;
 import ba.com.zira.praksa.dao.ObjectDAO;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.mapper.ObjectMapper;
@@ -30,12 +31,15 @@ import ba.com.zira.praksa.mapper.ObjectMapper;
 public class ObjectServiceImpl implements ObjectService {
 
     private RequestValidator requestValidator;
+    private ObjectRequestValidation objectRequestValidation;
     private ObjectDAO objectDAO;
     private ObjectMapper objectMapper;
 
-    public ObjectServiceImpl(final RequestValidator requestValidator, ObjectDAO objectDAO, ObjectMapper objectMapper) {
+    public ObjectServiceImpl(final RequestValidator requestValidator, ObjectRequestValidation objectRequestValidation, ObjectDAO objectDAO,
+            ObjectMapper objectMapper) {
         super();
         this.requestValidator = requestValidator;
+        this.objectRequestValidation = objectRequestValidation;
         this.objectDAO = objectDAO;
         this.objectMapper = objectMapper;
     }
@@ -53,6 +57,8 @@ public class ObjectServiceImpl implements ObjectService {
     @Override
     public PayloadResponse<ObjectResponse> findById(final SearchRequest<Long> request) throws ApiException {
         requestValidator.validate(request);
+        EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
+        objectRequestValidation.validateObjectExists(entityRequest, "validateAbstractRequest");
 
         final ObjectEntity objectEntity = objectDAO.findByPK(request.getEntity());
         final ObjectResponse object = objectMapper.entityToDto(objectEntity);
@@ -63,7 +69,7 @@ public class ObjectServiceImpl implements ObjectService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ObjectResponse> create(EntityRequest<ObjectCreateRequest> request) throws ApiException {
-        requestValidator.validate(request);
+        objectRequestValidation.validateObjectRequestFields(request, "basicNotNull");
 
         ObjectEntity objectEntity = objectMapper.dtoToEntity(request.getEntity());
         objectEntity.setCreated(LocalDateTime.now());
@@ -79,7 +85,8 @@ public class ObjectServiceImpl implements ObjectService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ObjectResponse> update(final EntityRequest<ObjectUpdateRequest> request) throws ApiException {
-        requestValidator.validate(request);
+
+        objectRequestValidation.validateObjectUpdate(request);
 
         final ObjectEntity objectEntity = objectDAO.findByPK(request.getEntity().getId());
         objectMapper.updateDtoToEntity(request.getEntity(), objectEntity);
@@ -98,7 +105,7 @@ public class ObjectServiceImpl implements ObjectService {
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<String> delete(final EntityRequest<Long> request) throws ApiException {
         EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
-        requestValidator.validate(entityRequest);
+        objectRequestValidation.validateObjectExists(entityRequest, "validateAbstractRequest");
 
         objectDAO.removeByPK(request.getEntity());
         return new PayloadResponse<>(request, ResponseCode.OK, "Object deleted!");
