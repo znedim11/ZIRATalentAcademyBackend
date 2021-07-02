@@ -1,6 +1,6 @@
 package ba.com.zira.praksa.dao;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.TypedQuery;
@@ -13,13 +13,13 @@ import ba.com.zira.praksa.dao.model.ReleaseEntity;
 @Repository
 public class ReleaseDAO extends AbstractDAO<ReleaseEntity, Long> {
 
-    public List<ReleaseEntity> getReleasesPerTimetable(String startRange, String endRange) {
+    public List<ReleaseEntity> getReleasesPerTimetable(LocalDateTime startRange, LocalDateTime endRange) {
 
         TypedQuery<ReleaseEntity> query = entityManager.createQuery(
                 "SELECT r FROM ReleaseEntity r WHERE releaseDate >= :startDate AND releaseDate <= :endDate", ReleaseEntity.class);
 
-        query.setParameter("startDate", Timestamp.valueOf(startRange));
-        query.setParameter("endDate", Timestamp.valueOf(endRange));
+        query.setParameter("startDate", startRange);
+        query.setParameter("endDate", endRange);
 
         return query.getResultList();
 

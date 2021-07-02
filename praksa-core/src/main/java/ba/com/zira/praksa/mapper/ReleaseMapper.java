@@ -1,12 +1,14 @@
 package ba.com.zira.praksa.mapper;
 
-import org.mapstruct.InheritInverseConfiguration;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import ba.com.zira.praksa.api.model.release.ReleaseRequest;
+import ba.com.zira.praksa.api.model.release.ReleaseResponseDetails;
 import ba.com.zira.praksa.api.model.release.ReleaseResponseLight;
 import ba.com.zira.praksa.dao.model.ReleaseEntity;
 
@@ -18,6 +20,8 @@ public interface ReleaseMapper {
     @Mapping(source = "type", target = "type")
     ReleaseResponseLight releaseEntityToRelease(ReleaseEntity sampleModelEntity);
 
+    List<ReleaseResponseDetails> entityListToDtoList(List<ReleaseEntity> sampleList);
+
     @Mapping(source = "type", target = "type")
     ReleaseEntity releaseToReleaseEntity(ReleaseRequest sampleModel);
 
@@ -27,7 +31,7 @@ public interface ReleaseMapper {
 
     ReleaseEntity dtoToEntity(ReleaseRequest sample);
 
-    @InheritInverseConfiguration(name = "dtoToEntity")
-    ReleaseResponseLight entityToDto(ReleaseEntity billingPeriodEntity);
+    // @InheritInverseConfiguration(name = "dtoToEntity")
+    // ReleaseResponseLight entityToDto(ReleaseEntity billingPeriodEntity);
 
 }
