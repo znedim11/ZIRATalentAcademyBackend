@@ -67,7 +67,7 @@ public class MediaServiceImpl implements MediaService {
                 mediaStoreEntity.setCreatedBy(request.getUserId());
                 mediaStoreEntity.setName(imageInfo.get("baseName"));
                 mediaStoreEntity.setExtension(imageInfo.get("extension"));
-                mediaStoreEntity.setType("IMAGE");
+                mediaStoreEntity.setType(request.getEntity().getMediaStoreType());
                 mediaStoreEntity.setUrl(imageInfo.get("url"));
                 mediaStoreEntity.setMedia(createdMediaEntity);
                 mediaStoreDAO.persist(mediaStoreEntity);

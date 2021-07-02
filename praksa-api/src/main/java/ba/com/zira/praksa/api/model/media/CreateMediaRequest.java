@@ -14,4 +14,5 @@ public class CreateMediaRequest implements Serializable {
     private String mediaObjectData;
     private String mediaObjectName;
     private String mediaObjectType;
+    private String mediaStoreType;
 }
