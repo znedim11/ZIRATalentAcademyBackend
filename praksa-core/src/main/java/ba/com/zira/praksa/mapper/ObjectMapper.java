@@ -1,5 +1,7 @@
 package ba.com.zira.praksa.mapper;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -36,10 +38,7 @@ public interface ObjectMapper {
     PagedData<ObjectResponse> entitiesToDtos(PagedData<ObjectEntity> objectEntities);
 
     ObjectCreateRequest updateToCreateRequest(ObjectUpdateRequest update);
-    /*
-     * @InheritInverseConfiguration(name = "dtoToEntity") ObjectResponse
-     * entityToDto(ObjectEntity sample);
-     *
-     * List<ObjectResponse> entityListToDtoList(List<ObjectEntity> entityList);
-     */
+
+    List<ObjectResponse> entityListToDtoList(List<ObjectEntity> entityList);
+
 }
