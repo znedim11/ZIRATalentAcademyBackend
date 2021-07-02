@@ -1,9 +1,9 @@
 package ba.com.zira.praksa.core.impl;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
@@ -14,12 +14,18 @@ import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.ObjectService;
-import ba.com.zira.praksa.api.model.object.ObjectRequest;
+import ba.com.zira.praksa.api.model.object.ObjectCreateRequest;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
+import ba.com.zira.praksa.api.model.object.ObjectUpdateRequest;
 import ba.com.zira.praksa.dao.ObjectDAO;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.mapper.ObjectMapper;
 
+/**
+ *
+ * @author zira
+ *
+ */
 @Service
 public class ObjectServiceImpl implements ObjectService {
 
@@ -28,6 +34,7 @@ public class ObjectServiceImpl implements ObjectService {
     private ObjectMapper objectMapper;
 
     public ObjectServiceImpl(final RequestValidator requestValidator, ObjectDAO objectDAO, ObjectMapper objectMapper) {
+        super();
         this.requestValidator = requestValidator;
         this.objectDAO = objectDAO;
         this.objectMapper = objectMapper;
@@ -38,30 +45,9 @@ public class ObjectServiceImpl implements ObjectService {
         requestValidator.validate(request);
 
         PagedData<ObjectEntity> objectModelEntities = objectDAO.findAll(request.getFilter());
-        final List<ObjectEntity> objectList = objectModelEntities.getRecords();
+        final PagedData<ObjectResponse> objectsPaged = objectMapper.entitiesToDtos(objectModelEntities);
 
-        final List<ObjectResponse> objectResList = objectMapper.entityListToDtoList(objectList);
-
-        PagedData<ObjectResponse> pagedData = new PagedData<>();
-        pagedData.setNumberOfPages(objectModelEntities.getNumberOfPages());
-        pagedData.setNumberOfRecords(objectModelEntities.getNumberOfRecords());
-        pagedData.setPage(objectModelEntities.getPage());
-        pagedData.setRecords(objectResList);
-        pagedData.setRecordsPerPage(objectModelEntities.getRecordsPerPage());
-
-        return new PagedPayloadResponse<>(request, ResponseCode.OK, pagedData);
-    }
-
-    @Override
-    public PayloadResponse<ObjectResponse> create(EntityRequest<ObjectRequest> request) throws ApiException {
-        requestValidator.validate(request);
-
-        ObjectEntity objectEntity = objectMapper.dtoToEntity(request.getEntity());
-        objectEntity.setCreated(LocalDateTime.now());
-        objectEntity.setCreatedBy(request.getUserId());
-
-        objectDAO.persist(objectEntity);
-        return new PayloadResponse<>(request, ResponseCode.OK, objectMapper.entityToDto(objectEntity));
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, objectsPaged);
     }
 
     @Override
@@ -69,34 +55,53 @@ public class ObjectServiceImpl implements ObjectService {
         requestValidator.validate(request);
 
         final ObjectEntity objectEntity = objectDAO.findByPK(request.getEntity());
-
-        return new PayloadResponse<>(request, ResponseCode.OK, objectMapper.entityToDto(objectEntity));
+        final ObjectResponse object = objectMapper.entityToDto(objectEntity);
+        return new PayloadResponse<>(request, ResponseCode.OK, object);
 
     }
 
     @Override
-    public PayloadResponse<ObjectRequest> update(final EntityRequest<ObjectRequest> request) throws ApiException {
+    @Transactional(rollbackFor = ApiException.class)
+    public PayloadResponse<ObjectResponse> create(EntityRequest<ObjectCreateRequest> request) throws ApiException {
         requestValidator.validate(request);
 
-        final LocalDateTime date = LocalDateTime.now();
-        final ObjectRequest object = request.getEntity();
+        ObjectEntity objectEntity = objectMapper.dtoToEntity(request.getEntity());
+        objectEntity.setCreated(LocalDateTime.now());
+        objectEntity.setCreatedBy(request.getUserId());
 
-        ObjectEntity entity = objectMapper.dtoToEntity(request.getEntity());
-
-        entity.setModified(date);
-        entity.setModifiedBy(request.getUserId());
-
-        objectDAO.merge(entity);
+        objectDAO.persist(objectEntity);
+        ObjectResponse object = objectMapper.entityToDto(objectEntity);
 
         return new PayloadResponse<>(request, ResponseCode.OK, object);
 
     }
 
     @Override
-    public PayloadResponse<String> delete(final EntityRequest<Long> request) throws ApiException {
+    @Transactional(rollbackFor = ApiException.class)
+    public PayloadResponse<ObjectResponse> update(final EntityRequest<ObjectUpdateRequest> request) throws ApiException {
         requestValidator.validate(request);
+
+        final ObjectEntity objectEntity = objectDAO.findByPK(request.getEntity().getId());
+        objectMapper.updateDtoToEntity(request.getEntity(), objectEntity);
+
+        objectEntity.setModified(LocalDateTime.now());
+        objectEntity.setModifiedBy(request.getUserId());
+
+        objectDAO.merge(objectEntity);
+        final ObjectResponse object = objectMapper.entityToDto(objectEntity);
+
+        return new PayloadResponse<>(request, ResponseCode.OK, object);
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = ApiException.class)
+    public PayloadResponse<String> delete(final EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
+        requestValidator.validate(entityRequest);
 
         objectDAO.removeByPK(request.getEntity());
         return new PayloadResponse<>(request, ResponseCode.OK, "Object deleted!");
     }
+
 }

@@ -18,18 +18,24 @@ import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.ObjectService;
-import ba.com.zira.praksa.api.model.object.ObjectRequest;
+import ba.com.zira.praksa.api.model.object.ObjectCreateRequest;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
+import ba.com.zira.praksa.api.model.object.ObjectUpdateRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+/**
+ *
+ * @author zira
+ *
+ */
 @Api(tags = "object")
 @RestController
 @RequestMapping(value = "object")
 public class ObjectRestService {
 
     @Autowired
-    private ObjectService sampleService;
+    ObjectService sampleService;
 
     @ApiOperation(value = "Find objects", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")
@@ -37,6 +43,7 @@ public class ObjectRestService {
 
         SearchRequest<String> request = new SearchRequest<>();
         request.setPagination(pagination);
+
         return sampleService.find(request);
     }
 
@@ -52,17 +59,17 @@ public class ObjectRestService {
 
     @ApiOperation(value = "Create object", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/create")
-    public PayloadResponse<ObjectResponse> createObject(@RequestBody EntityRequest<ObjectRequest> request) throws ApiException {
+    public PayloadResponse<ObjectResponse> createObject(@RequestBody EntityRequest<ObjectCreateRequest> request) throws ApiException {
         return sampleService.create(request);
     }
 
     @ApiOperation(value = "Update object", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PutMapping(value = "/{id}")
-    public PayloadResponse<ObjectRequest> update(@PathVariable final String id, @RequestBody final EntityRequest<ObjectRequest> request)
-            throws ApiException {
+    public PayloadResponse<ObjectResponse> update(@PathVariable final Long id,
+            @RequestBody final EntityRequest<ObjectUpdateRequest> request) throws ApiException {
 
-        final ObjectRequest sample = request.getEntity();
-        sample.setId(Long.decode(id));
+        final ObjectUpdateRequest sample = request.getEntity();
+        sample.setId(id);
 
         return sampleService.update(request);
     }
