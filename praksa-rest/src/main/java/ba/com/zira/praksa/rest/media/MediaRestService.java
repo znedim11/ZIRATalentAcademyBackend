@@ -17,7 +17,9 @@ import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
+import ba.com.zira.praksa.api.FileUploadService;
 import ba.com.zira.praksa.api.MediaService;
+import ba.com.zira.praksa.api.model.media.CreateMediaRequest;
 import ba.com.zira.praksa.api.model.media.Media;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,6 +31,9 @@ import io.swagger.annotations.ApiOperation;
 public class MediaRestService {
     @Autowired
     private MediaService mediaService;
+
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @ApiOperation(value = "Find Media", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")
@@ -73,5 +78,11 @@ public class MediaRestService {
         request.setEntity(id);
 
         mediaService.delete(request);
+    }
+
+    @ApiOperation(value = "Upload Image", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/upload")
+    public PayloadResponse<String> saveMedia(@RequestBody EntityRequest<CreateMediaRequest> imageUploadRequest) throws ApiException {
+        return mediaService.saveMedia(imageUploadRequest);
     }
 }

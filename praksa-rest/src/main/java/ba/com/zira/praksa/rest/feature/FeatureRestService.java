@@ -1,5 +1,9 @@
 package ba.com.zira.praksa.rest.feature;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
@@ -21,6 +26,7 @@ import ba.com.zira.praksa.api.FeatureService;
 import ba.com.zira.praksa.api.model.feature.FeatureCreateRequest;
 import ba.com.zira.praksa.api.model.feature.FeatureResponse;
 import ba.com.zira.praksa.api.model.feature.FeatureUpdateRequest;
+import ba.com.zira.praksa.api.model.game.Game;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -79,10 +85,30 @@ public class FeatureRestService {
 
     @ApiOperation(value = "Delete Feature by Id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @DeleteMapping(value = "/{id}")
-    public void delete(@PathVariable final Long id) throws ApiException {
+    public PayloadResponse<String> delete(@PathVariable final Long id) throws ApiException {
         final EntityRequest<Long> request = new EntityRequest<>();
         request.setEntity(id);
 
-        featureService.delete(request);
+        return featureService.delete(request);
+    }
+
+    @ApiOperation(value = "Get Games by Feature", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/get-games/{id}")
+    public PagedPayloadResponse<Game> getGamesByFeature(@PathVariable final Long id) throws ApiException {
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return featureService.getGamesByFeature(request);
+    }
+
+    @ApiOperation(value = "Get Set of Games by Set of Features", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/set-of-games")
+    public PayloadResponse<Map<String, Set<Game>>> getSetOfGamesByFeature(@RequestParam(required = false) final List<Long> ids)
+            throws ApiException {
+        ListRequest<Long> request = new ListRequest<>();
+        request.setList(ids);
+
+        return featureService.getSetOfGames(request);
     }
 }
