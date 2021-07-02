@@ -24,11 +24,14 @@ public class FileUploadServiceImpl implements FileUploadService {
     @Value("${image.folder.location://opt//zira//cdn//vigor//img}")
     private String imagePath;
 
+    @Value("${image.server.location:http://172.20.20.45:82//vigor//img}")
+    private String imageServerUrl;
+
     @Override
     public Map<String, String> uploadImage(EntityRequest<ImageUploadRequest> imageUploadRequest) throws ApiException {
         Map<String, String> result = new HashMap<>();
         try {
-            String url = imagePath + "/" + imageUploadRequest.getEntity().getImageName();
+            String url = imageServerUrl + "/" + imageUploadRequest.getEntity().getImageName();
             String base64Image = imageUploadRequest.getEntity().getImageData().split(",")[1];
             byte[] decodedImage = Base64.getDecoder().decode(base64Image.getBytes(StandardCharsets.UTF_8));
             Path destinationFile = Paths.get(imagePath, imageUploadRequest.getEntity().getImageName());
