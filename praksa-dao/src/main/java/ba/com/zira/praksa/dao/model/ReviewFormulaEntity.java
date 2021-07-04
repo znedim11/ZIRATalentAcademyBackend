@@ -42,6 +42,7 @@ public class ReviewFormulaEntity implements Serializable {
     private String createdBy;
 
     private String formula;
+    private String name;
 
     private LocalDateTime modified;
 

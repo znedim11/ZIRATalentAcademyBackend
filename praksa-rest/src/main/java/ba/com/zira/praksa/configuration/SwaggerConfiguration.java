@@ -159,6 +159,14 @@ public class SwaggerConfiguration {
 
     }
 
+    @Bean
+    public Docket reviewFormulaApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("review-formula-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.formula")).build()
+                .tags(new Tag("review-formula", "Formula APIs")).globalOperationParameters(operationParameters);
+
+    }
+
     private static ApiInfo apiInfo() {
         final Contact contact = new Contact("ZIRA", "http://www.zira.com.ba", "info@zira.com.ba");
         ApiInfoBuilder builder = new ApiInfoBuilder();
