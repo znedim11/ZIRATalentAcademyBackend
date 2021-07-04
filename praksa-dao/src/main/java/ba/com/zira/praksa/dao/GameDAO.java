@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import ba.com.zira.commons.dao.AbstractDAO;
 import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.praksa.api.model.LoV;
+import ba.com.zira.praksa.api.model.game.GameCharacterResponse;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
@@ -22,6 +23,24 @@ import ba.com.zira.praksa.dao.model.ReleaseEntity;
 
 @Repository
 public class GameDAO extends AbstractDAO<GameEntity, Long> {
+
+    public List<GameCharacterResponse> getGamesForCharacter(final Long characterId) {
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("SELECT new ba.com.zira.praksa.api.model.game.GameCharacterResponse(g.id, g.fullName, p.code, r.releaseDate) "
+                + "FROM GameEntity g ");
+        jpql.append("JOIN ReleaseEntity r ON g.id = r.game.id ");
+        jpql.append("JOIN PlatformEntity p ON r.platform.id = p.id ");
+        jpql.append("JOIN LinkMapEntity lm ON g.id = lm.game.id ");
+        jpql.append("WHERE r.releaseDate = (SELECT MIN(r1.releaseDate) FROM ReleaseEntity r1 WHERE r1.game.id = g.id) "
+                + "AND lm.character.id = :characterId");
+
+        TypedQuery<GameCharacterResponse> query = entityManager.createQuery(jpql.toString(), GameCharacterResponse.class)
+                .setParameter("characterId", characterId);
+
+        List<GameCharacterResponse> games = query.getResultList();
+
+        return games;
+    }
 
     public List<ConceptEntity> getConceptsByGame(Long gameId) {
         StringBuilder stringBuilder = new StringBuilder();
