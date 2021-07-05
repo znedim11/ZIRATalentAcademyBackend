@@ -9,7 +9,8 @@ public class ReviewSearchRequest implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long gameId;
     private Long platformId;
-    private Long reviewerId;
+    private String reviewerId;
     private Double lowestRating;
     private Double highestRating;
+    private String type;
 }

@@ -151,6 +151,13 @@ public class SwaggerConfiguration {
                 .globalOperationParameters(operationParameters);
     }
 
+    @Bean
+    public Docket userApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("user-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.user")).build().tags(new Tag("user", "User APIs"))
+                .globalOperationParameters(operationParameters);
+    }
+
     private static ApiInfo apiInfo() {
         final Contact contact = new Contact("ZIRA", "http://www.zira.com.ba", "info@zira.com.ba");
         ApiInfoBuilder builder = new ApiInfoBuilder();
