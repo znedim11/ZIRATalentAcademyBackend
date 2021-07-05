@@ -49,6 +49,8 @@ public class CharacterEntity implements Serializable {
 
     private String gender;
 
+    private String outlineText;
+
     private String information;
 
     private LocalDateTime modified;
