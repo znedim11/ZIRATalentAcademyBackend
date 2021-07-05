@@ -5,11 +5,14 @@ package ba.com.zira.praksa.core.impl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.collect.Sets;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
@@ -24,8 +27,8 @@ import ba.com.zira.praksa.core.validation.FormulaRequestValidation;
 import ba.com.zira.praksa.dao.FormulaDAO;
 import ba.com.zira.praksa.dao.GradeDAO;
 import ba.com.zira.praksa.dao.ReviewDAO;
+import ba.com.zira.praksa.dao.model.GradeEntity;
 import ba.com.zira.praksa.dao.model.ReviewFormulaEntity;
-import ba.com.zira.praksa.dao.model.ReviewGradeEntity;
 import ba.com.zira.praksa.mapper.FormulaMapper;
 
 /**
@@ -65,7 +68,7 @@ public class FormulaServiceImpl implements FormulaService {
 
         final FormulaResponse formulaResponse = formulaMapper.entityToResponse(formulaEntity);
 
-        // GET GRADES??
+        formulaResponse.setGrades(formulaDAO.getGradesByFormula(formulaResponse.getId()));
 
         return new PayloadResponse<>(request, ResponseCode.OK, formulaResponse);
     }
@@ -81,29 +84,81 @@ public class FormulaServiceImpl implements FormulaService {
         entity.setCreatedBy(request.getUserId());
 
         ReviewFormulaEntity createdEntity = formulaDAO.persist(entity);
-        List<ReviewGradeEntity> grades = new ArrayList<>();
+        List<GradeEntity> grades = new ArrayList<>();
 
         if (request.getEntity().getGrades() != null) {
             for (String grade : request.getEntity().getGrades()) {
-                ReviewGradeEntity gradeEntity = new ReviewGradeEntity();
-                gradeEntity.setUuid(UUID.randomUUID().toString());
+                GradeEntity gradeEntity = new GradeEntity();
                 gradeEntity.setType(grade);
                 gradeEntity.setFormulaId(createdEntity.getId());
+                gradeEntity.setCreated(LocalDateTime.now());
+                gradeEntity.setCreatedBy(request.getUserId());
 
                 grades.add(gradeEntity);
-                gradeDAO.merge(gradeEntity);
             }
+
+            gradeDAO.persistCollection(grades);
         }
 
         FormulaResponse response = formulaMapper.entityToResponse(entity);
+        response.setGrades(grades.stream().map(GradeEntity::getType).collect(Collectors.toList()));
 
         return new PayloadResponse<>(request, ResponseCode.OK, response);
     }
 
     @Override
+    @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<FormulaResponse> update(EntityRequest<FormulaUpdateRequest> request) throws ApiException {
-        // TODO Auto-generated method stub
-        return null;
+        formulaRequestValidation.validateEntityExistsInUpdateRequest(request, BASIC_NOT_NULL);
+
+        EntityRequest<Long> entityRequestId = new EntityRequest<>(request.getEntity().getId(), request);
+        formulaRequestValidation.validateFormulaExists(entityRequestId, VALIDATE_ABSTRACT_REQUEST);
+
+        formulaRequestValidation.validateRequiredAttributesExistInUpdateRequest(request, BASIC_NOT_NULL);
+
+        final FormulaUpdateRequest formulaRequest = request.getEntity();
+
+        ReviewFormulaEntity formulaEntity = formulaDAO.findByPK(request.getEntity().getId());
+        formulaEntity = formulaMapper.updateRequestToEntity(formulaRequest, formulaEntity);
+        formulaEntity.setModified(LocalDateTime.now());
+        formulaEntity.setModifiedBy(request.getUserId());
+
+        formulaDAO.merge(formulaEntity);
+
+        List<String> currentGrades = formulaDAO.getGradesByFormula(formulaEntity.getId());
+        List<String> newGrades = formulaRequest.getGrades();
+
+        final List<String> gradesToDelete = new ArrayList<>(Sets.difference(new HashSet<>(currentGrades), new HashSet<>(newGrades)));
+        final List<String> gradesToAdd = new ArrayList<>(Sets.difference(new HashSet<>(newGrades), new HashSet<>(currentGrades)));
+
+        List<GradeEntity> grades = new ArrayList<>();
+
+        if (!gradesToAdd.isEmpty()) {
+            for (String grade : gradesToAdd) {
+                GradeEntity gradeEntity = new GradeEntity();
+                gradeEntity.setType(grade);
+                gradeEntity.setFormulaId(formulaEntity.getId());
+                gradeEntity.setCreated(LocalDateTime.now());
+                gradeEntity.setCreatedBy(request.getUserId());
+
+                grades.add(gradeEntity);
+            }
+
+            gradeDAO.persistCollection(grades);
+        }
+
+        if (!gradesToDelete.isEmpty()) {
+            for (String grade : gradesToDelete) {
+                GradeEntity gradeEntity = gradeDAO.getGradeByName(formulaEntity.getId(), grade);
+
+                gradeDAO.remove(gradeEntity);
+            }
+        }
+
+        final FormulaResponse formulaResponse = formulaMapper.entityToResponse(formulaEntity);
+        formulaResponse.setGrades(formulaDAO.getGradesByFormula(formulaEntity.getId()));
+
+        return new PayloadResponse<>(request, ResponseCode.OK, formulaResponse);
     }
 
 }

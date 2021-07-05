@@ -1,6 +1,7 @@
 package ba.com.zira.praksa.api.model.formula;
 
 import java.io.Serializable;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -17,5 +18,5 @@ public class FormulaUpdateRequest implements Serializable {
 
     private String formula;
 
-    private String[] grades;
+    private List<String> grades;
 }

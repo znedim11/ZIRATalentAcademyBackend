@@ -1,6 +1,7 @@
 package ba.com.zira.praksa.api.model.formula;
 
 import java.io.Serializable;
+import java.util.List;
 
 import lombok.Data;
 
@@ -12,5 +13,5 @@ public class FormulaCreateRequest implements Serializable {
 
     private String formula;
 
-    private String[] grades;
+    private List<String> grades;
 }
