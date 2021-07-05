@@ -21,4 +21,14 @@ public class FormulaDAO extends AbstractDAO<ReviewFormulaEntity, Long> {
         return query.getResultList();
 
     }
+
+    public Long getNumberOfReviewsGamesByFormula(Long formulaId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT DISTINCT COUNT(r) FROM ReviewEntity r WHERE r.reviewFormula.id = :fId");
+
+        TypedQuery<Long> query = entityManager.createQuery(stringBuilder.toString(), Long.class);
+        query.setParameter("fId", formulaId);
+
+        return query.getSingleResult();
+    }
 }

@@ -1,5 +1,7 @@
 package ba.com.zira.praksa.mapper;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -26,4 +28,6 @@ public interface FormulaMapper {
     ReviewFormulaEntity updateRequestToEntity(FormulaUpdateRequest formulaUpdateRequest, @MappingTarget ReviewFormulaEntity formulaEntity);
 
     ReviewFormulaEntity createRequestToEntity(FormulaCreateRequest formulaCreateRequest);
+
+    List<FormulaResponse> entityListToResponseList(List<ReviewFormulaEntity> conceptEntities);
 }
