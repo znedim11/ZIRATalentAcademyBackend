@@ -148,7 +148,8 @@ public class ConceptServiceImpl implements ConceptService {
         if (requestEntity.getImageCreateRequest() != null && requestEntity.getImageCreateRequest().getImageData() != null
                 && requestEntity.getImageCreateRequest().getImageName() != null) {
             CreateMediaRequest mediaRequest = new CreateMediaRequest(ObjectType.CONCEPT.getValue(), createdEntity.getId(),
-                    requestEntity.getImageCreateRequest().getImageData(), requestEntity.getImageCreateRequest().getImageName(), "IMAGE");
+                    requestEntity.getImageCreateRequest().getImageData(), requestEntity.getImageCreateRequest().getImageName(), "IMAGE",
+                    "COVER_IMAGE");
 
             mediaService.saveMedia(new EntityRequest<>(mediaRequest, request));
         }
@@ -179,7 +180,8 @@ public class ConceptServiceImpl implements ConceptService {
         if (conceptRequest.getImageCreateRequest() != null && conceptRequest.getImageCreateRequest().getImageData() != null
                 && conceptRequest.getImageCreateRequest().getImageName() != null) {
             CreateMediaRequest mediaRequest = new CreateMediaRequest(ObjectType.CONCEPT.getValue(), conceptEntity.getId(),
-                    conceptRequest.getImageCreateRequest().getImageData(), conceptRequest.getImageCreateRequest().getImageName(), "IMAGE");
+                    conceptRequest.getImageCreateRequest().getImageData(), conceptRequest.getImageCreateRequest().getImageName(), "IMAGE",
+                    "COVER_IMAGE");
 
             mediaService.saveMedia(new EntityRequest<>(mediaRequest, request));
         }

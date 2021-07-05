@@ -3,26 +3,33 @@ package ba.com.zira.praksa.core.impl;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
+import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.ReleaseService;
 import ba.com.zira.praksa.api.model.enums.TimeSegment;
 import ba.com.zira.praksa.api.model.release.IntervalHelper;
 import ba.com.zira.praksa.api.model.release.ReleaseRequest;
+import ba.com.zira.praksa.api.model.release.ReleaseResponse;
 import ba.com.zira.praksa.api.model.release.ReleaseResponseDetails;
+import ba.com.zira.praksa.api.model.release.ReleaseResponseLight;
 import ba.com.zira.praksa.api.model.release.ReleasesByTimetableRequest;
 import ba.com.zira.praksa.api.model.release.ReleasesByTimetableResponse;
+import ba.com.zira.praksa.core.validation.ReleaseRequestValidation;
 import ba.com.zira.praksa.dao.CompanyDAO;
 import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.PlatformDAO;
@@ -31,20 +38,64 @@ import ba.com.zira.praksa.dao.ReleaseDAO;
 import ba.com.zira.praksa.dao.model.ReleaseEntity;
 import ba.com.zira.praksa.mapper.ReleaseMapper;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Service
-@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ReleaseServiceImpl implements ReleaseService {
     RequestValidator requestValidator;
+    ReleaseRequestValidation releaseRequestValidation;
     ReleaseMapper releaseMapper;
     ReleaseDAO releaseDAO;
     PlatformDAO platformDAO;
     CompanyDAO companyDAO;
     GameDAO gameDAO;
     RegionDAO regionDAO;
+
+    static final String VALIDATION_RULE = "validateAbstractRequest";
+
+    public ReleaseServiceImpl(RequestValidator requestValidator, ReleaseRequestValidation releaseRequestValidation,
+            ReleaseMapper releaseMapper, ReleaseDAO releaseDAO, PlatformDAO platformDAO, CompanyDAO companyDAO, GameDAO gameDAO,
+            RegionDAO regionDAO) {
+        super();
+        this.requestValidator = requestValidator;
+        this.releaseRequestValidation = releaseRequestValidation;
+        this.releaseMapper = releaseMapper;
+        this.releaseDAO = releaseDAO;
+        this.companyDAO = companyDAO;
+        this.gameDAO = gameDAO;
+        this.platformDAO = platformDAO;
+        this.regionDAO = regionDAO;
+
+    }
+
+    @Override
+    public PagedPayloadResponse<ReleaseResponse> find(final SearchRequest<String> request) throws ApiException {
+        requestValidator.validate(request);
+
+        PagedData<ReleaseEntity> releaseEntities = releaseDAO.findAll(request.getFilter());
+        final List<ReleaseEntity> releaseEntityList = releaseEntities.getRecords();
+
+        final List<ReleaseResponse> releasesList = releaseMapper.entityListToResponseList(releaseEntityList);
+
+        PagedData<ReleaseResponse> data = new PagedData<>();
+        data.setNumberOfPages(releaseEntities.getNumberOfPages());
+        data.setRecords(releasesList);
+        data.setNumberOfRecords(releaseEntities.getNumberOfRecords());
+        data.setPage(releaseEntities.getPage());
+        data.setRecordsPerPage(releaseEntities.getRecordsPerPage());
+        data.setHasMoreRecords(releaseEntities.hasMoreRecords());
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, data);
+    }
+
+    @Override
+    public PayloadResponse<ReleaseResponseLight> findByUuid(final EntityRequest<String> request) throws ApiException {
+        releaseRequestValidation.validateReleaseRequest(request, VALIDATION_RULE);
+
+        final ReleaseEntity releaseEntity = releaseDAO.findByPK(request.getEntity());
+
+        return new PayloadResponse<>(request, ResponseCode.OK, releaseMapper.entityToDto(releaseEntity));
+    }
 
     @Override
     public PayloadResponse<String> addRelease(final EntityRequest<ReleaseRequest> request) throws ApiException {
@@ -69,16 +120,16 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Override
     public PayloadResponse<ReleasesByTimetableResponse> getReleasesByTimetable(EntityRequest<ReleasesByTimetableRequest> request)
             throws ApiException {
-        requestValidator.validate(request);
+        EntityRequest<ReleasesByTimetableRequest> entityRequest = new EntityRequest<>(request.getEntity());
+        releaseRequestValidation.validateReleaseByTimetableRequest(entityRequest, VALIDATION_RULE);
 
         ReleasesByTimetableResponse releasesByTimetableResponse = new ReleasesByTimetableResponse();
-        List<ReleaseEntity> listOfReleasesInRange = releaseDAO.getReleasesPerTimetable(request.getEntity().getStartDate(),
-                request.getEntity().getEndDate());
 
         LocalDateTime localDate = LocalDateTime.now();
         LocalDateTime startDate = request.getEntity().getStartDate() == null ? localDate : request.getEntity().getStartDate();
         LocalDateTime endDate = request.getEntity().getEndDate() == null ? localDate : request.getEntity().getEndDate();
 
+        List<ReleaseEntity> listOfReleasesInRange = releaseDAO.getReleasesPerTimetable(startDate, endDate);
         List<IntervalHelper> helpers = createSplitHelpes(request.getEntity().getTimeSegment(), startDate, endDate);
 
         releasesByTimetableResponse.setMapOfReleasesByIntervals(mapReleaseEntitiesToIntervals(helpers, listOfReleasesInRange));
@@ -110,7 +161,7 @@ public class ReleaseServiceImpl implements ReleaseService {
                 helpers.add(new IntervalHelper(startDate, endDate));
             } else {
                 for (int i = 0; i < (diffWeek.getDays() + diff.getMonths() * 30 + diff.getYears() * 365 / 7); i++) {
-                    helpers.add(new IntervalHelper(startDate.plusDays(i * 7), startDate.plusYears(i * 7 + 7)));
+                    helpers.add(new IntervalHelper(startDate.plusDays(7L * i), startDate.plusYears(i * 7L + 7)));
                 }
             }
         }
@@ -167,7 +218,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     private Map<IntervalHelper, List<ReleaseResponseDetails>> mapReleaseEntitiesToIntervals(List<IntervalHelper> intervals,
             List<ReleaseEntity> listOfReleaseEntities) {
 
-        Map<IntervalHelper, List<ReleaseResponseDetails>> map = new LinkedHashMap<>();
+        Map<IntervalHelper, List<ReleaseResponseDetails>> map = new HashMap<>();
 
         for (IntervalHelper interval : intervals) {
 
@@ -177,14 +228,25 @@ public class ReleaseServiceImpl implements ReleaseService {
             List<ReleaseEntity> releasesTemp = listOfReleaseEntities.stream().filter(isBetween(startOfSegment, endOfSegment))
                     .collect(Collectors.toList());
 
-            List<ReleaseResponseDetails> responseLightList = releaseMapper.entityListToDtoList(releasesTemp);
+            List<ReleaseResponseDetails> responseList = releaseMapper.entityListToDtoList(releasesTemp);
 
             interval.setReleaseCount(Long.valueOf(releasesTemp.size()));
-            interval.setListOfReleases(responseLightList);
-            map.put(interval, responseLightList);
+
+            map.put(interval, responseList);
 
         }
 
         return map;
     }
+
+    @Override
+    @Transactional(rollbackFor = ApiException.class)
+    public PayloadResponse<String> delete(EntityRequest<String> request) throws ApiException {
+        EntityRequest<String> entityRequest = new EntityRequest<>(request.getEntity(), request);
+        releaseRequestValidation.validateReleaseRequest(entityRequest, VALIDATION_RULE);
+
+        releaseDAO.removeByPK(request.getEntity());
+        return new PayloadResponse<>(request, ResponseCode.OK, "Release deleted!");
+    }
+
 }

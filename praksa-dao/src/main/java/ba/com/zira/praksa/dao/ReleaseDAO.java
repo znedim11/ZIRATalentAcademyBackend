@@ -11,7 +11,7 @@ import ba.com.zira.commons.dao.AbstractDAO;
 import ba.com.zira.praksa.dao.model.ReleaseEntity;
 
 @Repository
-public class ReleaseDAO extends AbstractDAO<ReleaseEntity, Long> {
+public class ReleaseDAO extends AbstractDAO<ReleaseEntity, String> {
 
     public List<ReleaseEntity> getReleasesPerTimetable(LocalDateTime startRange, LocalDateTime endRange) {
 
