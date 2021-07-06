@@ -38,7 +38,7 @@ public class LookupService {
 
     public static String getForString(final String key, final Map<String, String> lookup) {
         if (key != null) {
-            return lookup.get(key) == null ? key.toString() : lookup.get(key);
+            return lookup.get(key) == null ? key : lookup.get(key);
         }
         return null;
     }
@@ -71,11 +71,10 @@ public class LookupService {
         if (!(ids == null || ids.isEmpty())) {
             List<UserCodeDisplay> users = uaaFeignClient.getUserDetails().getPayload().stream().filter(isInList(ids))
                     .collect(Collectors.toList());
-            Map<String, String> lookup = users.stream().collect(Collectors.toMap(UserCodeDisplay::getUsercode, u -> {
-                return u.getDisplayname();
-            }, (u1, u2) -> {
-                return u1;
-            }));
+            Map<String, String> lookup = users.stream()
+                    .collect(Collectors.toMap(UserCodeDisplay::getUsercode, UserCodeDisplay::getDisplayname, (u1, u2) -> {
+                        return u1;
+                    }));
             values.parallelStream().forEach(r -> setter.accept(r, getForString(getter.apply(r), lookup)));
         }
     }

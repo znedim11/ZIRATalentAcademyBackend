@@ -7,6 +7,7 @@ import javax.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 
 import ba.com.zira.commons.dao.AbstractDAO;
+import ba.com.zira.praksa.api.model.enums.ReviewType;
 import ba.com.zira.praksa.api.model.review.CompleteReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewSearchRequest;
@@ -18,7 +19,8 @@ public class ExternalReviewDAO extends AbstractDAO<ExternalReviewEntity, Long> {
     public List<ReviewResponse> searchReviews(final ReviewSearchRequest searchRequest) {
         StringBuilder jpql = new StringBuilder();
         jpql.append(
-                "SELECT DISTINCT new ba.com.zira.praksa.api.model.review.ReviewResponse(g.fullName, g.id, p.abbriviation, p.id, g.fullName, er.createdBy, 'N/A', er.id, 'external')");
+                "SELECT new ba.com.zira.praksa.api.model.review.ReviewResponse(g.fullName, g.id, p.abbriviation, p.id, g.fullName, er.createdBy, 'N/A', er.id, ");
+        jpql.append(String.format("'%s' )", ReviewType.EXTERNAL.getValue()));
         jpql.append(" FROM ExternalReviewEntity er ");
         jpql.append(" LEFT OUTER JOIN  GameEntity g on g.id =er.game.id");
         jpql.append(" LEFT OUTER JOIN  ReleaseEntity rl on rl.game.id =g.id");
@@ -49,7 +51,7 @@ public class ExternalReviewDAO extends AbstractDAO<ExternalReviewEntity, Long> {
 
     public List<CompleteReviewResponse> getMostPopularPlatform(final ReviewSearchRequest searchRequest) {
         StringBuilder jpql = new StringBuilder();
-        jpql.append("SELECT DISTINCT new ba.com.zira.praksa.api.model.review.CompleteReviewResponse( p.fullName, p.id , COUNT(p.id))");
+        jpql.append("SELECT new ba.com.zira.praksa.api.model.review.CompleteReviewResponse( p.fullName, p.id , COUNT(p.id))");
         jpql.append(" FROM ExternalReviewEntity er ");
         jpql.append(" LEFT OUTER JOIN  GameEntity g on g.id =er.game.id");
         jpql.append(" LEFT OUTER JOIN  ReleaseEntity rl on rl.game.id =g.id");

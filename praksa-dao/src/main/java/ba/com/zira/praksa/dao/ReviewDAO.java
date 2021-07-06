@@ -7,6 +7,7 @@ import javax.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 
 import ba.com.zira.commons.dao.AbstractDAO;
+import ba.com.zira.praksa.api.model.enums.ReviewType;
 import ba.com.zira.praksa.api.model.review.CompleteReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewSearchRequest;
@@ -19,7 +20,8 @@ public class ReviewDAO extends AbstractDAO<ReviewEntity, Long> {
 
         StringBuilder jpql = new StringBuilder();
         jpql.append(
-                "SELECT DISTINCT new ba.com.zira.praksa.api.model.review.ReviewResponse(g.fullName, g.id, p.abbriviation, p.id, r.title, r.createdBy, rg.grade, r.id, 'internal')");
+                "SELECT DISTINCT new ba.com.zira.praksa.api.model.review.ReviewResponse(g.fullName, g.id, p.abbriviation, p.id, r.title, r.createdBy, rg.grade, r.id, ");
+        jpql.append(String.format("'%s' )", ReviewType.INTERNAL.getValue()));
         jpql.append(" FROM ReviewEntity r");
         jpql.append(" JOIN GameEntity g on g.id=r.game.id");
         jpql.append(" JOIN ReleaseEntity re on re.game.id=g.id");
