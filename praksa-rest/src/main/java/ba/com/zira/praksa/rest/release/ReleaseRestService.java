@@ -19,6 +19,7 @@ import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
+import ba.com.zira.commons.model.User;
 import ba.com.zira.praksa.api.ReleaseService;
 import ba.com.zira.praksa.api.model.release.ReleaseRequest;
 import ba.com.zira.praksa.api.model.release.ReleaseResponse;
@@ -89,7 +90,8 @@ public class ReleaseRestService {
         releasesByTimetableRequest.setTimeSegment(timeSegment);
 
         request.setEntity(releasesByTimetableRequest);
-
+        User user = new User("System");
+        request.setUser(user);
         return releaseService.getReleasesByTimetable(request);
     }
 }

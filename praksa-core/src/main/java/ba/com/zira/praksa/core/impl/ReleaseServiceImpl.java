@@ -118,7 +118,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     }
 
     @Override
-    public PayloadResponse<ReleasesByTimetableResponse> getReleasesByTimetable(EntityRequest<ReleasesByTimetableRequest> request)
+    public PayloadResponse<ReleasesByTimetableResponse> getReleasesByTimetable(final EntityRequest<ReleasesByTimetableRequest> request)
             throws ApiException {
         EntityRequest<ReleasesByTimetableRequest> entityRequest = new EntityRequest<>(request.getEntity());
         releaseRequestValidation.validateReleaseByTimetableRequest(entityRequest, VALIDATION_RULE);
