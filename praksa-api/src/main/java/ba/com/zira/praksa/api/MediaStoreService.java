@@ -3,9 +3,11 @@ package ba.com.zira.praksa.api;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
+import ba.com.zira.praksa.api.model.media.MediaRetrivalRequest;
 import ba.com.zira.praksa.api.model.mediastore.MediaStoreCreateRequest;
 import ba.com.zira.praksa.api.model.mediastore.MediaStoreResponse;
 import ba.com.zira.praksa.api.model.mediastore.MediaStoreUpdateRequest;
@@ -99,4 +101,7 @@ public interface MediaStoreService {
      *             corresponding error message and {@link ResponseCode}.
      */
     PayloadResponse<String> delete(EntityRequest<String> request) throws ApiException;
+
+    ListPayloadResponse<String> getImageUrl(final EntityRequest<MediaRetrivalRequest> request) throws ApiException;
+
 }

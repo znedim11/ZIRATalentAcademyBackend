@@ -59,20 +59,7 @@ public class MediaStoreRequestValidation {
         return validationResponse;
     }
 
-    public ValidationResponse validateEntityExistsInCreateRequest(final EntityRequest<MediaStoreCreateRequest> request,
-            final String validationRuleMessage) {
-        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
-        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-            StringBuilder errorDescription = new StringBuilder();
-            if (request.getEntity() == null) {
-                errorDescription.append("Entity must exist in request!");
-            }
-            validationResponse = requestValidator.createResponse(request, errorDescription);
-        }
-        return validationResponse;
-    }
-
-    public ValidationResponse validateEntityExistsInUpdateRequest(final EntityRequest<MediaStoreUpdateRequest> request,
+    public ValidationResponse validateEntityExistsInRequest(final EntityRequest<?> request,
             final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {

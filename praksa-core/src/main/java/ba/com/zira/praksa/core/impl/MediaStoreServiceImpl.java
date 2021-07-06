@@ -1,6 +1,7 @@
 package ba.com.zira.praksa.core.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.PagedData;
@@ -25,6 +27,7 @@ import ba.com.zira.praksa.dao.MediaStoreDAO;
 import ba.com.zira.praksa.dao.model.MediaEntity;
 import ba.com.zira.praksa.dao.model.MediaStoreEntity;
 import ba.com.zira.praksa.mapper.MediaStoreMapper;
+import ba.com.zira.praksa.api.model.media.MediaRetrivalRequest;
 
 @Service
 public class MediaStoreServiceImpl implements MediaStoreService {
@@ -69,7 +72,7 @@ public class MediaStoreServiceImpl implements MediaStoreService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<MediaStoreResponse> create(EntityRequest<MediaStoreCreateRequest> request) throws ApiException {
-        mediaStoreRequestValidation.validateEntityExistsInCreateRequest(request, BASIC_NOT_NULL);
+        mediaStoreRequestValidation.validateEntityExistsInRequest(request, BASIC_NOT_NULL);
 
         EntityRequest<String> entityRequest = new EntityRequest<>(request.getEntity().getName(), request);
         mediaStoreRequestValidation.validateMediaStoreNameExists(entityRequest, BASIC_NOT_NULL);
@@ -109,7 +112,7 @@ public class MediaStoreServiceImpl implements MediaStoreService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<MediaStoreResponse> update(final EntityRequest<MediaStoreUpdateRequest> request) throws ApiException {
-        mediaStoreRequestValidation.validateEntityExistsInUpdateRequest(request, BASIC_NOT_NULL);
+        mediaStoreRequestValidation.validateEntityExistsInRequest(request, BASIC_NOT_NULL);
 
         EntityRequest<String> entityRequestUuid = new EntityRequest<>(request.getEntity().getUuid(), request);
         mediaStoreRequestValidation.validateMediaStoreExists(entityRequestUuid, VALIDATE_ABSTRACT_REQUEST);
@@ -145,5 +148,18 @@ public class MediaStoreServiceImpl implements MediaStoreService {
         mediaStoreDAO.removeByPK(request.getEntity());
 
         return new PayloadResponse<>(request, ResponseCode.OK, "Concept deleted!");
+    }
+
+    @Override
+    public ListPayloadResponse<String> getImageUrl(final EntityRequest<MediaRetrivalRequest> request) throws ApiException {
+        mediaStoreRequestValidation.validateEntityExistsInRequest(request, VALIDATE_ABSTRACT_REQUEST);
+        List<String> url = new ArrayList<>();
+        url.addAll(mediaStoreDAO.getUrl(request.getEntity().getObjectId(), request.getEntity().getObjectType(),
+                request.getEntity().getMediaType()));
+        if (url.isEmpty()) {
+            url.add("");
+        }
+        return new ListPayloadResponse<>(request, ResponseCode.OK, url);
+
     }
 }
