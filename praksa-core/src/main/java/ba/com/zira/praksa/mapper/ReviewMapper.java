@@ -2,6 +2,7 @@ package ba.com.zira.praksa.mapper;
 
 import org.mapstruct.Mapper;
 
+import ba.com.zira.praksa.api.model.review.ReviewCreateRequest;
 import ba.com.zira.praksa.api.model.review.ReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewSearchRequest;
 import ba.com.zira.praksa.dao.model.ReviewEntity;
@@ -12,5 +13,7 @@ public interface ReviewMapper {
     ReviewResponse reviewEntityToReview(ReviewEntity reviewEntity);
 
     ReviewEntity reviewToReviewEntity(ReviewSearchRequest review);
+
+    ReviewEntity createRequestToEntity(ReviewCreateRequest entity);
 
 }

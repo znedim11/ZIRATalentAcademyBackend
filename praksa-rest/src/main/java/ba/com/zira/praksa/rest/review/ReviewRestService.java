@@ -3,6 +3,8 @@ package ba.com.zira.praksa.rest.review;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +15,7 @@ import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.ReviewService;
 import ba.com.zira.praksa.api.model.review.CompleteReviewResponse;
+import ba.com.zira.praksa.api.model.review.ReviewCreateRequest;
 import ba.com.zira.praksa.api.model.review.ReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewSearchRequest;
 import io.swagger.annotations.Api;
@@ -62,5 +65,11 @@ public class ReviewRestService {
         entityRequest.setEntity(reviewRequest);
 
         return reviewService.getStats(entityRequest);
+    }
+
+    @ApiOperation(value = "Create Review", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/create")
+    public PayloadResponse<ReviewResponse> create(@RequestBody EntityRequest<ReviewCreateRequest> request) throws ApiException {
+        return reviewService.create(request);
     }
 }

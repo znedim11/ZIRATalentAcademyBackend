@@ -1,21 +1,23 @@
 package ba.com.zira.praksa.api.model.review;
 
 import java.io.Serializable;
+import java.util.Map;
 
-import ba.com.zira.praksa.api.model.utils.ImageCreateRequest;
 import lombok.Data;
 
 @Data
 public class ReviewCreateRequest implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String aliases;
+    private String title;
 
-    private String information;
+    private String text;
 
-    private String name;
+    private Long formulaId;
 
-    private String outline;
+    private Long gameId;
 
-    private ImageCreateRequest imageCreateRequest;
+    private Map<String, Double> grades;
+
+    private Double totalRating;
 }

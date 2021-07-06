@@ -16,6 +16,8 @@ public class ReviewResponse implements Serializable {
     private String reviewerId;
     private String reviewerName;
     private Double totalRating;
+    private String text;
+    private Long formulaId;
 
     public ReviewResponse() {
     }
