@@ -7,5 +7,5 @@ import ba.com.zira.praksa.dao.model.MediaEntity;
 
 @Repository
 public class MediaDAO extends AbstractDAO<MediaEntity, Long> {
-
+    
 }
