@@ -17,8 +17,11 @@ import com.google.common.collect.Sets;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
+import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
+import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.FormulaService;
 import ba.com.zira.praksa.api.model.formula.FormulaCreateRequest;
 import ba.com.zira.praksa.api.model.formula.FormulaResponse;
@@ -42,6 +45,7 @@ public class FormulaServiceImpl implements FormulaService {
     static final String VALIDATE_ABSTRACT_REQUEST = "validateAbstractRequest";
     static final String BASIC_NOT_NULL = "basicNotNull";
 
+    RequestValidator requestValidator;
     FormulaRequestValidation formulaRequestValidation;
     FormulaDAO formulaDAO;
     FormulaMapper formulaMapper;
@@ -49,14 +53,34 @@ public class FormulaServiceImpl implements FormulaService {
     GradeDAO gradeDAO;
     ReviewDAO reviewDAO;
 
-    public FormulaServiceImpl(FormulaRequestValidation formulaRequestValidation, FormulaDAO formulaDAO, FormulaMapper formulaMapper,
-            GradeDAO gradeDAO, ReviewDAO reviewDAO) {
+    public FormulaServiceImpl(RequestValidator requestValidator, FormulaRequestValidation formulaRequestValidation, FormulaDAO formulaDAO,
+            FormulaMapper formulaMapper, GradeDAO gradeDAO, ReviewDAO reviewDAO) {
         super();
+        this.requestValidator = requestValidator;
         this.formulaRequestValidation = formulaRequestValidation;
         this.formulaDAO = formulaDAO;
         this.formulaMapper = formulaMapper;
         this.gradeDAO = gradeDAO;
         this.reviewDAO = reviewDAO;
+    }
+
+    @Override
+    public PagedPayloadResponse<FormulaResponse> find(SearchRequest<String> request) throws ApiException {
+        requestValidator.validate(request);
+
+        PagedData<ReviewFormulaEntity> conceptEntitesData = formulaDAO.findAll(request.getFilter());
+        List<ReviewFormulaEntity> conceptEntities = conceptEntitesData.getRecords();
+
+        final List<FormulaResponse> conceptList = formulaMapper.entityListToResponseList(conceptEntities);
+
+        PagedData<FormulaResponse> pagedData = new PagedData<>();
+        pagedData.setNumberOfPages(conceptEntitesData.getNumberOfPages());
+        pagedData.setNumberOfRecords(conceptEntitesData.getNumberOfRecords());
+        pagedData.setPage(conceptEntitesData.getPage());
+        pagedData.setRecords(conceptList);
+        pagedData.setRecordsPerPage(conceptEntitesData.getRecordsPerPage());
+
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, pagedData);
     }
 
     @Override
@@ -159,6 +183,16 @@ public class FormulaServiceImpl implements FormulaService {
         formulaResponse.setGrades(formulaDAO.getGradesByFormula(formulaEntity.getId()));
 
         return new PayloadResponse<>(request, ResponseCode.OK, formulaResponse);
+    }
+
+    @Override
+    public PayloadResponse<Long> getNumberOfReviewsGamesByFormula(EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
+        formulaRequestValidation.validateFormulaExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+
+        Long numberofReviews = formulaDAO.getNumberOfReviewsGamesByFormula(request.getEntity());
+
+        return new PayloadResponse<>(request, ResponseCode.OK, numberofReviews);
     }
 
 }

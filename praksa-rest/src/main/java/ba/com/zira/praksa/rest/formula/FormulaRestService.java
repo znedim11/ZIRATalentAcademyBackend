@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.FormulaService;
 import ba.com.zira.praksa.api.model.formula.FormulaCreateRequest;
@@ -38,6 +40,16 @@ public class FormulaRestService {
 
     @Autowired
     FormulaService formulaService;
+
+    @ApiOperation(value = "Find Formulas", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/find")
+    public PagedPayloadResponse<FormulaResponse> find(@RequestParam(required = false) final String pagination) throws ApiException {
+
+        SearchRequest<String> request = new SearchRequest<>();
+        request.setPagination(pagination);
+
+        return formulaService.find(request);
+    }
 
     @ApiOperation(value = "Get Concept by Id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}")
@@ -67,4 +79,16 @@ public class FormulaRestService {
 
         return formulaService.update(request);
     }
+
+    @ApiOperation(value = "Get number of Reviews by Formula.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/reviewcount")
+    public PayloadResponse<Long> getNumberOfReviewsForFormula(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return formulaService.getNumberOfReviewsGamesByFormula(request);
+    }
+
 }
