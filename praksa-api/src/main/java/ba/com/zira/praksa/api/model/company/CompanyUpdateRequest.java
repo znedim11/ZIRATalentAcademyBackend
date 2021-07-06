@@ -1,9 +1,9 @@
 package ba.com.zira.praksa.api.model.company;
 
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import ba.com.zira.praksa.api.model.utils.ImageCreateRequest;
 import lombok.Data;
 
 @Data
@@ -17,12 +17,11 @@ public class CompanyUpdateRequest implements Serializable {
     private String email;
     private LocalDateTime endDate;
     private String information;
-    private LocalDateTime modified;
-    private String modifiedBy;
     private String name;
     private String outlineText;
     private LocalDateTime startDate;
     private String telNumber;
-    private String website;  
+    private String website;
 
+    private ImageCreateRequest imageCreateRequest;
 }
