@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 	<springProperty scope="context" name="rootLogLevel" source="root.logging.level"
-        defaultValue="info"/>
+        defaultValue="info"></springProperty>
 	<springProperty scope="context" name="ziraLogLevel" source="zira.logging.level"
         defaultValue="debug"/>
         

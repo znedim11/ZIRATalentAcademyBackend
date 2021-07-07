@@ -15,13 +15,14 @@ public class ReviewResponse implements Serializable {
     private String title;
     private String reviewerId;
     private String reviewerName;
-    private Double totalRating;
+    private String totalRating;
+    private String type;
 
     public ReviewResponse() {
     }
 
     public ReviewResponse(final String game, final Long gameId, final String platformName, final Long platformId, final String title,
-            final String reviewerName, final Double totalRating, final Long reviewId) {
+            final String reviewer, final Double totalRating, final Long reviewId, final String type) {
         super();
         this.gameId = gameId;
         this.gameName = game;
@@ -29,7 +30,22 @@ public class ReviewResponse implements Serializable {
         this.platformId = platformId;
         this.title = title;
         this.id = reviewId;
-        this.reviewerName = reviewerName;
+        this.reviewerId = reviewer;
+        this.totalRating = String.valueOf(totalRating);
+        this.type = type;
+    }
+
+    public ReviewResponse(final String game, final Long gameId, final String platformName, final Long platformId, final String title,
+            final String reviewer, final String totalRating, final Long reviewId, final String type) {
+        super();
+        this.gameId = gameId;
+        this.gameName = game;
+        this.platform = platformName;
+        this.platformId = platformId;
+        this.title = title;
+        this.id = reviewId;
+        this.reviewerId = reviewer;
         this.totalRating = totalRating;
+        this.type = type;
     }
 }
