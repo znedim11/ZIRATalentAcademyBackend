@@ -16,9 +16,12 @@ import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.CompanyService;
+import ba.com.zira.praksa.api.MediaService;
 import ba.com.zira.praksa.api.model.company.CompanyCreateRequest;
 import ba.com.zira.praksa.api.model.company.CompanyResponse;
 import ba.com.zira.praksa.api.model.company.CompanyUpdateRequest;
+import ba.com.zira.praksa.api.model.enums.ObjectType;
+import ba.com.zira.praksa.api.model.media.CreateMediaRequest;
 import ba.com.zira.praksa.dao.CompanyDAO;
 import ba.com.zira.praksa.dao.model.CompanyEntity;
 import ba.com.zira.praksa.mapper.CompanyMapper;
@@ -29,6 +32,7 @@ public class CompanyServiceImpl implements CompanyService {
     private RequestValidator requestValidator;
     private CompanyDAO companyDAO;
     private CompanyMapper companyMapper;
+    private MediaService mediaService;
 
     public CompanyServiceImpl(final RequestValidator requestValidator, CompanyDAO companyDAO, CompanyMapper companyMapper) {
         this.requestValidator = requestValidator;
@@ -52,8 +56,21 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public PayloadResponse<CompanyResponse> create(EntityRequest<CompanyCreateRequest> request) throws ApiException {
         requestValidator.validate(request);
+
         CompanyEntity entity = companyMapper.dtoToEntity(request.getEntity());
+        entity.setCreated(LocalDateTime.now());
+        entity.setCreatedBy(request.getUserId());
         companyDAO.persist(entity);
+
+        if (request.getEntity().getImageCreateRequest() != null && request.getEntity().getImageCreateRequest().getImageData() != null
+                && request.getEntity().getImageCreateRequest().getImageName() != null) {
+            CreateMediaRequest mediaRequest = new CreateMediaRequest(ObjectType.COMPANY.getValue(), entity.getId(),
+                    request.getEntity().getImageCreateRequest().getImageData(), request.getEntity().getImageCreateRequest().getImageName(),
+                    "IMAGE", "COVER_IMAGE");
+
+            mediaService.saveMedia(new EntityRequest<>(mediaRequest, request));
+        }
+
         CompanyResponse response = companyMapper.entityToDto(entity);
         return new PayloadResponse<>(request, ResponseCode.OK, response);
     }
@@ -84,6 +101,15 @@ public class CompanyServiceImpl implements CompanyService {
         existingCompanyEntity.setModifiedBy(request.getUserId());
 
         companyDAO.merge(existingCompanyEntity);
+
+        if (request.getEntity().getImageCreateRequest() != null && request.getEntity().getImageCreateRequest().getImageData() != null
+                && request.getEntity().getImageCreateRequest().getImageName() != null) {
+            CreateMediaRequest mediaRequest = new CreateMediaRequest(ObjectType.COMPANY.getValue(), existingCompanyEntity.getId(),
+                    request.getEntity().getImageCreateRequest().getImageData(), request.getEntity().getImageCreateRequest().getImageName(),
+                    "IMAGE", "COVER_IMAGE");
+
+            mediaService.saveMedia(new EntityRequest<>(mediaRequest, request));
+        }
 
         final CompanyResponse response = companyMapper.entityToDto(existingCompanyEntity);
         return new PayloadResponse<>(request, ResponseCode.OK, response);

@@ -10,7 +10,6 @@ import ba.com.zira.commons.dao.AbstractDAO;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.character.CharacterSearchRequest;
 import ba.com.zira.praksa.api.model.character.CharacterSearchResponse;
-import ba.com.zira.praksa.api.model.enums.ObjectType;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
 
 @Repository
@@ -19,11 +18,11 @@ public class CharacterDAO extends AbstractDAO<CharacterEntity, Long> {
     public List<CharacterSearchResponse> searchCharacters(CharacterSearchRequest searchRequest) {
         StringBuilder jpql = new StringBuilder();
         jpql.append(
-                " SELECT new ba.com.zira.praksa.api.model.character.CharacterSearchResponse(c.id, c.name, c.information, ms.url, (SELECT COUNT(*) FROM LinkMapEntity lm WHERE lm.character.id = c.id AND lm.game.id IS NOT NULL))");
+                " SELECT new ba.com.zira.praksa.api.model.character.CharacterSearchResponse(c.id, c.name, c.outlineText, ms.url, (SELECT COUNT(*) FROM LinkMapEntity lm WHERE lm.character.id = c.id AND lm.game.id IS NOT NULL))");
         jpql.append(" FROM CharacterEntity c");
         jpql.append(" LEFT OUTER JOIN MediaEntity m ON m.objectId = c.id");
         jpql.append(" LEFT OUTER JOIN MediaStoreEntity ms ON ms.media.id = m.id");
-        jpql.append(" WHERE m.objectType = :objectType");
+        jpql.append(" WHERE 1=1");
 
         if (searchRequest.getName() != null && !searchRequest.getName().isEmpty()) {
             jpql.append(" AND UPPER(c.name) like :name");
@@ -57,7 +56,6 @@ public class CharacterDAO extends AbstractDAO<CharacterEntity, Long> {
         }
 
         TypedQuery<CharacterSearchResponse> query = entityManager.createQuery(jpql.toString(), CharacterSearchResponse.class);
-        query.setParameter("objectType", ObjectType.CHARACTER.getValue());
 
         if (searchRequest.getName() != null && !searchRequest.getName().isEmpty()) {
             query.setParameter("name", "%" + searchRequest.getName().toUpperCase() + "%");

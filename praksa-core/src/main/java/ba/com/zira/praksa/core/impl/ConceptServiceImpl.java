@@ -24,6 +24,7 @@ import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.ConceptService;
 import ba.com.zira.praksa.api.MediaService;
+import ba.com.zira.praksa.api.MediaStoreService;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.character.CharacterResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptCreateRequest;
@@ -34,6 +35,7 @@ import ba.com.zira.praksa.api.model.enums.ObjectType;
 import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.location.Location;
 import ba.com.zira.praksa.api.model.media.CreateMediaRequest;
+import ba.com.zira.praksa.api.model.media.MediaRetrivalRequest;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
 import ba.com.zira.praksa.core.validation.ConceptRequestValidation;
@@ -79,11 +81,12 @@ public class ConceptServiceImpl implements ConceptService {
     ReleaseMapper releaseMapper;
     GameDAO gameDAO;
     MediaService mediaService;
+    MediaStoreService mediaStoreService;
 
     public ConceptServiceImpl(RequestValidator requestValidator, ConceptRequestValidation conceptRequestValidation, ConceptDAO conceptDAO,
             ConceptMapper conceptMapper, GameMapper gameMapper, PersonMapper personMapper, ObjectMapper objectMapper,
             CharacterMapper characterMapper, LocationMapper locationMapper, PlatformMapper platformMapper, ReleaseMapper releaseMapper,
-            GameDAO gameDAO, MediaService mediaService) {
+            GameDAO gameDAO, MediaService mediaService, MediaStoreService mediaStoreService) {
         super();
         this.requestValidator = requestValidator;
         this.conceptRequestValidation = conceptRequestValidation;
@@ -98,6 +101,7 @@ public class ConceptServiceImpl implements ConceptService {
         this.releaseMapper = releaseMapper;
         this.gameDAO = gameDAO;
         this.mediaService = mediaService;
+        this.mediaStoreService = mediaStoreService;
     }
 
     @Override
@@ -127,7 +131,11 @@ public class ConceptServiceImpl implements ConceptService {
         final ConceptEntity conceptEntity = conceptDAO.findByPK(request.getEntity());
 
         final ConceptResponse conceptResponse = conceptMapper.entityToResponse(conceptEntity);
-
+        MediaRetrivalRequest mrr = new MediaRetrivalRequest();
+        mrr.setObjectId(conceptResponse.getId());
+        mrr.setObjectType(ObjectType.CONCEPT.getValue());
+        mrr.setMediaType("COVER_IMAGE");
+        conceptResponse.setImageUrl(mediaStoreService.getImageUrl(new EntityRequest<>(mrr, request)).getPayload().get(0));
         return new PayloadResponse<>(request, ResponseCode.OK, conceptResponse);
     }
 

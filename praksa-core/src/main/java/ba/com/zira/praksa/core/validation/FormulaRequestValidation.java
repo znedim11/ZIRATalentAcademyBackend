@@ -1,3 +1,6 @@
+/**
+ *
+ */
 package ba.com.zira.praksa.core.validation;
 
 import org.apache.commons.lang.StringUtils;
@@ -7,59 +10,39 @@ import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.response.ValidationResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
-import ba.com.zira.praksa.api.MediaStoreService;
-import ba.com.zira.praksa.api.model.mediastore.MediaStoreCreateRequest;
-import ba.com.zira.praksa.api.model.mediastore.MediaStoreUpdateRequest;
-import ba.com.zira.praksa.dao.MediaDAO;
-import ba.com.zira.praksa.dao.MediaStoreDAO;
+import ba.com.zira.praksa.api.model.formula.FormulaCreateRequest;
+import ba.com.zira.praksa.api.model.formula.FormulaUpdateRequest;
+import ba.com.zira.praksa.dao.FormulaDAO;
 
 /**
- * SampleRequestValidation is used for validation of {@link MediaStoreService}
- * requests.<br>
- * e.g. database validation needed
- *
  * @author zira
  *
  */
-@Component("componentRequestValidation")
-public class MediaStoreRequestValidation {
 
+@Component("formulaRequestValidation")
+public class FormulaRequestValidation {
     RequestValidator requestValidator;
-    MediaStoreDAO mediaStoreDAO;
-    MediaDAO mediaDAO;
+    FormulaDAO formulaDAO;
 
-    public MediaStoreRequestValidation(RequestValidator requestValidator, MediaStoreDAO mediaStoreDAO, MediaDAO mediaDAO) {
+    public FormulaRequestValidation(RequestValidator requestValidator, FormulaDAO formulaDAO) {
         super();
         this.requestValidator = requestValidator;
-        this.mediaStoreDAO = mediaStoreDAO;
-        this.mediaDAO = mediaDAO;
+        this.formulaDAO = formulaDAO;
     }
 
-    public ValidationResponse validateMediaStoreExists(final EntityRequest<String> request, final String validationRuleMessage) {
+    public ValidationResponse validateFormulaExists(final EntityRequest<Long> request, final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
             StringBuilder errorDescription = new StringBuilder();
-            if (!mediaStoreDAO.existsByPK(request.getEntity())) {
-                errorDescription.append("MediaStore with id ").append(request.getEntity()).append(" does not exist !");
+            if (!formulaDAO.existsByPK(request.getEntity())) {
+                errorDescription.append("Formula with id ").append(request.getEntity()).append(" does not exist !");
             }
             validationResponse = requestValidator.createResponse(request, errorDescription);
         }
         return validationResponse;
     }
 
-    public ValidationResponse validateMediaStoreNameExists(final EntityRequest<String> request, final String validationRuleMessage) {
-        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
-        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-            StringBuilder errorDescription = new StringBuilder();
-            if (StringUtils.isBlank(request.getEntity())) {
-                errorDescription.append("MediaStore must have name!");
-            }
-            validationResponse = requestValidator.createResponse(request, errorDescription);
-        }
-        return validationResponse;
-    }
-
-    public ValidationResponse validateEntityExistsInRequest(final EntityRequest<?> request,
+    public ValidationResponse validateEntityExistsInCreateRequest(final EntityRequest<FormulaCreateRequest> request,
             final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
@@ -72,16 +55,42 @@ public class MediaStoreRequestValidation {
         return validationResponse;
     }
 
-    public ValidationResponse validateMediaIdExists(final EntityRequest<Long> request, final String validationRuleMessage) {
+    public ValidationResponse validateEntityExistsInUpdateRequest(final EntityRequest<FormulaUpdateRequest> request,
+            final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
             StringBuilder errorDescription = new StringBuilder();
-            if (!mediaDAO.existsByPK(request.getEntity())) {
-                errorDescription.append("Media with id ").append(request.getEntity()).append(" does not exist !");
+            if (request.getEntity() == null) {
+                errorDescription.append("Entity must exist in request!");
             }
             validationResponse = requestValidator.createResponse(request, errorDescription);
         }
+        return validationResponse;
+    }
 
+    public ValidationResponse validateRequiredAttributesExistInCreateRequest(final EntityRequest<FormulaCreateRequest> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (StringUtils.isBlank(request.getEntity().getName()) || StringUtils.isBlank(request.getEntity().getFormula())) {
+                errorDescription.append("Formula must have name and formula definition!");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateRequiredAttributesExistInUpdateRequest(final EntityRequest<FormulaUpdateRequest> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (StringUtils.isBlank(request.getEntity().getName()) || StringUtils.isBlank(request.getEntity().getFormula())) {
+                errorDescription.append("Formula must have name and formula definition!");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
         return validationResponse;
     }
 }

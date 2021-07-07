@@ -104,7 +104,7 @@ public class ConceptDAO extends AbstractDAO<ConceptEntity, Long> {
         stringBuilder.append("WHERE 1 = 1 ");
 
         if (request.getName() != null && !request.getName().equals("")) {
-            stringBuilder.append("AND c.name LIKE :name ");
+            stringBuilder.append("AND LOWER(c.name) LIKE LOWER(CONCAT('%',:name,'%')) ");
         }
         if (request.getGameIds() != null) {
             stringBuilder.append("AND g.id IN :gameIds ");
