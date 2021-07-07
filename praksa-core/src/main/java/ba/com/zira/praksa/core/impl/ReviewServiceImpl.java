@@ -109,6 +109,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public PayloadResponse<CompleteReviewResponse> getStats(final EntityRequest<ReviewSearchRequest> request) throws ApiException {
         requestValidator.validate(request);
+        reviewRequestValidation.validateEntityExists(request, BASIC_NOT_NULL);
 
         CompleteReviewResponse completeReviewResponse = new CompleteReviewResponse();
         ReviewSearchRequest searchRequest = request.getEntity();

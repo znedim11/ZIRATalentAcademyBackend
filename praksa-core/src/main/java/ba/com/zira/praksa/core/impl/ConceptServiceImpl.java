@@ -154,7 +154,7 @@ public class ConceptServiceImpl implements ConceptService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ConceptResponse> create(EntityRequest<ConceptCreateRequest> request) throws ApiException {
-        conceptRequestValidation.validateEntityExistsInCreateRequest(request, BASIC_NOT_NULL);
+        conceptRequestValidation.validateEntityExistsInRequest(request, BASIC_NOT_NULL);
         ConceptCreateRequest requestEntity = request.getEntity();
         EntityRequest<String> entityRequest = new EntityRequest<>(requestEntity.getName(), request);
         conceptRequestValidation.validateConceptNameExists(entityRequest, BASIC_NOT_NULL);
@@ -182,7 +182,7 @@ public class ConceptServiceImpl implements ConceptService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ConceptResponse> update(final EntityRequest<ConceptUpdateRequest> request) throws ApiException {
-        conceptRequestValidation.validateEntityExistsInUpdateRequest(request, BASIC_NOT_NULL);
+        conceptRequestValidation.validateEntityExistsInRequest(request, BASIC_NOT_NULL);
 
         EntityRequest<Long> entityRequestId = new EntityRequest<>(request.getEntity().getId(), request);
         conceptRequestValidation.validateConceptExists(entityRequestId, VALIDATE_ABSTRACT_REQUEST);

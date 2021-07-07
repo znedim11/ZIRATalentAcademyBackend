@@ -90,7 +90,7 @@ public class LinkMapServiceImpl implements LinkMapService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PayloadResponse<String> createSingleLinkRequest(EntityRequest<LinkRequest> request) throws ApiException {
-        linkMapRequestValidation.validateEntityExistsInLinkRequest(request, BASIC_NOT_NULL);
+        linkMapRequestValidation.validateEntityExistsInRequest(request, BASIC_NOT_NULL);
         linkMapRequestValidation.validateRequiredFieldsExistInSingleLinkRequest(request, BASIC_NOT_NULL);
         linkMapRequestValidation.validateKeysExistInSingleLinkRequest(request, VALIDATE_ABSTRACT_REQUEST);
         linkMapRequestValidation.validateLinkDoesNotExistInSingleLinkRequest(request, BASIC_NOT_NULL);
@@ -108,7 +108,7 @@ public class LinkMapServiceImpl implements LinkMapService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PayloadResponse<String> createMultipleLinkRequest(EntityRequest<MultipleLinkRequest> request) throws ApiException {
-        linkMapRequestValidation.validateEntityExistsInLinkRequest(request, BASIC_NOT_NULL);
+        linkMapRequestValidation.validateEntityExistsInRequest(request, BASIC_NOT_NULL);
         linkMapRequestValidation.validateRequiredFieldsExistInMultipleLinkRequest(request, BASIC_NOT_NULL);
         linkMapRequestValidation.validateKeysExistInMultipleLinkRequest(request, VALIDATE_ABSTRACT_REQUEST);
         linkMapRequestValidation.validateLinkDoesNotExistInMultipleLinkRequest(request, BASIC_NOT_NULL);
