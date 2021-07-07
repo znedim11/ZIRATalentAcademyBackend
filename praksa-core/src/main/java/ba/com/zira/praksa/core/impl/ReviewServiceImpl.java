@@ -22,6 +22,7 @@ import ba.com.zira.praksa.api.model.review.ReviewCreateRequest;
 import ba.com.zira.praksa.api.model.review.ReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewSearchRequest;
 import ba.com.zira.praksa.core.utils.LookupService;
+import ba.com.zira.praksa.core.validation.ReviewRequestValidation;
 import ba.com.zira.praksa.dao.FormulaDAO;
 import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.ReviewDAO;
@@ -40,8 +41,10 @@ import ba.com.zira.praksa.mapper.ReviewMapper;
 @Service
 @ComponentScan("ba.com.zira.praksa.core.utils")
 public class ReviewServiceImpl implements ReviewService {
+    static final String BASIC_NOT_NULL = "basicNotNull";
 
     RequestValidator requestValidator;
+    ReviewRequestValidation reviewRequestValidation;
     ReviewDAO reviewDAO;
     LookupService lookupService;
     ReviewMapper reviewMapper;
@@ -49,10 +52,11 @@ public class ReviewServiceImpl implements ReviewService {
     FormulaDAO formulaDAO;
     ReviewGradeDAO reviewGradeDAO;
 
-    public ReviewServiceImpl(RequestValidator requestValidator, ReviewDAO reviewDAO, LookupService lookupService, ReviewMapper reviewMapper,
-            GameDAO gameDAO, FormulaDAO formulaDAO, ReviewGradeDAO reviewGradeDAO) {
+    public ReviewServiceImpl(RequestValidator requestValidator, ReviewRequestValidation reviewRequestValidation, ReviewDAO reviewDAO,
+            LookupService lookupService, ReviewMapper reviewMapper, GameDAO gameDAO, FormulaDAO formulaDAO, ReviewGradeDAO reviewGradeDAO) {
         super();
         this.requestValidator = requestValidator;
+        this.reviewRequestValidation = reviewRequestValidation;
         this.reviewDAO = reviewDAO;
         this.lookupService = lookupService;
         this.reviewMapper = reviewMapper;
@@ -113,8 +117,9 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ReviewResponse> create(EntityRequest<ReviewCreateRequest> request) throws ApiException {
-        // TODO: Dodati custom validaciju
         requestValidator.validate(request);
+        reviewRequestValidation.validateEntityExists(request, BASIC_NOT_NULL);
+        reviewRequestValidation.validateRequiredFieldsExists(request, BASIC_NOT_NULL);
 
         ReviewEntity reviewEntity = reviewMapper.createRequestToEntity(request.getEntity());
         GameEntity gameEntity = gameDAO.findByPK(request.getEntity().getGameId());
@@ -139,11 +144,11 @@ public class ReviewServiceImpl implements ReviewService {
         if (request.getEntity().getGrades() != null) {
             for (Map.Entry<String, Double> grade : request.getEntity().getGrades().entrySet()) {
                 ReviewGradeEntity gradeEntity = new ReviewGradeEntity();
-                totalGradeEntity.setFormulaId(request.getEntity().getFormulaId());
-                totalGradeEntity.setGrade(grade.getValue());
-                totalGradeEntity.setReview(createdReviewEntity);
-                totalGradeEntity.setType(grade.getKey());
-                totalGradeEntity.setUuid(UUID.randomUUID().toString());
+                gradeEntity.setFormulaId(request.getEntity().getFormulaId());
+                gradeEntity.setGrade(grade.getValue());
+                gradeEntity.setReview(createdReviewEntity);
+                gradeEntity.setType(grade.getKey());
+                gradeEntity.setUuid(UUID.randomUUID().toString());
 
                 reviewGradeDAO.merge(gradeEntity);
             }
@@ -152,6 +157,7 @@ public class ReviewServiceImpl implements ReviewService {
         ReviewResponse response = reviewMapper.reviewEntityToReview(reviewEntity);
         response.setFormulaId(createdReviewEntity.getReviewFormula().getId());
         response.setGameId(createdReviewEntity.getGame().getId());
+        response.setTotalRating(reviewDAO.getTotalRatingByReview(createdReviewEntity.getId()));
 
         return new PayloadResponse<>(request, ResponseCode.OK, response);
     }

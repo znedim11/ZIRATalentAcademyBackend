@@ -151,4 +151,16 @@ public class ReviewDAO extends AbstractDAO<ReviewEntity, Long> {
 
         return query.getResultList();
     }
+
+    public Double getTotalRatingByReview(final Long reviewId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT g.grade FROM ReviewGradeEntity g WHERE g.review.id = :rId AND g.type = :type");
+
+        TypedQuery<Double> query = entityManager.createQuery(stringBuilder.toString(), Double.class);
+        query.setParameter("rId", reviewId);
+        query.setParameter("type", "TOTAL_GRADE");
+
+        return query.getResultList().stream().findFirst().orElse(null);
+
+    }
 }

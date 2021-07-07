@@ -7,5 +7,4 @@ import ba.com.zira.praksa.dao.model.ReviewGradeEntity;
 
 @Repository
 public class ReviewGradeDAO extends AbstractDAO<ReviewGradeEntity, String> {
-
 }
