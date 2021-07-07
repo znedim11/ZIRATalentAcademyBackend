@@ -3,7 +3,7 @@ package ba.com.zira.praksa.core.impl;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -120,8 +120,9 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Override
     public PayloadResponse<ReleasesByTimetableResponse> getReleasesByTimetable(final EntityRequest<ReleasesByTimetableRequest> request)
             throws ApiException {
-        EntityRequest<ReleasesByTimetableRequest> entityRequest = new EntityRequest<>(request.getEntity());
+        EntityRequest<ReleasesByTimetableRequest> entityRequest = new EntityRequest<>(request.getEntity(), request);
         releaseRequestValidation.validateReleaseByTimetableRequest(entityRequest, VALIDATION_RULE);
+        releaseRequestValidation.validateDatesInRequest(entityRequest, VALIDATION_RULE);
 
         ReleasesByTimetableResponse releasesByTimetableResponse = new ReleasesByTimetableResponse();
 
@@ -130,7 +131,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         LocalDateTime endDate = request.getEntity().getEndDate() == null ? localDate : request.getEntity().getEndDate();
 
         List<ReleaseEntity> listOfReleasesInRange = releaseDAO.getReleasesPerTimetable(startDate, endDate);
-        List<IntervalHelper> helpers = createSplitHelpes(request.getEntity().getTimeSegment(), startDate, endDate);
+        List<IntervalHelper> helpers = createSplitHelpers(request.getEntity().getTimeSegment(), startDate, endDate);
 
         releasesByTimetableResponse.setMapOfReleasesByIntervals(mapReleaseEntitiesToIntervals(helpers, listOfReleasesInRange));
         releasesByTimetableResponse.setStartDate(startDate);
@@ -144,33 +145,40 @@ public class ReleaseServiceImpl implements ReleaseService {
                 && (a.getReleaseDate().isBefore(endOfSegment) || a.getReleaseDate().isEqual(endOfSegment));
     }
 
-    private List<IntervalHelper> createSplitHelpes(final String typeOfSplit, final LocalDateTime startDate, final LocalDateTime endDate) {
+    private List<IntervalHelper> createSplitHelpers(final String typeOfSplit, final LocalDateTime startDate, final LocalDateTime endDate) {
 
         List<IntervalHelper> helpers = new ArrayList<>();
         Period diff = Period.between(startDate.toLocalDate().withDayOfMonth(1), endDate.toLocalDate().withDayOfMonth(1));
+        Period diffWeek = Period.ofDays(7);
 
-        createYearlyHelpers(typeOfSplit, startDate, endDate, helpers, diff);
+        createWeeklyHelpers(typeOfSplit, startDate, endDate, helpers, diffWeek, diff);
         createMonthlyHelpers(typeOfSplit, startDate, endDate, helpers, diff);
         createQuartalHelpers(typeOfSplit, startDate, endDate, helpers, diff);
+        createYearlyHelpers(typeOfSplit, startDate, endDate, helpers, diff);
+        createAlltimeHelper(typeOfSplit, startDate, endDate, helpers);
 
-        Period diffWeek = Period.ofDays(7);
+        return helpers;
+    }
+
+    private void createAlltimeHelper(final String typeOfSplit, final LocalDateTime startDate, final LocalDateTime endDate,
+            final List<IntervalHelper> helpers) {
+        if (TimeSegment.ALLTIME.getValue().equalsIgnoreCase(typeOfSplit)) {
+            helpers.add(new IntervalHelper(startDate, endDate));
+        }
+    }
+
+    private void createWeeklyHelpers(final String typeOfSplit, final LocalDateTime startDate, final LocalDateTime endDate,
+            final List<IntervalHelper> helpers, final Period diffWeek, final Period diff) {
         if (TimeSegment.WEEK.getValue().equalsIgnoreCase(typeOfSplit)) {
-            diff = Period.between(startDate.toLocalDate(), endDate.toLocalDate());
-
             if (diffWeek.getDays() == 0) {
                 helpers.add(new IntervalHelper(startDate, endDate));
             } else {
-                for (int i = 0; i < (diffWeek.getDays() + diff.getMonths() * 30 + diff.getYears() * 365 / 7); i++) {
-                    helpers.add(new IntervalHelper(startDate.plusDays(7L * i), startDate.plusYears(i * 7L + 7)));
+                for (int i = 0; i < (diffWeek.getDays() + diff.getMonths() * 30 + diff.getYears() * 365) / 7; i++) {
+                    helpers.add(new IntervalHelper(startDate.plusDays(i * 7L), startDate.plusDays(7 * i + 7L)));
                 }
             }
         }
 
-        if (TimeSegment.ALLTIME.getValue().equalsIgnoreCase(typeOfSplit)) {
-            helpers.add(new IntervalHelper(startDate, endDate));
-        }
-
-        return helpers;
     }
 
     private void createYearlyHelpers(final String typeOfSplit, final LocalDateTime startDate, final LocalDateTime endDate,
@@ -190,7 +198,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     private void createMonthlyHelpers(final String typeOfSplit, final LocalDateTime startDate, final LocalDateTime endDate,
             final List<IntervalHelper> helpers, final Period diff) {
         if (TimeSegment.MONTH.getValue().equalsIgnoreCase(typeOfSplit)) {
-            if (diff.getMonths() == 0) {
+            if (diff.getMonths() < 0) {
                 helpers.add(new IntervalHelper(startDate, endDate));
             } else {
                 for (int i = 0; i < diff.getMonths() + diff.getYears() * 12; i++) {
@@ -204,10 +212,10 @@ public class ReleaseServiceImpl implements ReleaseService {
     private void createQuartalHelpers(final String typeOfSplit, final LocalDateTime startDate, final LocalDateTime endDate,
             final List<IntervalHelper> helpers, final Period diff) {
         if (TimeSegment.QUARTAL.getValue().equalsIgnoreCase(typeOfSplit)) {
-            if (diff.getMonths() == 0) {
+            if (diff.getMonths() < 0) {
                 helpers.add(new IntervalHelper(startDate, endDate));
             } else {
-                for (int i = 0; i < diff.getMonths() / 4 + diff.getYears() * 4; i++) {
+                for (int i = 0; i < (diff.getMonths() / 4 + diff.getYears() * 12); i += 3) {
                     helpers.add(new IntervalHelper(startDate.plusMonths(i), startDate.plusMonths(i + 3L)));
                 }
             }
@@ -215,10 +223,10 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     }
 
-    private Map<IntervalHelper, List<ReleaseResponseDetails>> mapReleaseEntitiesToIntervals(List<IntervalHelper> intervals,
+    private Map<String, List<ReleaseResponseDetails>> mapReleaseEntitiesToIntervals(List<IntervalHelper> intervals,
             List<ReleaseEntity> listOfReleaseEntities) {
 
-        Map<IntervalHelper, List<ReleaseResponseDetails>> map = new HashMap<>();
+        Map<String, List<ReleaseResponseDetails>> map = new LinkedHashMap<>();
 
         for (IntervalHelper interval : intervals) {
 
@@ -232,7 +240,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
             interval.setReleaseCount(Long.valueOf(releasesTemp.size()));
 
-            map.put(interval, responseList);
+            map.put(interval.toString(), responseList);
 
         }
 

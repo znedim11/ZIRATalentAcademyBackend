@@ -14,6 +14,6 @@ public class ReleasesByTimetableResponse implements Serializable {
 
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private Map<IntervalHelper, List<ReleaseResponseDetails>> mapOfReleasesByIntervals;
+    private Map<String, List<ReleaseResponseDetails>> mapOfReleasesByIntervals;
 
 }

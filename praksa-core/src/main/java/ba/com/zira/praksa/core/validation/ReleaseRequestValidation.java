@@ -62,6 +62,21 @@ public class ReleaseRequestValidation {
         return validationResponse;
     }
 
+    public ValidationResponse validateDatesInRequest(final EntityRequest<ReleasesByTimetableRequest> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (!request.getEntity().getStartDate().isBefore(request.getEntity().getEndDate())) {
+                errorDescription.append("Start date must be before end date!");
+
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+
+        return validationResponse;
+    }
+
     public ValidationResponse validateUpdateReleaseRequest(final EntityRequest<ReleaseRequest> request,
             final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
