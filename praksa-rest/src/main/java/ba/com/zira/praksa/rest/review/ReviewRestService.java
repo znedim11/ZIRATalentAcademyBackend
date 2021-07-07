@@ -37,8 +37,9 @@ public class ReviewRestService {
     @ApiOperation(value = "Search for a review", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/search")
     public PagedPayloadResponse<ReviewResponse> search(@RequestParam(required = false) Long gameId,
-            @RequestParam(required = false) Long reviewerId, @RequestParam(required = false) Long platformId,
-            @RequestParam(required = false) Double lowestRating, @RequestParam(required = false) Double highestRating) throws ApiException {
+            @RequestParam(required = false) String reviewerId, @RequestParam(required = false) Long platformId,
+            @RequestParam(required = false) Double lowestRating, @RequestParam(required = false) Double highestRating,
+            @RequestParam(required = false) String type) throws ApiException {
 
         ReviewSearchRequest reviewRequest = new ReviewSearchRequest();
         reviewRequest.setGameId(gameId);
@@ -46,6 +47,7 @@ public class ReviewRestService {
         reviewRequest.setReviewerId(reviewerId);
         reviewRequest.setLowestRating(lowestRating);
         reviewRequest.setHighestRating(highestRating);
+        reviewRequest.setType(type);
 
         EntityRequest<ReviewSearchRequest> entityRequest = new EntityRequest<>();
         entityRequest.setEntity(reviewRequest);
@@ -56,8 +58,9 @@ public class ReviewRestService {
     @ApiOperation(value = "Get stats for reviews", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/stats")
     public PayloadResponse<CompleteReviewResponse> getStats(@RequestParam(required = false) Long gameId,
-            @RequestParam(required = false) Long reviewerId, @RequestParam(required = false) Long platformId,
-            @RequestParam(required = false) Double lowestRating, @RequestParam(required = false) Double highestRating) throws ApiException {
+            @RequestParam(required = false) String reviewerId, @RequestParam(required = false) Long platformId,
+            @RequestParam(required = false) Double lowestRating, @RequestParam(required = false) Double highestRating,
+            @RequestParam(required = false) String type) throws ApiException {
 
         ReviewSearchRequest reviewRequest = new ReviewSearchRequest();
         reviewRequest.setGameId(gameId);
@@ -65,6 +68,7 @@ public class ReviewRestService {
         reviewRequest.setReviewerId(reviewerId);
         reviewRequest.setLowestRating(lowestRating);
         reviewRequest.setHighestRating(highestRating);
+        reviewRequest.setType(type);
 
         EntityRequest<ReviewSearchRequest> entityRequest = new EntityRequest<>();
         entityRequest.setEntity(reviewRequest);

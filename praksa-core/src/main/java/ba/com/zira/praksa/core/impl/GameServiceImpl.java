@@ -294,7 +294,7 @@ public class GameServiceImpl implements GameService {
         List<ReleaseEntity> entity = gameDAO.getFirstReleaseByGame(request.getEntity());
 
         if (!entity.isEmpty()) {
-            ReleaseResponseLight release = releaseMapper.entityToDto(entity.get(0));
+            ReleaseResponseLight release = releaseMapper.releaseEntityToRelease(entity.get(0));
             release.setDeveloperName(entity.get(0).getDeveloper().getName());
             release.setPublisherName(entity.get(0).getPublisher().getName());
             release.setPlatformName(entity.get(0).getPlatform().getFullName());
