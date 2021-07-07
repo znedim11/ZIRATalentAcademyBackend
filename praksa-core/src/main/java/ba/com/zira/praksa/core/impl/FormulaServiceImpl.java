@@ -16,13 +16,16 @@ import com.google.common.collect.Sets;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.FormulaService;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.formula.FormulaCreateRequest;
 import ba.com.zira.praksa.api.model.formula.FormulaResponse;
 import ba.com.zira.praksa.api.model.formula.FormulaUpdateRequest;
@@ -193,6 +196,20 @@ public class FormulaServiceImpl implements FormulaService {
         Long numberofReviews = formulaDAO.getNumberOfReviewsGamesByFormula(request.getEntity());
 
         return new PayloadResponse<>(request, ResponseCode.OK, numberofReviews);
+    }
+
+    @Override
+    public ListPayloadResponse<LoV> getLoVs(ListRequest<Long> request) throws ApiException {
+        if (request.getList() != null) {
+            for (Long item : request.getList()) {
+                EntityRequest<Long> longRequest = new EntityRequest<>(item, request);
+                formulaRequestValidation.validateFormulaExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+            }
+        }
+
+        List<LoV> loVs = formulaDAO.getLoVs(request.getList());
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
     }
 
 }

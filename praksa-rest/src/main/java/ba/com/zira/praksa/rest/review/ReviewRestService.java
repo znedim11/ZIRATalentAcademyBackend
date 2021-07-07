@@ -1,9 +1,13 @@
 package ba.com.zira.praksa.rest.review;
 
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +22,7 @@ import ba.com.zira.praksa.api.model.review.CompleteReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewCreateRequest;
 import ba.com.zira.praksa.api.model.review.ReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewSearchRequest;
+import ba.com.zira.praksa.api.model.review.ReviewUpdateRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -71,5 +76,18 @@ public class ReviewRestService {
     @PostMapping(value = "/create")
     public PayloadResponse<ReviewResponse> create(@RequestBody EntityRequest<ReviewCreateRequest> request) throws ApiException {
         return reviewService.create(request);
+    }
+
+    @ApiOperation(value = "Update Review", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}")
+    public PayloadResponse<ReviewResponse> update(@PathVariable final Long id,
+            @RequestBody final EntityRequest<ReviewUpdateRequest> request) throws ApiException {
+
+        final ReviewUpdateRequest concept = request.getEntity();
+        if (!Objects.isNull(concept)) {
+            concept.setId(id);
+        }
+
+        return reviewService.update(request);
     }
 }

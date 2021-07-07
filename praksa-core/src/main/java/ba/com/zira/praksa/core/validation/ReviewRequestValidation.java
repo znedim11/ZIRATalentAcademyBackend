@@ -11,6 +11,7 @@ import ba.com.zira.commons.message.response.ValidationResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.model.review.ReviewCreateRequest;
+import ba.com.zira.praksa.api.model.review.ReviewUpdateRequest;
 import ba.com.zira.praksa.dao.ReviewDAO;
 
 /**
@@ -29,7 +30,19 @@ public class ReviewRequestValidation {
         this.reviewDAO = reviewDAO;
     }
 
-    public ValidationResponse validateRequiredFieldsExists(final EntityRequest<ReviewCreateRequest> request,
+    public ValidationResponse validateReviewExists(final EntityRequest<Long> request, final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (!reviewDAO.existsByPK(request.getEntity())) {
+                errorDescription.append("Review with id ").append(request.getEntity()).append(" does not exist !");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateRequiredFieldsExistsInCreateRequest(final EntityRequest<ReviewCreateRequest> request,
             final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
@@ -55,7 +68,30 @@ public class ReviewRequestValidation {
         return validationResponse;
     }
 
-    public ValidationResponse validateEntityExists(final EntityRequest<ReviewCreateRequest> request, final String validationRuleMessage) {
+    public ValidationResponse validateRequiredFieldsExistsInUpdateRequest(final EntityRequest<ReviewUpdateRequest> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            ReviewUpdateRequest entity = request.getEntity();
+            StringBuilder errorDescription = new StringBuilder();
+            if (StringUtils.isBlank(entity.getTitle())) {
+                errorDescription.append("Review must have title! ");
+            }
+            if (entity.getFormulaId() == null) {
+                errorDescription.append("Review must have formulaId! ");
+            }
+            if (entity.getGrades() == null) {
+                errorDescription.append("Review must have grades! ");
+            }
+            if (entity.getTotalRating() == null) {
+                errorDescription.append("Review must have total rating! ");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateEntityExists(final EntityRequest<?> request, final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
             StringBuilder errorDescription = new StringBuilder();

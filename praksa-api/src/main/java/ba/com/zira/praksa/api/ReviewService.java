@@ -9,6 +9,7 @@ import ba.com.zira.praksa.api.model.review.CompleteReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewCreateRequest;
 import ba.com.zira.praksa.api.model.review.ReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewSearchRequest;
+import ba.com.zira.praksa.api.model.review.ReviewUpdateRequest;
 
 /**
  *
@@ -35,5 +36,20 @@ public interface ReviewService {
      *             corresponding error message and {@link ResponseCode}.
      */
     PayloadResponse<ReviewResponse> create(EntityRequest<ReviewCreateRequest> request) throws ApiException;
+
+    /**
+     * Update existing {@link ReviewResponse}. <br>
+     * Method validates if Sample exists and if the request is valid update
+     * database.
+     *
+     * @param request
+     *            {@link EntityRequest} for {@link ReviewResponse}
+     * @return {@link PayloadResponse} holding created {@link ReviewResponse}.
+     * @throws ApiException
+     *             If there was a problem during API invocation then.
+     *             {@link ApiException} will be generated/returned with
+     *             corresponding error message and {@link ResponseCode}.
+     */
+    PayloadResponse<ReviewResponse> update(final EntityRequest<ReviewUpdateRequest> request) throws ApiException;
 
 }

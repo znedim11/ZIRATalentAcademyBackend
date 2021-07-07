@@ -3,6 +3,7 @@
  */
 package ba.com.zira.praksa.rest.formula;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.FormulaService;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.formula.FormulaCreateRequest;
 import ba.com.zira.praksa.api.model.formula.FormulaResponse;
 import ba.com.zira.praksa.api.model.formula.FormulaUpdateRequest;
@@ -89,6 +93,17 @@ public class FormulaRestService {
         request.setEntity(id);
 
         return formulaService.getNumberOfReviewsGamesByFormula(request);
+    }
+
+    @ApiOperation(value = "Get Formula names by Ids.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/lovs")
+    public ListPayloadResponse<LoV> getLoVs(@RequestParam(required = false) final List<Long> ids) throws ApiException {
+
+        final ListRequest<Long> request = new ListRequest<>();
+        request.setList(ids);
+
+        return formulaService.getLoVs(request);
     }
 
 }
