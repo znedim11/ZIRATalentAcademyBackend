@@ -7,24 +7,9 @@ import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.response.ValidationResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
-import ba.com.zira.praksa.api.ReleaseService;
 import ba.com.zira.praksa.api.model.release.ReleaseRequest;
-import ba.com.zira.praksa.api.model.release.ReleaseResponse;
 import ba.com.zira.praksa.api.model.release.ReleasesByTimetableRequest;
 import lombok.AllArgsConstructor;
-
-/**
- * Validates findById, update, delete ReleaseResponse plan from
- * {@link ReleaseService}.
- *
- * @param request
- *            the {@link EntityRequest} to validate.
- * @param validationRuleMessage
- *            name of the validation rule that is going to be used for
- *            validating {@link ReleaseResponse}
- *
- * @return {@link ValidationResponse}
- */
 
 @Component("releaseRequestValidation")
 @AllArgsConstructor

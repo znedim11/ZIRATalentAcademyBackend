@@ -38,6 +38,7 @@ import ba.com.zira.praksa.api.model.media.CreateMediaRequest;
 import ba.com.zira.praksa.api.model.media.MediaRetrivalRequest;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
+import ba.com.zira.praksa.core.utils.LookupService;
 import ba.com.zira.praksa.core.validation.ConceptRequestValidation;
 import ba.com.zira.praksa.dao.ConceptDAO;
 import ba.com.zira.praksa.dao.GameDAO;
@@ -82,11 +83,12 @@ public class ConceptServiceImpl implements ConceptService {
     GameDAO gameDAO;
     MediaService mediaService;
     MediaStoreService mediaStoreService;
+    LookupService lookupService;
 
     public ConceptServiceImpl(RequestValidator requestValidator, ConceptRequestValidation conceptRequestValidation, ConceptDAO conceptDAO,
             ConceptMapper conceptMapper, GameMapper gameMapper, PersonMapper personMapper, ObjectMapper objectMapper,
             CharacterMapper characterMapper, LocationMapper locationMapper, PlatformMapper platformMapper, ReleaseMapper releaseMapper,
-            GameDAO gameDAO, MediaService mediaService, MediaStoreService mediaStoreService) {
+            GameDAO gameDAO, MediaService mediaService, MediaStoreService mediaStoreService, LookupService lookupService) {
         super();
         this.requestValidator = requestValidator;
         this.conceptRequestValidation = conceptRequestValidation;
@@ -102,6 +104,7 @@ public class ConceptServiceImpl implements ConceptService {
         this.gameDAO = gameDAO;
         this.mediaService = mediaService;
         this.mediaStoreService = mediaStoreService;
+        this.lookupService = lookupService;
     }
 
     @Override
@@ -112,6 +115,7 @@ public class ConceptServiceImpl implements ConceptService {
         List<ConceptEntity> conceptEntities = conceptEntitesData.getRecords();
 
         final List<ConceptResponse> conceptList = conceptMapper.entityListToResponseList(conceptEntities);
+        lookupService.lookupCoverImage(conceptList, ConceptResponse::getId, ObjectType.CONCEPT.getValue(), ConceptResponse::setImageUrl);
 
         PagedData<ConceptResponse> pagedData = new PagedData<>();
         pagedData.setNumberOfPages(conceptEntitesData.getNumberOfPages());
@@ -317,6 +321,8 @@ public class ConceptServiceImpl implements ConceptService {
             conceptList = conceptList.stream().sorted(Comparator.comparingLong(ConceptResponse::getNumberofGames).reversed())
                     .collect(Collectors.toList());
         }
+
+        lookupService.lookupCoverImage(conceptList, ConceptResponse::getId, ObjectType.CONCEPT.getValue(), ConceptResponse::setImageUrl);
 
         return new ListPayloadResponse<>(request, ResponseCode.OK, conceptList);
     }

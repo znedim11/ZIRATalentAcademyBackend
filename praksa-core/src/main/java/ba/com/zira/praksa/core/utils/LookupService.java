@@ -14,6 +14,7 @@ import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.praksa.api.model.users.UserCodeDisplay;
 import ba.com.zira.praksa.core.clients.UAAFeignClient;
 import ba.com.zira.praksa.dao.GameDAO;
+import ba.com.zira.praksa.dao.MediaStoreDAO;
 import ba.com.zira.praksa.dao.PlatformDAO;
 
 @Component
@@ -22,11 +23,13 @@ public class LookupService {
     PlatformDAO platformDAO;
     GameDAO gameDAO;
     UAAFeignClient uaaFeignClient;
+    MediaStoreDAO mediaStoreDAO;
 
-    public LookupService(PlatformDAO platformDAO, GameDAO gameDAO, UAAFeignClient uaaFeignClient) {
+    public LookupService(PlatformDAO platformDAO, GameDAO gameDAO, UAAFeignClient uaaFeignClient, MediaStoreDAO mediaStoreDAO) {
         this.platformDAO = platformDAO;
         this.gameDAO = gameDAO;
         this.uaaFeignClient = uaaFeignClient;
+        this.mediaStoreDAO = mediaStoreDAO;
     }
 
     public static String get(final Long key, final Map<Long, String> lookup) {
@@ -81,6 +84,17 @@ public class LookupService {
 
     private Predicate<? super UserCodeDisplay> isInList(List<String> ids) {
         return u -> ids.contains(u.getUsercode());
+    }
+
+    public <E> void lookupCoverImage(final List<E> values, final Function<E, Long> getter, String objectType,
+            final BiConsumer<E, String> setter) throws ApiException {
+        // @formatter:off
+        List<Long> ids = values.parallelStream().map(getter).distinct().collect(Collectors.toList());
+        // @formatter:on
+        if (!(ids == null || ids.isEmpty())) {
+            Map<Long, String> lookup = mediaStoreDAO.getUrlsForList(ids, objectType, "COVER_IMAGE");
+            values.parallelStream().forEach(r -> setter.accept(r, get(getter.apply(r), lookup)));
+        }
     }
 
 }
