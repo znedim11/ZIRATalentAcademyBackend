@@ -36,4 +36,18 @@ public class ReviewResponse implements Serializable {
         this.totalRating = totalRating;
         this.type = type;
     }
+
+    public ReviewResponse(final String game, final Long gameId, final String platformName, final Long platformId, final String title,
+            final String reviewer, final Long reviewId, final String type) {
+        super();
+        this.gameId = gameId;
+        this.gameName = game;
+        this.platform = platformName;
+        this.platformId = platformId;
+        this.title = title;
+        this.id = reviewId;
+        this.reviewerId = reviewer;
+        this.totalRating = 0D;
+        this.type = type;
+    }
 }
