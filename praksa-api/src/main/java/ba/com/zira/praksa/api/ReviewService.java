@@ -2,6 +2,7 @@ package ba.com.zira.praksa.api;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
@@ -51,5 +52,22 @@ public interface ReviewService {
      *             corresponding error message and {@link ResponseCode}.
      */
     PayloadResponse<ReviewResponse> update(final EntityRequest<ReviewUpdateRequest> request) throws ApiException;
+
+    /**
+     * Retrieve {@link ReviewResponse} by Id.
+     *
+     * @param request
+     *            {@link SearchRequest} for ReviewResponse Id and additional
+     *            pagination and sorting information.
+     * @return {@link PayloadResponse} for {@link ReviewResponse}.
+     * @throws ApiException
+     *             If there was a problem during API invocation then.
+     *             {@link ApiException} will be generated/returned with
+     *             corresponding error message and {@link ResponseCode}.
+     */
+    PayloadResponse<ReviewResponse> findById(SearchRequest<Long> request) throws ApiException;
+
+    // ListPayloadResponse<ReviewResponse> getGradesByReview(SearchRequest<Long>
+    // request) throws ApiException;
 
 }

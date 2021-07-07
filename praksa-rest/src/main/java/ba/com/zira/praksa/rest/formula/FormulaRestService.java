@@ -55,7 +55,7 @@ public class FormulaRestService {
         return formulaService.find(request);
     }
 
-    @ApiOperation(value = "Get Concept by Id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Formula by Id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}")
     public PayloadResponse<FormulaResponse> findById(@PathVariable final Long id) throws ApiException {
 
@@ -65,13 +65,13 @@ public class FormulaRestService {
         return formulaService.findById(request);
     }
 
-    @ApiOperation(value = "Create Concept", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Create Formula", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/create")
     public PayloadResponse<FormulaResponse> create(@RequestBody EntityRequest<FormulaCreateRequest> request) throws ApiException {
         return formulaService.create(request);
     }
 
-    @ApiOperation(value = "Update Concept", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Update Formula", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PutMapping(value = "/{id}")
     public PayloadResponse<FormulaResponse> update(@PathVariable final Long id,
             @RequestBody final EntityRequest<FormulaUpdateRequest> request) throws ApiException {
@@ -106,4 +106,14 @@ public class FormulaRestService {
         return formulaService.getLoVs(request);
     }
 
+    @ApiOperation(value = "Get grade types by Formula.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/grades")
+    public ListPayloadResponse<String> getGradesByFormula(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return formulaService.getGradesByFormula(request);
+    }
 }

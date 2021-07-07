@@ -85,4 +85,6 @@ public interface FormulaService {
     PayloadResponse<Long> getNumberOfReviewsGamesByFormula(final EntityRequest<Long> request) throws ApiException;
 
     ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<String> getGradesByFormula(final EntityRequest<Long> request) throws ApiException;
 }

@@ -212,4 +212,14 @@ public class FormulaServiceImpl implements FormulaService {
         return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
     }
 
+    @Override
+    public ListPayloadResponse<String> getGradesByFormula(EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
+        formulaRequestValidation.validateFormulaExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+
+        List<String> grades = formulaDAO.getGradesByFormula(request.getEntity());
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, grades);
+    }
+
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.ReviewService;
@@ -93,5 +94,15 @@ public class ReviewRestService {
         }
 
         return reviewService.update(request);
+    }
+
+    @ApiOperation(value = "Get Review by Id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}")
+    public PayloadResponse<ReviewResponse> findById(@PathVariable final Long id) throws ApiException {
+
+        final SearchRequest<Long> request = new SearchRequest<>();
+        request.setEntity(id);
+
+        return reviewService.findById(request);
     }
 }

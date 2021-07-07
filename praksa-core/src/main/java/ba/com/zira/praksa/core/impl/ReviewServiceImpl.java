@@ -16,6 +16,7 @@ import com.google.common.collect.Maps;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
@@ -316,4 +317,25 @@ public class ReviewServiceImpl implements ReviewService {
     private void setTopPlatform(CompleteReviewResponse completeReviewResponse, boolean isPlatformsEmpty, Long mostPopularPlatformId) {
         completeReviewResponse.setTopPlatformId(!isPlatformsEmpty ? mostPopularPlatformId : null);
     }
+
+    @Override
+    public PayloadResponse<ReviewResponse> findById(SearchRequest<Long> request) throws ApiException {
+        EntityRequest<Long> entityRequest = new EntityRequest<>(request.getEntity(), request);
+        reviewRequestValidation.validateReviewExists(entityRequest, VALIDATE_ABSTRACT_REQUEST);
+
+        final ReviewEntity reviewEntity = reviewDAO.findByPK(request.getEntity());
+
+        final ReviewResponse reviewResponse = reviewMapper.reviewEntityToReview(reviewEntity);
+
+        List<ReviewGradeEntity> gradeEntities = reviewGradeDAO.getGradesByReview(reviewEntity.getId()).stream()
+                .collect(Collectors.toList());
+
+        ReviewGradeEntity totalGradeEntity = gradeEntities.stream().filter(g -> g.getType().equals(TOTAL_GRADE_TYPE))
+                .collect(Collectors.toList()).get(0);
+
+        reviewResponse.setTotalRating(totalGradeEntity.getGrade());
+
+        return new PayloadResponse<>(request, ResponseCode.OK, reviewResponse);
+    }
+
 }
