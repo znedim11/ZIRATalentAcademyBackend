@@ -19,7 +19,7 @@ public class ExternalReviewDAO extends AbstractDAO<ExternalReviewEntity, Long> {
     public List<ReviewResponse> searchReviews(final ReviewSearchRequest searchRequest) {
         StringBuilder jpql = new StringBuilder();
         jpql.append(
-                "SELECT new ba.com.zira.praksa.api.model.review.ReviewResponse(g.fullName, g.id, p.abbriviation, p.id, g.fullName, er.createdBy, 'N/A', er.id, ");
+                "SELECT new ba.com.zira.praksa.api.model.review.ReviewResponse(g.fullName, g.id, p.abbriviation, p.id, g.fullName, er.createdBy , er.id, ");
         jpql.append(String.format("'%s' )", ReviewType.EXTERNAL.getValue()));
         jpql.append(" FROM ExternalReviewEntity er ");
         jpql.append(" LEFT OUTER JOIN  GameEntity g on g.id =er.game.id");
