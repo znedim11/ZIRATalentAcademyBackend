@@ -6,8 +6,12 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,8 +25,10 @@ import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.CharacterService;
 import ba.com.zira.praksa.api.model.LoV;
+import ba.com.zira.praksa.api.model.character.CharacterCreateRequest;
 import ba.com.zira.praksa.api.model.character.CharacterSearchRequest;
 import ba.com.zira.praksa.api.model.character.CharacterSearchResponse;
+import ba.com.zira.praksa.api.model.character.CharacterUpdateRequest;
 import ba.com.zira.praksa.api.model.character.CompleteCharacterResponse;
 import ba.com.zira.praksa.api.model.game.GameCharacterResponse;
 import io.swagger.annotations.Api;
@@ -81,6 +87,35 @@ public class CharacterRestService {
         request.setEntity(id);
 
         return characterService.getGamesForCharacter(request);
+    }
+
+    @ApiOperation(value = "Create Character", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/create")
+    public PayloadResponse<CompleteCharacterResponse> create(@RequestBody EntityRequest<CharacterCreateRequest> request)
+            throws ApiException {
+
+        return characterService.create(request);
+    }
+
+    @ApiOperation(value = "Update Character", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}")
+    public PayloadResponse<CompleteCharacterResponse> update(@PathVariable final Long id,
+            @RequestBody final EntityRequest<CharacterUpdateRequest> request) throws ApiException {
+
+        final CharacterUpdateRequest characterUpdateRequest = request.getEntity();
+        characterUpdateRequest.setId(id);
+
+        return characterService.update(request);
+    }
+
+    @ApiOperation(value = "Delete Character by Id", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{id}")
+    public PayloadResponse<String> delete(@PathVariable final Long id) throws ApiException {
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return characterService.delete(request);
     }
 
     @ApiOperation(value = "Get Character names by Ids.", consumes = MediaType.APPLICATION_JSON_VALUE,
