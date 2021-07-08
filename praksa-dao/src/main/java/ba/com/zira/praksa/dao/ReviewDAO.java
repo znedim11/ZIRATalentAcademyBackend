@@ -123,10 +123,10 @@ public class ReviewDAO extends AbstractDAO<ReviewEntity, Long> {
             jpql.append(" AND rg.grade BETWEEN :lowestRating AND :highestRating");
         }
         if (searchRequest.getLowestRating() == null && searchRequest.getHighestRating() != null) {
-            jpql.append(" AND rg.grade < :highestRating");
+            jpql.append(" AND rg.grade <= :highestRating");
         }
         if (searchRequest.getLowestRating() != null && searchRequest.getHighestRating() == null) {
-            jpql.append(" AND rg.grade > :lowestRating");
+            jpql.append(" AND rg.grade >= :lowestRating");
         }
 
         return jpql;

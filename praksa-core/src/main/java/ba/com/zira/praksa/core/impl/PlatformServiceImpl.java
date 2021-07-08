@@ -9,13 +9,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.PlatformService;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.platform.PlatformCreateRequest;
 import ba.com.zira.praksa.api.model.platform.PlatformResponse;
 import ba.com.zira.praksa.api.model.platform.PlatformUpdateRequest;
@@ -26,6 +29,7 @@ import ba.com.zira.praksa.mapper.PlatformMapper;
 
 @Service
 public class PlatformServiceImpl implements PlatformService {
+    static final String VALIDATE_ABSTRACT_REQUEST = "validateAbstractRequest";
     PlatformRequestValidation platformRequestValidation;
     RequestValidator requestValidator;
     PlatformDAO platformDAO;
@@ -100,5 +104,19 @@ public class PlatformServiceImpl implements PlatformService {
 
         platformDAO.removeByPK(request.getEntity());
         return new PayloadResponse<>(request, ResponseCode.OK, "Platform deleted!");
+    }
+
+    @Override
+    public ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException {
+        if (request.getList() != null) {
+            for (Long item : request.getList()) {
+                EntityRequest<Long> longRequest = new EntityRequest<>(item, request);
+                platformRequestValidation.validateIfPlatformExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+            }
+        }
+
+        List<LoV> loVs = platformDAO.getLoVs(request.getList());
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
     }
 }
