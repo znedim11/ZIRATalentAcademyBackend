@@ -1,7 +1,9 @@
 package ba.com.zira.praksa.api.model.review;
 
 import java.io.Serializable;
+import java.util.List;
 
+import ba.com.zira.praksa.api.model.reviewgrade.ReviewGradeResponse;
 import lombok.Data;
 
 @Data
@@ -16,12 +18,17 @@ public class ReviewResponse implements Serializable {
     private String reviewerId;
     private String reviewerName;
     private Double totalRating;
+    private String text;
+    private Long formulaId;
+    private String type;
+    private Long numOfReviewesByReviewer;
+    private List<ReviewGradeResponse> grades;
 
     public ReviewResponse() {
     }
 
     public ReviewResponse(final String game, final Long gameId, final String platformName, final Long platformId, final String title,
-            final String reviewerName, final Double totalRating, final Long reviewId) {
+            final String reviewer, final Double totalRating, final Long reviewId, final String type) {
         super();
         this.gameId = gameId;
         this.gameName = game;
@@ -29,7 +36,22 @@ public class ReviewResponse implements Serializable {
         this.platformId = platformId;
         this.title = title;
         this.id = reviewId;
-        this.reviewerName = reviewerName;
+        this.reviewerId = reviewer;
         this.totalRating = totalRating;
+        this.type = type;
+    }
+
+    public ReviewResponse(final String game, final Long gameId, final String platformName, final Long platformId, final String title,
+            final String reviewer, final Long reviewId, final String type) {
+        super();
+        this.gameId = gameId;
+        this.gameName = game;
+        this.platform = platformName;
+        this.platformId = platformId;
+        this.title = title;
+        this.id = reviewId;
+        this.reviewerId = reviewer;
+        this.totalRating = 0D;
+        this.type = type;
     }
 }

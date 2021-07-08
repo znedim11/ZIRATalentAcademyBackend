@@ -38,13 +38,17 @@ import ba.com.zira.praksa.api.model.media.CreateMediaRequest;
 import ba.com.zira.praksa.api.model.media.MediaRetrivalRequest;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
+import ba.com.zira.praksa.core.utils.LookupService;
 import ba.com.zira.praksa.core.validation.ConceptRequestValidation;
 import ba.com.zira.praksa.dao.ConceptDAO;
 import ba.com.zira.praksa.dao.GameDAO;
+import ba.com.zira.praksa.dao.MediaDAO;
+import ba.com.zira.praksa.dao.MediaStoreDAO;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.dao.model.LocationEntity;
+import ba.com.zira.praksa.dao.model.MediaStoreEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
 import ba.com.zira.praksa.dao.model.ReleaseEntity;
@@ -82,11 +86,15 @@ public class ConceptServiceImpl implements ConceptService {
     GameDAO gameDAO;
     MediaService mediaService;
     MediaStoreService mediaStoreService;
+    MediaStoreDAO mediaStoreDAO;
+    MediaDAO mediaDAO;
+    LookupService lookupService;
 
     public ConceptServiceImpl(RequestValidator requestValidator, ConceptRequestValidation conceptRequestValidation, ConceptDAO conceptDAO,
             ConceptMapper conceptMapper, GameMapper gameMapper, PersonMapper personMapper, ObjectMapper objectMapper,
             CharacterMapper characterMapper, LocationMapper locationMapper, PlatformMapper platformMapper, ReleaseMapper releaseMapper,
-            GameDAO gameDAO, MediaService mediaService, MediaStoreService mediaStoreService) {
+            GameDAO gameDAO, MediaService mediaService, MediaStoreService mediaStoreService, MediaStoreDAO mediaStoreDAO, MediaDAO mediaDAO,
+            LookupService lookupService) {
         super();
         this.requestValidator = requestValidator;
         this.conceptRequestValidation = conceptRequestValidation;
@@ -102,6 +110,9 @@ public class ConceptServiceImpl implements ConceptService {
         this.gameDAO = gameDAO;
         this.mediaService = mediaService;
         this.mediaStoreService = mediaStoreService;
+        this.mediaStoreDAO = mediaStoreDAO;
+        this.mediaDAO = mediaDAO;
+        this.lookupService = lookupService;
     }
 
     @Override
@@ -112,6 +123,7 @@ public class ConceptServiceImpl implements ConceptService {
         List<ConceptEntity> conceptEntities = conceptEntitesData.getRecords();
 
         final List<ConceptResponse> conceptList = conceptMapper.entityListToResponseList(conceptEntities);
+        lookupService.lookupCoverImage(conceptList, ConceptResponse::getId, ObjectType.CONCEPT.getValue(), ConceptResponse::setImageUrl);
 
         PagedData<ConceptResponse> pagedData = new PagedData<>();
         pagedData.setNumberOfPages(conceptEntitesData.getNumberOfPages());
@@ -142,7 +154,7 @@ public class ConceptServiceImpl implements ConceptService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ConceptResponse> create(EntityRequest<ConceptCreateRequest> request) throws ApiException {
-        conceptRequestValidation.validateEntityExistsInCreateRequest(request, BASIC_NOT_NULL);
+        conceptRequestValidation.validateEntityExistsInRequest(request, BASIC_NOT_NULL);
         ConceptCreateRequest requestEntity = request.getEntity();
         EntityRequest<String> entityRequest = new EntityRequest<>(requestEntity.getName(), request);
         conceptRequestValidation.validateConceptNameExists(entityRequest, BASIC_NOT_NULL);
@@ -170,7 +182,7 @@ public class ConceptServiceImpl implements ConceptService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<ConceptResponse> update(final EntityRequest<ConceptUpdateRequest> request) throws ApiException {
-        conceptRequestValidation.validateEntityExistsInUpdateRequest(request, BASIC_NOT_NULL);
+        conceptRequestValidation.validateEntityExistsInRequest(request, BASIC_NOT_NULL);
 
         EntityRequest<Long> entityRequestId = new EntityRequest<>(request.getEntity().getId(), request);
         conceptRequestValidation.validateConceptExists(entityRequestId, VALIDATE_ABSTRACT_REQUEST);
@@ -184,6 +196,14 @@ public class ConceptServiceImpl implements ConceptService {
         conceptEntity = conceptMapper.updateRequestToEntity(conceptRequest, conceptEntity);
         conceptEntity.setModified(LocalDateTime.now());
         conceptEntity.setModifiedBy(request.getUserId());
+
+        MediaStoreEntity mse = conceptDAO.getCoverByConcept(request.getEntity().getId());
+
+        if (mse != null) {
+            Long mediaId = mse.getMedia().getId();
+            mediaStoreDAO.remove(mse);
+            mediaDAO.removeByPK(mediaId);
+        }
 
         if (conceptRequest.getImageCreateRequest() != null && conceptRequest.getImageCreateRequest().getImageData() != null
                 && conceptRequest.getImageCreateRequest().getImageName() != null) {
@@ -317,6 +337,8 @@ public class ConceptServiceImpl implements ConceptService {
             conceptList = conceptList.stream().sorted(Comparator.comparingLong(ConceptResponse::getNumberofGames).reversed())
                     .collect(Collectors.toList());
         }
+
+        lookupService.lookupCoverImage(conceptList, ConceptResponse::getId, ObjectType.CONCEPT.getValue(), ConceptResponse::setImageUrl);
 
         return new ListPayloadResponse<>(request, ResponseCode.OK, conceptList);
     }
