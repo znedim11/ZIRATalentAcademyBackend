@@ -108,13 +108,6 @@ public class PlatformServiceImpl implements PlatformService {
 
     @Override
     public ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException {
-        if (request.getList() != null) {
-            for (Long item : request.getList()) {
-                EntityRequest<Long> longRequest = new EntityRequest<>(item, request);
-                platformRequestValidation.validateIfPlatformExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
-            }
-        }
-
         List<LoV> loVs = platformDAO.getLoVs(request.getList());
 
         return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
