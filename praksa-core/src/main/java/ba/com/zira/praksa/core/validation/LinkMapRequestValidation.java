@@ -14,7 +14,6 @@ import ba.com.zira.commons.model.FilterExpression.FilterOperation;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.model.enums.ObjectType;
-import ba.com.zira.praksa.api.model.linkmap.LinkMapCreate;
 import ba.com.zira.praksa.api.model.linkmap.LinkRequest;
 import ba.com.zira.praksa.api.model.linkmap.MultipleLinkRequest;
 import ba.com.zira.praksa.dao.CharacterDAO;
@@ -75,20 +74,7 @@ public class LinkMapRequestValidation {
         return validationResponse;
     }
 
-    public ValidationResponse validateEntityExistsRequest(final EntityRequest<LinkMapCreate> request,
-            final String validationRuleMessage) {
-        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
-        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-            StringBuilder errorDescription = new StringBuilder();
-            if (request.getEntity() == null) {
-                errorDescription.append(ENTITY_EXISTS);
-            }
-            validationResponse = requestValidator.createResponse(request, errorDescription);
-        }
-        return validationResponse;
-    }
-
-    public ValidationResponse validateEntityExistsInLinkRequest(final EntityRequest<?> request, final String validationRuleMessage) {
+    public ValidationResponse validateEntityExistsInRequest(final EntityRequest<?> request, final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
             StringBuilder errorDescription = new StringBuilder();
