@@ -1,7 +1,9 @@
 package ba.com.zira.praksa.api.model.review;
 
 import java.io.Serializable;
+import java.util.List;
 
+import ba.com.zira.praksa.api.model.reviewgrade.ReviewGradeResponse;
 import lombok.Data;
 
 @Data
@@ -19,6 +21,7 @@ public class ReviewResponse implements Serializable {
     private String text;
     private Long formulaId;
     private String type;
+    private List<ReviewGradeResponse> grades;
 
     public ReviewResponse() {
     }

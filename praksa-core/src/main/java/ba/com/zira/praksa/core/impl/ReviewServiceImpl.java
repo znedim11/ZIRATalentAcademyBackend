@@ -1,9 +1,10 @@
 package ba.com.zira.praksa.core.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -11,8 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.MapDifference;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
@@ -28,6 +28,8 @@ import ba.com.zira.praksa.api.model.review.ReviewCreateRequest;
 import ba.com.zira.praksa.api.model.review.ReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewSearchRequest;
 import ba.com.zira.praksa.api.model.review.ReviewUpdateRequest;
+import ba.com.zira.praksa.api.model.reviewgrade.ReviewGradeCreateRequest;
+import ba.com.zira.praksa.api.model.reviewgrade.ReviewGradeResponse;
 import ba.com.zira.praksa.core.utils.LookupService;
 import ba.com.zira.praksa.core.validation.ReviewRequestValidation;
 import ba.com.zira.praksa.dao.ExternalReviewDAO;
@@ -39,6 +41,7 @@ import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.dao.model.ReviewEntity;
 import ba.com.zira.praksa.dao.model.ReviewFormulaEntity;
 import ba.com.zira.praksa.dao.model.ReviewGradeEntity;
+import ba.com.zira.praksa.mapper.ReviewGradeMapper;
 import ba.com.zira.praksa.mapper.ReviewMapper;
 
 /**
@@ -62,10 +65,11 @@ public class ReviewServiceImpl implements ReviewService {
     GameDAO gameDAO;
     FormulaDAO formulaDAO;
     ReviewGradeDAO reviewGradeDAO;
+    ReviewGradeMapper reviewGradeMapper;
 
     public ReviewServiceImpl(RequestValidator requestValidator, ReviewRequestValidation reviewRequestValidation, ReviewDAO reviewDAO,
             ExternalReviewDAO externalReviewDAO, LookupService lookupService, ReviewMapper reviewMapper, GameDAO gameDAO,
-            FormulaDAO formulaDAO, ReviewGradeDAO reviewGradeDAO) {
+            FormulaDAO formulaDAO, ReviewGradeDAO reviewGradeDAO, ReviewGradeMapper reviewGradeMapper) {
         super();
         this.requestValidator = requestValidator;
         this.reviewRequestValidation = reviewRequestValidation;
@@ -76,6 +80,7 @@ public class ReviewServiceImpl implements ReviewService {
         this.gameDAO = gameDAO;
         this.formulaDAO = formulaDAO;
         this.reviewGradeDAO = reviewGradeDAO;
+        this.reviewGradeMapper = reviewGradeMapper;
     }
 
     @Override
@@ -223,12 +228,10 @@ public class ReviewServiceImpl implements ReviewService {
         reviewGradeDAO.merge(totalGradeEntity);
 
         if (request.getEntity().getGrades() != null) {
-            for (Map.Entry<String, Double> grade : request.getEntity().getGrades().entrySet()) {
-                ReviewGradeEntity gradeEntity = new ReviewGradeEntity();
+            for (ReviewGradeCreateRequest grade : request.getEntity().getGrades()) {
+                ReviewGradeEntity gradeEntity = reviewGradeMapper.reviewGradeCreateRequestToEntity(grade);
                 gradeEntity.setFormulaId(request.getEntity().getFormulaId());
-                gradeEntity.setGrade(grade.getValue());
                 gradeEntity.setReview(createdReviewEntity);
-                gradeEntity.setType(grade.getKey());
                 gradeEntity.setUuid(UUID.randomUUID().toString());
 
                 reviewGradeDAO.merge(gradeEntity);
@@ -268,36 +271,40 @@ public class ReviewServiceImpl implements ReviewService {
         totalGradeEntity.setGrade(request.getEntity().getTotalRating());
         reviewGradeDAO.merge(totalGradeEntity);
 
-        Map<String, Double> currentGrades = gradeEntities.stream().filter(g -> !g.getType().equals(TOTAL_GRADE_TYPE))
-                .collect(Collectors.toMap(ReviewGradeEntity::getType, ReviewGradeEntity::getGrade));
+        List<ReviewGradeEntity> currentGradeEntites = gradeEntities.stream().filter(g -> !g.getType().equals(TOTAL_GRADE_TYPE))
+                .collect(Collectors.toList());
+
+        List<ReviewGradeResponse> requestGrades = reviewGradeMapper
+                .reviewGradeCreateRequestListToResponseList(request.getEntity().getGrades());
+        List<ReviewGradeResponse> currentGrades = reviewGradeMapper.reviewGradeEntityListToResponseList(currentGradeEntites);
 
         if (request.getEntity().getGrades() != null) {
-            final Map<String, Double> gradesToDelete = Maps.difference(currentGrades, request.getEntity().getGrades()).entriesOnlyOnLeft();
-            final Map<String, Double> gradesToAdd = Maps.difference(request.getEntity().getGrades(), currentGrades).entriesOnlyOnLeft();
-            final Map<String, MapDifference.ValueDifference<Double>> gradesToEdit = Maps
-                    .difference(currentGrades, request.getEntity().getGrades()).entriesDiffering();
+            final List<ReviewGradeResponse> gradesToDelete = new ArrayList<>(
+                    Sets.difference(new HashSet<>(currentGrades), new HashSet<>(requestGrades)));
+            final List<ReviewGradeResponse> gradesToAdd = new ArrayList<>(
+                    Sets.difference(new HashSet<>(requestGrades), new HashSet<>(currentGrades)));
+            final List<ReviewGradeResponse> gradesToEdit = new ArrayList<>(
+                    Sets.intersection(new HashSet<>(requestGrades), new HashSet<>(currentGrades)));
 
-            for (Map.Entry<String, MapDifference.ValueDifference<Double>> grade : gradesToEdit.entrySet()) {
-                ReviewGradeEntity gradeEntity = gradeEntities.stream().filter(g -> g.getType().equals(grade.getKey()))
+            for (ReviewGradeResponse grade : gradesToEdit) {
+                ReviewGradeEntity gradeEntity = currentGradeEntites.stream().filter(g -> g.getType().equals(grade.getType()))
                         .collect(Collectors.toList()).get(0);
-                gradeEntity.setGrade(grade.getValue().rightValue());
+                gradeEntity.setGrade(grade.getGrade());
 
                 reviewGradeDAO.merge(gradeEntity);
             }
 
-            for (Map.Entry<String, Double> grade : gradesToDelete.entrySet()) {
-                ReviewGradeEntity gradeEntity = gradeEntities.stream().filter(g -> g.getType().equals(grade.getKey()))
+            for (ReviewGradeResponse grade : gradesToDelete) {
+                ReviewGradeEntity gradeEntity = gradeEntities.stream().filter(g -> g.getType().equals(grade.getType()))
                         .collect(Collectors.toList()).get(0);
 
                 reviewGradeDAO.remove(gradeEntity);
             }
 
-            for (Map.Entry<String, Double> grade : gradesToAdd.entrySet()) {
-                ReviewGradeEntity gradeEntity = new ReviewGradeEntity();
+            for (ReviewGradeResponse grade : gradesToAdd) {
+                ReviewGradeEntity gradeEntity = reviewGradeMapper.reviewGradeResponseToEntity(grade);
                 gradeEntity.setFormulaId(request.getEntity().getFormulaId());
-                gradeEntity.setGrade(grade.getValue());
                 gradeEntity.setReview(reviewEntity);
-                gradeEntity.setType(grade.getKey());
                 gradeEntity.setUuid(UUID.randomUUID().toString());
 
                 reviewGradeDAO.merge(gradeEntity);
@@ -333,6 +340,11 @@ public class ReviewServiceImpl implements ReviewService {
         ReviewGradeEntity totalGradeEntity = gradeEntities.stream().filter(g -> g.getType().equals(TOTAL_GRADE_TYPE))
                 .collect(Collectors.toList()).get(0);
 
+        List<ReviewGradeEntity> grades = gradeEntities.stream().filter(g -> !g.getType().equals(TOTAL_GRADE_TYPE))
+                .collect(Collectors.toList());
+        List<ReviewGradeResponse> gradeResponses = reviewGradeMapper.reviewGradeEntityListToResponseList(grades);
+
+        reviewResponse.setGrades(gradeResponses);
         reviewResponse.setTotalRating(totalGradeEntity.getGrade());
 
         return new PayloadResponse<>(request, ResponseCode.OK, reviewResponse);

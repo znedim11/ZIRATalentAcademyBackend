@@ -1,10 +1,11 @@
 package ba.com.zira.praksa.api.model.review;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import ba.com.zira.praksa.api.model.reviewgrade.ReviewGradeCreateRequest;
 import lombok.Data;
 
 @Data
@@ -20,7 +21,7 @@ public class ReviewUpdateRequest implements Serializable {
 
     private Long formulaId;
 
-    private Map<String, Double> grades;
+    private List<ReviewGradeCreateRequest> grades;
 
     private Double totalRating;
 }

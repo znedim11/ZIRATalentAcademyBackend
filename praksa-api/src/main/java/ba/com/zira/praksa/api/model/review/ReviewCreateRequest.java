@@ -1,8 +1,9 @@
 package ba.com.zira.praksa.api.model.review;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.List;
 
+import ba.com.zira.praksa.api.model.reviewgrade.ReviewGradeCreateRequest;
 import lombok.Data;
 
 @Data
@@ -17,7 +18,7 @@ public class ReviewCreateRequest implements Serializable {
 
     private Long gameId;
 
-    private Map<String, Double> grades;
+    private List<ReviewGradeCreateRequest> grades;
 
     private Double totalRating;
 }
