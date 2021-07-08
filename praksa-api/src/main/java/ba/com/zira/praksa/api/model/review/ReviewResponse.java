@@ -21,6 +21,7 @@ public class ReviewResponse implements Serializable {
     private String text;
     private Long formulaId;
     private String type;
+    private Long numOfReviewesByReviewer;
     private List<ReviewGradeResponse> grades;
 
     public ReviewResponse() {

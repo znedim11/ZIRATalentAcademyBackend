@@ -154,4 +154,13 @@ public class ReviewDAO extends AbstractDAO<ReviewEntity, Long> {
         return query.getResultList();
     }
 
+    public Long getNumberOfReviewsByReviewer(final String reviewer) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT COUNT(r) FROM ReviewEntity r WHERE r.createdBy = :reviewer");
+
+        TypedQuery<Long> query = entityManager.createQuery(stringBuilder.toString(), Long.class);
+        query.setParameter("reviewer", reviewer);
+
+        return query.getSingleResult();
+    }
 }

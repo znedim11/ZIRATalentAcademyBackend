@@ -346,6 +346,9 @@ public class ReviewServiceImpl implements ReviewService {
 
         reviewResponse.setGrades(gradeResponses);
         reviewResponse.setTotalRating(totalGradeEntity.getGrade());
+        reviewResponse.setReviewerId(reviewEntity.getCreatedBy());
+        reviewResponse.setNumOfReviewesByReviewer(reviewDAO.getNumberOfReviewsByReviewer(reviewEntity.getCreatedBy()));
+        lookupService.lookupReviewerName(Arrays.asList(reviewResponse), ReviewResponse::getReviewerId, ReviewResponse::setReviewerName);
 
         return new PayloadResponse<>(request, ResponseCode.OK, reviewResponse);
     }
