@@ -1,5 +1,7 @@
 package ba.com.zira.praksa.rest.platform;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,11 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.PlatformService;
 import ba.com.zira.praksa.api.ReleaseService;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.enums.ReleaseType;
 import ba.com.zira.praksa.api.model.platform.PlatformCreateRequest;
 import ba.com.zira.praksa.api.model.platform.PlatformResponse;
@@ -70,6 +75,17 @@ public class PlatformRestService {
         updateRequest.setId(Long.decode(id));
 
         return platformService.update(request);
+    }
+
+    @ApiOperation(value = "Get Platform names by Ids", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/lovs")
+    public ListPayloadResponse<LoV> getLoVs(@RequestParam(required = false) final List<Long> ids) throws ApiException {
+
+        final ListRequest<Long> request = new ListRequest<>();
+        request.setList(ids);
+
+        return platformService.getLoVs(request);
     }
 
     @ApiOperation(value = "Delete Platform by Id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
