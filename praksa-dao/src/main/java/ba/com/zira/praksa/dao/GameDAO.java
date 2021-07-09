@@ -26,7 +26,7 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
 
     public List<GameCharacterResponse> getGamesForCharacter(final Long characterId) {
         StringBuilder jpql = new StringBuilder();
-        jpql.append("SELECT new ba.com.zira.praksa.api.model.game.GameCharacterResponse(g.id, g.fullName, p.code, r.releaseDate) "
+        jpql.append("SELECT DISTINCT new ba.com.zira.praksa.api.model.game.GameCharacterResponse(g.id, g.fullName, p.code, r.releaseDate) "
                 + "FROM GameEntity g ");
         jpql.append("JOIN ReleaseEntity r ON g.id = r.game.id ");
         jpql.append("JOIN PlatformEntity p ON r.platform.id = p.id ");

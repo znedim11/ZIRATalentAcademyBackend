@@ -3,6 +3,8 @@ package ba.com.zira.praksa.dao;
 import java.util.List;
 
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
 
@@ -11,6 +13,7 @@ import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.character.CharacterSearchRequest;
 import ba.com.zira.praksa.api.model.character.CharacterSearchResponse;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
+import ba.com.zira.praksa.dao.model.LinkMapEntity;
 
 @Repository
 public class CharacterDAO extends AbstractDAO<CharacterEntity, Long> {
@@ -71,6 +74,24 @@ public class CharacterDAO extends AbstractDAO<CharacterEntity, Long> {
         }
 
         return query.getResultList();
+    }
+
+    public void removeAllGames(Long characterId) {
+        CriteriaDelete<LinkMapEntity> criteriaDelete = builder.createCriteriaDelete(LinkMapEntity.class);
+        Root<LinkMapEntity> root = criteriaDelete.from(LinkMapEntity.class);
+
+        criteriaDelete.where(builder.equal(root.get("character"), characterId), builder.isNotNull(root.get("game")));
+
+        entityManager.createQuery(criteriaDelete).executeUpdate();
+    }
+
+    public void deleteRelations(final Long characterId) {
+        CriteriaDelete<LinkMapEntity> criteriaDelete = builder.createCriteriaDelete(LinkMapEntity.class);
+        Root<LinkMapEntity> root = criteriaDelete.from(LinkMapEntity.class);
+
+        criteriaDelete.where(builder.equal(root.get("character"), characterId));
+
+        entityManager.createQuery(criteriaDelete).executeUpdate();
     }
 
     public List<LoV> getLoVs(List<Long> list) {
