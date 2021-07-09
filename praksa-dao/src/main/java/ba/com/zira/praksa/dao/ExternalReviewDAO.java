@@ -18,8 +18,10 @@ public class ExternalReviewDAO extends AbstractDAO<ExternalReviewEntity, Long> {
 
     public List<ReviewResponse> searchReviews(final ReviewSearchRequest searchRequest) {
         StringBuilder jpql = new StringBuilder();
+        Double grade = 0D;
         jpql.append(
-                "SELECT new ba.com.zira.praksa.api.model.review.ReviewResponse(g.fullName, g.id, p.abbriviation, p.id, g.fullName, er.createdBy , er.id, ");
+                "SELECT new ba.com.zira.praksa.api.model.review.ReviewResponse(g.fullName, g.id, p.abbriviation, p.id, g.fullName, er.createdBy, "
+                        + grade + ", er.id, ");
         jpql.append(String.format("'%s' )", ReviewType.EXTERNAL.getValue()));
         jpql.append(" FROM ExternalReviewEntity er ");
         jpql.append(" LEFT OUTER JOIN  GameEntity g on g.id =er.game.id");
@@ -35,6 +37,16 @@ public class ExternalReviewDAO extends AbstractDAO<ExternalReviewEntity, Long> {
         if (searchRequest.getReviewerId() != null) {
             jpql.append(" AND er.createdBy=:reviewerId");
         }
+        if (searchRequest.getLowestRating() != null && searchRequest.getHighestRating() != null) {
+            jpql.append(" AND " + grade + " BETWEEN :lowestRating AND :highestRating");
+        }
+        if (searchRequest.getLowestRating() == null && searchRequest.getHighestRating() != null) {
+            jpql.append(" AND " + grade + " <= :highestRating");
+        }
+        if (searchRequest.getLowestRating() != null && searchRequest.getHighestRating() == null) {
+            jpql.append(" AND " + grade + " >= :lowestRating");
+        }
+
         TypedQuery<ReviewResponse> query = entityManager.createQuery(jpql.toString(), ReviewResponse.class);
         if (searchRequest.getGameId() != null) {
             query.setParameter("gameId", searchRequest.getGameId());
@@ -44,6 +56,12 @@ public class ExternalReviewDAO extends AbstractDAO<ExternalReviewEntity, Long> {
         }
         if (searchRequest.getReviewerId() != null) {
             query.setParameter("reviewerId", searchRequest.getReviewerId());
+        }
+        if (searchRequest.getLowestRating() != null) {
+            query.setParameter("lowestRating", searchRequest.getLowestRating());
+        }
+        if (searchRequest.getHighestRating() != null) {
+            query.setParameter("highestRating", searchRequest.getHighestRating());
         }
 
         return query.getResultList();
