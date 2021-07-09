@@ -27,17 +27,32 @@ import ba.com.zira.praksa.api.model.character.CharacterSearchRequest;
 import ba.com.zira.praksa.api.model.character.CharacterSearchResponse;
 import ba.com.zira.praksa.api.model.character.CharacterUpdateRequest;
 import ba.com.zira.praksa.api.model.character.CompleteCharacterResponse;
+import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.enums.ObjectType;
 import ba.com.zira.praksa.api.model.game.GameCharacterResponse;
+import ba.com.zira.praksa.api.model.location.Location;
 import ba.com.zira.praksa.api.model.media.CreateMediaRequest;
+import ba.com.zira.praksa.api.model.object.ObjectResponse;
+import ba.com.zira.praksa.api.model.person.Person;
 import ba.com.zira.praksa.core.utils.LookupService;
 import ba.com.zira.praksa.core.validation.CharacterRequestValidation;
 import ba.com.zira.praksa.dao.CharacterDAO;
 import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.LinkMapDAO;
+import ba.com.zira.praksa.dao.MediaDAO;
+import ba.com.zira.praksa.dao.MediaStoreDAO;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
+import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.LinkMapEntity;
+import ba.com.zira.praksa.dao.model.LocationEntity;
+import ba.com.zira.praksa.dao.model.MediaStoreEntity;
+import ba.com.zira.praksa.dao.model.ObjectEntity;
+import ba.com.zira.praksa.dao.model.PersonEntity;
 import ba.com.zira.praksa.mapper.CharacterMapper;
+import ba.com.zira.praksa.mapper.ConceptMapper;
+import ba.com.zira.praksa.mapper.LocationMapper;
+import ba.com.zira.praksa.mapper.ObjectMapper;
+import ba.com.zira.praksa.mapper.PersonMapper;
 
 /**
  * @author zira
@@ -55,20 +70,33 @@ public class CharacterServiceImpl implements CharacterService {
     CharacterDAO characterDAO;
     GameDAO gameDAO;
     LinkMapDAO linkMapDAO;
+    MediaStoreDAO mediaStoreDAO;
+    MediaDAO mediaDAO;
     CharacterMapper characterMapper;
+    ConceptMapper conceptMapper;
+    PersonMapper personMapper;
+    ObjectMapper objectMapper;
+    LocationMapper locationMapper;
     MediaService mediaService;
     LookupService lookupService;
 
     public CharacterServiceImpl(RequestValidator requestValidator, CharacterRequestValidation characterRequestValidation,
-            CharacterDAO characterDAO, GameDAO gameDAO, CharacterMapper characterMapper, MediaService mediaService, LinkMapDAO linkMapDAO,
-            LookupService lookupService) {
+            CharacterDAO characterDAO, GameDAO gameDAO, CharacterMapper characterMapper, ConceptMapper conceptMapper,
+            PersonMapper personMapper, ObjectMapper objectMapper, LocationMapper locationMapper, MediaService mediaService,
+            LinkMapDAO linkMapDAO, MediaStoreDAO mediaStoreDAO, MediaDAO mediaDAO, LookupService lookupService) {
         super();
         this.requestValidator = requestValidator;
         this.characterRequestValidation = characterRequestValidation;
         this.characterDAO = characterDAO;
         this.gameDAO = gameDAO;
         this.linkMapDAO = linkMapDAO;
+        this.mediaStoreDAO = mediaStoreDAO;
+        this.mediaDAO = mediaDAO;
         this.characterMapper = characterMapper;
+        this.conceptMapper = conceptMapper;
+        this.personMapper = personMapper;
+        this.objectMapper = objectMapper;
+        this.locationMapper = locationMapper;
         this.mediaService = mediaService;
         this.lookupService = lookupService;
     }
@@ -101,15 +129,6 @@ public class CharacterServiceImpl implements CharacterService {
                 CompleteCharacterResponse::setImageUrl);
 
         return new PayloadResponse<>(request, ResponseCode.OK, temp.get(0));
-    }
-
-    @Override
-    public PagedPayloadResponse<GameCharacterResponse> getGamesForCharacter(final EntityRequest<Long> request) throws ApiException {
-        characterRequestValidation.validateCharacterExists(new EntityRequest<>(request.getEntity(), request), VALIDATE_ABSTRACT_REQUEST);
-
-        List<GameCharacterResponse> gamesList = gameDAO.getGamesForCharacter(request.getEntity());
-
-        return new PagedPayloadResponse<>(request, ResponseCode.OK, gamesList.size(), 1, 1, gamesList.size(), gamesList);
     }
 
     @Override
@@ -170,6 +189,14 @@ public class CharacterServiceImpl implements CharacterService {
         characterEntity.setDob(requestEntity.getDob() != null ? LocalDate.parse(requestEntity.getDob(), formatter).atStartOfDay() : null);
         characterEntity.setDod(requestEntity.getDod() != null ? LocalDate.parse(requestEntity.getDod(), formatter).atStartOfDay() : null);
 
+        MediaStoreEntity mse = characterDAO.getCoverImage(request.getEntity().getId());
+
+        if (mse != null) {
+            Long mediaId = mse.getMedia().getId();
+            mediaStoreDAO.remove(mse);
+            mediaDAO.removeByPK(mediaId);
+        }
+
         if (requestEntity.getImageCreateRequest() != null && requestEntity.getImageCreateRequest().getImageData() != null
                 && requestEntity.getImageCreateRequest().getImageName() != null) {
             CreateMediaRequest mediaRequest = new CreateMediaRequest(ObjectType.CHARACTER.getValue(), characterEntity.getId(),
@@ -221,5 +248,58 @@ public class CharacterServiceImpl implements CharacterService {
         List<LoV> loVs = characterDAO.getLoVs(request.getList());
 
         return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
+    }
+
+    @Override
+    public ListPayloadResponse<GameCharacterResponse> getGamesForCharacter(final EntityRequest<Long> request) throws ApiException {
+        characterRequestValidation.validateCharacterExists(new EntityRequest<>(request.getEntity(), request), VALIDATE_ABSTRACT_REQUEST);
+
+        List<GameCharacterResponse> gamesList = gameDAO.getGamesForCharacter(request.getEntity());
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, gamesList);
+    }
+
+    @Override
+    public ListPayloadResponse<ConceptResponse> getConceptsByCharacter(EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
+        characterRequestValidation.validateCharacterExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+
+        List<ConceptEntity> entityList = characterDAO.getConceptsByCharacter(request.getEntity());
+        List<ConceptResponse> locationList = conceptMapper.entityListToResponseList(entityList);
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, locationList);
+    }
+
+    @Override
+    public ListPayloadResponse<Location> getLocationsByCharacter(EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
+        characterRequestValidation.validateCharacterExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+
+        List<LocationEntity> entityList = characterDAO.getLocationsByCharacter(request.getEntity());
+        List<Location> locationList = locationMapper.entityListToDtoList(entityList);
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, locationList);
+    }
+
+    @Override
+    public ListPayloadResponse<ObjectResponse> getObjectsByCharacter(EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
+        characterRequestValidation.validateCharacterExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+
+        List<ObjectEntity> entityList = characterDAO.getObjectsByCharacter(request.getEntity());
+        List<ObjectResponse> objectList = objectMapper.entityListToDtoList(entityList);
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, objectList);
+    }
+
+    @Override
+    public ListPayloadResponse<Person> getPersonsByCharacter(final EntityRequest<Long> request) throws ApiException {
+        EntityRequest<Long> longRequest = new EntityRequest<>(request.getEntity(), request);
+        characterRequestValidation.validateCharacterExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
+
+        List<PersonEntity> entityList = characterDAO.getPersonsByCharacter(request.getEntity());
+        List<Person> personList = personMapper.entityListToDtoList(entityList);
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, personList);
     }
 }
