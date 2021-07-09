@@ -48,6 +48,8 @@ public class PlatformEntity implements Serializable {
     @Column(name = "full_name")
     private String fullName;
 
+    private String aliases;
+
     private String information;
 
     private LocalDateTime modified;

@@ -1,8 +1,12 @@
 package ba.com.zira.praksa.core.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.math.NumberUtils;
@@ -53,41 +57,87 @@ public class DataTransferServiceImpl implements DataTransferService {
         Map<String, List<CompanyEntity>> companyEntites = companyDAO.findAll().stream()
                 .collect(Collectors.groupingBy(CompanyEntity::getName));
 
-        for (TransferPlatformEntity transferPlatform : transferPlatformEntities) {
-            PlatformEntity platformEntity = new PlatformEntity();
-            platformEntity.setFullName(transferPlatform.getName());
-            platformEntity.setAbbriviation(makeAbbrevation(transferPlatform.getName()));
-            checkCompanyName(transferPlatform.getDeveloper(), transferCompanyEntities, companyEntites);
+        List<CompanyEntity> companiesToAdd = new ArrayList<>();
+        List<CompanyEntity> companiesToEdit = new ArrayList<>();
 
+        List<PlatformEntity> platformsToAdd = new ArrayList<>();
+        List<PlatformEntity> platformsToEdit = new ArrayList<>();
+
+        Map<String, String> companyNamesMap = new HashMap<>();
+
+        for (TransferCompanyEntity transferCompanyEntity : transferCompanyEntities) {
+            String rootName = transferCompanyEntity.getRootName();
+            List<String> names = Arrays.asList(transferCompanyEntity.getAllNames().split("#"));
+
+            for (String name : names) {
+                companyNamesMap.put(name, rootName);
+            }
         }
+
+        transferPlatformEntities.stream().forEach(createPlatform(platformEntities, companyEntites, companiesToAdd, companiesToEdit,
+                companyNamesMap, platformsToAdd, platformsToEdit));
+
         return null;
     }
 
-    private CompanyEntity checkCompanyName(String developer, List<TransferCompanyEntity> transferCompanyEntities,
-            Map<String, List<CompanyEntity>> companyEntites) {
-        String companyName = null;
-        if (developer != null) {
-            for (TransferCompanyEntity transferCompany : transferCompanyEntities) {
-                String[] names = transferCompany.getAllNames().split("#");
-                for (String name : names) {
-                    if (name.equalsIgnoreCase(developer)) {
-                        companyName = transferCompany.getRootName();
-                        break;
-                    }
-                }
-            }
+    private Consumer<? super TransferPlatformEntity> createPlatform(Map<String, List<PlatformEntity>> platformEntities,
+            Map<String, List<CompanyEntity>> companyEntites, List<CompanyEntity> companiesToAdd, List<CompanyEntity> companiesToEdit,
+            Map<String, String> companyNamesMap, List<PlatformEntity> platformsToAdd, List<PlatformEntity> platformsToEdit) {
+        return transferPlatform -> {
+            PlatformEntity platformEntity = new PlatformEntity();
 
-            if (companyEntites.get(companyName) == null) {
-                return createCompany(companyName);
+            if (platformEntities.get(transferPlatform.getName()) == null) {
+                platformEntity.setCreated(LocalDateTime.now());
+                platformEntity.setCreatedBy("DTS");
+                platformEntity.setFullName(transferPlatform.getName());
+                platformEntity.setAbbriviation(makeAbbrevation(transferPlatform.getName()));
+                platformEntity.setAliases(transferPlatform.getPlatformAlternateName());
+                platformEntity.setInformation(createPlatformInformation(transferPlatform));
+                checkCompanyName(transferPlatform.getDeveloper(), companyEntites, companiesToAdd, companiesToEdit, companyNamesMap);
 
+                platformsToAdd.add(platformEntity);
             } else {
-                LOGGER.info("Existing Company --> {}", companyEntites.get(companyName).get(0));
-                return companyEntites.get(companyName).get(0);
+                platformEntity = platformEntities.get(transferPlatform.getName()).get(0);
+                platformEntity.setModified(LocalDateTime.now());
+                platformEntity.setModifiedBy("DTS");
+                platformsToEdit.add(platformEntity);
             }
-        } else {
-            return null;
-        }
+        };
 
+    }
+
+    private String createPlatformInformation(TransferPlatformEntity transferPlatform) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(String.format("<p>%s<p><br/>", transferPlatform.getNotes()));
+        stringBuilder.append("<table>");
+        stringBuilder.append("<tr> <th>Element</th> <th>Information</th> </tr>");
+        stringBuilder.append(String.format("<tr> <td>CPU</td> <td>%s</td> </tr>", transferPlatform.getCpu()));
+        stringBuilder.append(String.format("<tr> <td>Memory</td> <td>%s</td> </tr>", transferPlatform.getMemory()));
+        stringBuilder.append(String.format("<tr> <td>Graphics</td> <td>%s</td> </tr>", transferPlatform.getGraphics()));
+        stringBuilder.append(String.format("<tr> <td>Sound</td> <td>%s</td> </tr>", transferPlatform.getSound()));
+        stringBuilder.append(String.format("<tr> <td>Display</td> <td>%s</td> </tr>", transferPlatform.getDisplay()));
+        stringBuilder.append(String.format("<tr> <td>Media</td> <td>%s</td> </tr>", transferPlatform.getMedia()));
+        stringBuilder.append(String.format("<tr> <td>Max controllers</td> <td>%s</td> </tr>", transferPlatform.getMaxControles()));
+        stringBuilder.append("</table>");
+
+        return stringBuilder.toString();
+    }
+
+    private void checkCompanyName(String companyName, Map<String, List<CompanyEntity>> companyEntites, List<CompanyEntity> companiesToAdd,
+            List<CompanyEntity> companiesToEdit, Map<String, String> companyNamesMap) {
+        String rootCompanyName = null;
+        if (companyName != null) {
+            rootCompanyName = companyNamesMap.get(companyName);
+
+            if (rootCompanyName == null) {
+                companiesToAdd.add(createCompany(companyName));
+            } else if (companyEntites.get(rootCompanyName) == null) {
+                companiesToAdd.add(createCompany(rootCompanyName));
+            } else {
+                LOGGER.info("Existing Company --> {}", companyEntites.get(rootCompanyName).get(0));
+                companiesToEdit.add(companyEntites.get(rootCompanyName).get(0));
+            }
+        }
     }
 
     private CompanyEntity createCompany(String companyName) {
@@ -95,7 +145,7 @@ public class DataTransferServiceImpl implements DataTransferService {
         company.setName(companyName);
         company.setCreated(LocalDateTime.now());
         company.setCreatedBy("DTS");
-        companyDAO.persist(company);
+        // companyDAO.persist(company);
         LOGGER.info("Created Company --> {}", company.getName());
 
         return company;
