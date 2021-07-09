@@ -3,6 +3,7 @@ package ba.com.zira.praksa.core.impl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -94,7 +95,12 @@ public class CharacterServiceImpl implements CharacterService {
         CompleteCharacterResponse characterResponse = characterMapper
                 .characterEntityToCompleteCharacter(characterDAO.findByPK(request.getEntity()));
 
-        return new PayloadResponse<>(request, ResponseCode.OK, characterResponse);
+        List<CompleteCharacterResponse> temp = new ArrayList<>();
+        temp.add(characterResponse);
+        lookupService.lookupCoverImage(temp, CompleteCharacterResponse::getId, ObjectType.CHARACTER.getValue(),
+                CompleteCharacterResponse::setImageUrl);
+
+        return new PayloadResponse<>(request, ResponseCode.OK, temp.get(0));
     }
 
     @Override

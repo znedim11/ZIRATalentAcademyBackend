@@ -30,6 +30,8 @@ public interface CharacterMapper {
     @Mapping(target = "dod", ignore = true)
     CharacterEntity dtoToEntity(CharacterCreateRequest characterDto);
 
+    @Mapping(target = "dob", ignore = true)
+    @Mapping(target = "dod", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     void updateDtoToEntity(CharacterUpdateRequest characterDto, @MappingTarget CharacterEntity characterEntity);

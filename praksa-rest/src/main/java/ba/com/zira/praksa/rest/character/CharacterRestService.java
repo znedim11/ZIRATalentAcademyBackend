@@ -100,9 +100,9 @@ public class CharacterRestService {
     @ApiOperation(value = "Update Character", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PutMapping(value = "/{id}")
     public PayloadResponse<CompleteCharacterResponse> update(@PathVariable final Long id,
-            @RequestBody final EntityRequest<CharacterUpdateRequest> request) throws ApiException {
+            @RequestBody EntityRequest<CharacterUpdateRequest> request) throws ApiException {
 
-        final CharacterUpdateRequest characterUpdateRequest = request.getEntity();
+        CharacterUpdateRequest characterUpdateRequest = request.getEntity();
         characterUpdateRequest.setId(id);
 
         return characterService.update(request);
