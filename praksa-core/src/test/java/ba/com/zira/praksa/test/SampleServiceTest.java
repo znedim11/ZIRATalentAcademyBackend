@@ -17,9 +17,13 @@ import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.core.impl.GameServiceImpl;
 import ba.com.zira.praksa.core.validation.FeatureRequestValidation;
 import ba.com.zira.praksa.core.validation.GameRequestValidation;
+import ba.com.zira.praksa.dao.CompanyDAO;
 import ba.com.zira.praksa.dao.FeatureDAO;
+import ba.com.zira.praksa.dao.FranchiseDAO;
 import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.GameFeatureDAO;
+import ba.com.zira.praksa.dao.PlatformDAO;
+import ba.com.zira.praksa.dao.ReleaseDAO;
 import ba.com.zira.praksa.mapper.CharacterMapper;
 import ba.com.zira.praksa.mapper.ConceptMapper;
 import ba.com.zira.praksa.mapper.FeatureMapper;
@@ -46,6 +50,10 @@ public class SampleServiceTest extends BasicTestConfiguration {
     private GameDAO gameDAO;
     private FeatureDAO featureDAO;
     private GameFeatureDAO gameFeatureDAO;
+    private ReleaseDAO releaseDAO;
+    private PlatformDAO platformDAO;
+    private CompanyDAO companyDAO;
+    private FranchiseDAO franchiseDAO;
     private RequestValidator requestValidator;
     private GameRequestValidation sampleRequestValidation;
     private FeatureRequestValidation featureRequestValidation;
@@ -65,6 +73,10 @@ public class SampleServiceTest extends BasicTestConfiguration {
         this.gameDAO = Mockito.mock(GameDAO.class);
         this.featureDAO = Mockito.mock(FeatureDAO.class);
         this.gameFeatureDAO = Mockito.mock(GameFeatureDAO.class);
+        this.releaseDAO = Mockito.mock(ReleaseDAO.class);
+        this.companyDAO = Mockito.mock(CompanyDAO.class);
+        this.franchiseDAO = Mockito.mock(FranchiseDAO.class);
+        this.platformDAO = Mockito.mock(PlatformDAO.class);
         this.sampleRequestValidation = Mockito.mock(GameRequestValidation.class);
         this.featureRequestValidation = Mockito.mock(FeatureRequestValidation.class);
         this.conceptMapper = Mockito.mock(ConceptMapper.class);
@@ -75,8 +87,8 @@ public class SampleServiceTest extends BasicTestConfiguration {
         this.platformMapper = Mockito.mock(PlatformMapper.class);
         this.releaseMapper = Mockito.mock(ReleaseMapper.class);
         this.gameService = new GameServiceImpl(requestValidator, sampleRequestValidation, featureRequestValidation, gameDAO, featureDAO,
-                gameFeatureDAO, sampleMapper, conceptMapper, personMapper, objectMapper, characterMapper, locationMapper, featureMapper,
-                gameFeatureMapper, releaseMapper, platformMapper);
+                gameFeatureDAO, releaseDAO, platformDAO, companyDAO, franchiseDAO, sampleMapper, conceptMapper, personMapper, objectMapper,
+                characterMapper, locationMapper, featureMapper, gameFeatureMapper, releaseMapper, platformMapper);
     }
 
     @Test

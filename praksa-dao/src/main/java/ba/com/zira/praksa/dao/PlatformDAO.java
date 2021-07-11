@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import ba.com.zira.commons.dao.AbstractDAO;
 import ba.com.zira.praksa.api.model.LoV;
+import ba.com.zira.praksa.api.model.game.dlc.DlcPlatform;
 import ba.com.zira.praksa.dao.model.PlatformEntity;
 
 @Repository
@@ -34,4 +35,19 @@ public class PlatformDAO extends AbstractDAO<PlatformEntity, Long> {
 
         return query.getResultList();
     }
+
+    public List<DlcPlatform> getDlcPlatforms() {
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("SELECT new ba.com.zira.praksa.api.model.game.dlc.DlcPlatform(platform.id, platform.fullName, platform.code, ");
+        jpql.append("SUM((SELECT COUNT(*) FROM GameEntity dlc WHERE dlc.parentGame = game.id))) ");
+        jpql.append("FROM PlatformEntity platform ");
+        jpql.append("JOIN ReleaseEntity r ON platform.id = r.platform.id ");
+        jpql.append("JOIN GameEntity game ON game.id = r.game.id ");
+        jpql.append("WHERE game.dlc LIKE '0' AND (SELECT COUNT(*) FROM GameEntity dlc WHERE dlc.parentGame = game.id) <> 0 ");
+        jpql.append("GROUP BY 1, 2, 3");
+
+        TypedQuery<DlcPlatform> query = entityManager.createQuery(jpql.toString(), DlcPlatform.class);
+        return query.getResultList();
+    }
+
 }

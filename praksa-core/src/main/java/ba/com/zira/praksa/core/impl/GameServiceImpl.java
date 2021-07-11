@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ba.com.zira.commons.exception.ApiException;
+import ba.com.zira.commons.message.request.EmptyRequest;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
@@ -27,6 +28,7 @@ import ba.com.zira.praksa.api.model.game.GameCreateRequest;
 import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
+import ba.com.zira.praksa.api.model.game.dlc.DlcAnalysisReport;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureResponse;
 import ba.com.zira.praksa.api.model.location.Location;
@@ -36,9 +38,13 @@ import ba.com.zira.praksa.api.model.platform.PlatformResponse;
 import ba.com.zira.praksa.api.model.release.ReleaseResponseLight;
 import ba.com.zira.praksa.core.validation.FeatureRequestValidation;
 import ba.com.zira.praksa.core.validation.GameRequestValidation;
+import ba.com.zira.praksa.dao.CompanyDAO;
 import ba.com.zira.praksa.dao.FeatureDAO;
+import ba.com.zira.praksa.dao.FranchiseDAO;
 import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.GameFeatureDAO;
+import ba.com.zira.praksa.dao.PlatformDAO;
+import ba.com.zira.praksa.dao.ReleaseDAO;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.FeatureEntity;
@@ -71,6 +77,10 @@ public class GameServiceImpl implements GameService {
     GameDAO gameDAO;
     FeatureDAO featureDAO;
     GameFeatureDAO gameFeatureDAO;
+    ReleaseDAO releaseDAO;
+    PlatformDAO platformDAO;
+    CompanyDAO companyDAO;
+    FranchiseDAO franchiseDAO;
 
     GameMapper gameMapper;
     ConceptMapper conceptMapper;
@@ -85,9 +95,10 @@ public class GameServiceImpl implements GameService {
 
     public GameServiceImpl(RequestValidator requestValidator, GameRequestValidation gameRequestValidation,
             FeatureRequestValidation featureRequestValidation, GameDAO gameDAO, FeatureDAO featureDAO, GameFeatureDAO gameFeatureDAO,
-            GameMapper gameMapper, ConceptMapper conceptMapper, PersonMapper personMapper, ObjectMapper objectMapper,
-            CharacterMapper characterMapper, LocationMapper locationMapper, FeatureMapper featureMapper,
-            GameFeatureMapper gameFeatureMapper, ReleaseMapper releaseMapper, PlatformMapper platformMapper) {
+            ReleaseDAO releaseDAO, PlatformDAO platformDAO, CompanyDAO companyDAO, FranchiseDAO franchiseDAO, GameMapper gameMapper,
+            ConceptMapper conceptMapper, PersonMapper personMapper, ObjectMapper objectMapper, CharacterMapper characterMapper,
+            LocationMapper locationMapper, FeatureMapper featureMapper, GameFeatureMapper gameFeatureMapper, ReleaseMapper releaseMapper,
+            PlatformMapper platformMapper) {
         super();
         this.requestValidator = requestValidator;
         this.gameRequestValidation = gameRequestValidation;
@@ -95,6 +106,10 @@ public class GameServiceImpl implements GameService {
         this.gameDAO = gameDAO;
         this.featureDAO = featureDAO;
         this.gameFeatureDAO = gameFeatureDAO;
+        this.releaseDAO = releaseDAO;
+        this.platformDAO = platformDAO;
+        this.companyDAO = companyDAO;
+        this.franchiseDAO = franchiseDAO;
         this.gameMapper = gameMapper;
         this.conceptMapper = conceptMapper;
         this.personMapper = personMapper;
@@ -307,4 +322,18 @@ public class GameServiceImpl implements GameService {
 
         return new PayloadResponse<>(request, ResponseCode.OK, gameOverview);
     }
+
+    @Override
+    public PayloadResponse<DlcAnalysisReport> dlcAnalysisReport(final EmptyRequest request) throws ApiException {
+
+        DlcAnalysisReport dlcAnalysisReport = new DlcAnalysisReport();
+        dlcAnalysisReport.setDlcGames(gameDAO.getDlcGames());
+        dlcAnalysisReport.setDlcPlatforms(platformDAO.getDlcPlatforms());
+        dlcAnalysisReport.setDlcCompanies(companyDAO.getDlcCompanies());
+        dlcAnalysisReport.setDlcFranchises(franchiseDAO.getDlcFranchises());
+        dlcAnalysisReport.setTotalNumberOfDlc(gameDAO.getCountOfDlcs());
+
+        return new PayloadResponse<>(request, ResponseCode.OK, dlcAnalysisReport);
+    }
+
 }
