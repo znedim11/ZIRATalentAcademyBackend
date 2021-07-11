@@ -64,4 +64,11 @@ public class PlatformEntity implements Serializable {
     @OneToMany(mappedBy = "platform")
     private List<ReleaseEntity> releases;
 
+    @Override
+    public String toString() {
+        return "PlatformEntity [id=" + id + ", abbriviation=" + abbriviation + ", code=" + code + ", created=" + created + ", createdBy="
+                + createdBy + ", fullName=" + fullName + ", aliases=" + aliases + ", information=" + information + ", modified=" + modified
+                + ", modifiedBy=" + modifiedBy + ", outlineText=" + outlineText + ", releases=" + releases + "]";
+    }
+
 }

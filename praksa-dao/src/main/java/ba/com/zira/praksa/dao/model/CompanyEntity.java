@@ -80,4 +80,13 @@ public class CompanyEntity implements Serializable {
     @OneToMany(mappedBy = "developer")
     private List<ReleaseEntity> developerReleases;
 
+    @Override
+    public String toString() {
+        return "CompanyEntity [id=" + id + ", address=" + address + ", city=" + city + ", country=" + country + ", created=" + created
+                + ", createdBy=" + createdBy + ", email=" + email + ", endDate=" + endDate + ", information=" + information + ", modified="
+                + modified + ", modifiedBy=" + modifiedBy + ", name=" + name + ", outlineText=" + outlineText + ", startDate=" + startDate
+                + ", telNumber=" + telNumber + ", website=" + website + ", publisherReleases=" + publisherReleases + ", developerReleases="
+                + developerReleases + "]";
+    }
+
 }
