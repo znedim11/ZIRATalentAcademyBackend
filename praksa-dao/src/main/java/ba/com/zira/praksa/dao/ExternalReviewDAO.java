@@ -20,7 +20,7 @@ public class ExternalReviewDAO extends AbstractDAO<ExternalReviewEntity, Long> {
         StringBuilder jpql = new StringBuilder();
         Double grade = 0D;
         jpql.append(
-                "SELECT new ba.com.zira.praksa.api.model.review.ReviewResponse(g.fullName, g.id, p.abbriviation, p.id, g.fullName, er.createdBy, "
+                "SELECT new ba.com.zira.praksa.api.model.review.ReviewResponse(g.fullName, g.id, p.fullName, p.id, er.gameName, er.createdBy, "
                         + grade + ", er.id, ");
         jpql.append(String.format("'%s' )", ReviewType.EXTERNAL.getValue()));
         jpql.append(" FROM ExternalReviewEntity er ");
