@@ -28,11 +28,11 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         StringBuilder jpql = new StringBuilder();
         jpql.append("SELECT DISTINCT new ba.com.zira.praksa.api.model.game.GameCharacterResponse(g.id, g.fullName, p.code, r.releaseDate) "
                 + "FROM GameEntity g ");
-        jpql.append("JOIN ReleaseEntity r ON g.id = r.game.id ");
-        jpql.append("JOIN PlatformEntity p ON r.platform.id = p.id ");
+        jpql.append("LEFT JOIN ReleaseEntity r ON g.id = r.game.id ");
+        jpql.append("LEFT JOIN PlatformEntity p ON r.platform.id = p.id ");
         jpql.append("JOIN LinkMapEntity lm ON g.id = lm.game.id ");
-        jpql.append("WHERE r.releaseDate = (SELECT MIN(r1.releaseDate) FROM ReleaseEntity r1 WHERE r1.game.id = g.id) "
-                + "AND lm.character.id = :characterId");
+        jpql.append("WHERE lm.character.id = :characterId "
+                + "AND (r.releaseDate IS NULL OR r.releaseDate = (SELECT MIN(r1.releaseDate) FROM ReleaseEntity r1 WHERE r1.game.id = g.id))");
 
         TypedQuery<GameCharacterResponse> query = entityManager.createQuery(jpql.toString(), GameCharacterResponse.class)
                 .setParameter("characterId", characterId);

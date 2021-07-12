@@ -14,7 +14,11 @@ import ba.com.zira.praksa.api.model.character.CharacterSearchRequest;
 import ba.com.zira.praksa.api.model.character.CharacterSearchResponse;
 import ba.com.zira.praksa.api.model.character.CharacterUpdateRequest;
 import ba.com.zira.praksa.api.model.character.CompleteCharacterResponse;
+import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.game.GameCharacterResponse;
+import ba.com.zira.praksa.api.model.location.Location;
+import ba.com.zira.praksa.api.model.object.ObjectResponse;
+import ba.com.zira.praksa.api.model.person.Person;
 
 /**
  * * Methods used to manipulate Character data. <br>
@@ -55,8 +59,6 @@ public interface CharacterService {
      */
     PayloadResponse<CompleteCharacterResponse> findById(SearchRequest<Long> request) throws ApiException;
 
-    PagedPayloadResponse<GameCharacterResponse> getGamesForCharacter(final EntityRequest<Long> request) throws ApiException;
-
     PayloadResponse<CompleteCharacterResponse> create(EntityRequest<CharacterCreateRequest> request) throws ApiException;
 
     PayloadResponse<CompleteCharacterResponse> update(EntityRequest<CharacterUpdateRequest> request) throws ApiException;
@@ -64,4 +66,14 @@ public interface CharacterService {
     public PayloadResponse<String> delete(final EntityRequest<Long> request) throws ApiException;
 
     ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<GameCharacterResponse> getGamesForCharacter(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<ConceptResponse> getConceptsByCharacter(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<Person> getPersonsByCharacter(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<ObjectResponse> getObjectsByCharacter(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<Location> getLocationsByCharacter(final EntityRequest<Long> request) throws ApiException;
 }

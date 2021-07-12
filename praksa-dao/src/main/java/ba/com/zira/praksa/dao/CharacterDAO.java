@@ -12,8 +12,14 @@ import ba.com.zira.commons.dao.AbstractDAO;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.character.CharacterSearchRequest;
 import ba.com.zira.praksa.api.model.character.CharacterSearchResponse;
+import ba.com.zira.praksa.api.model.enums.ObjectType;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
+import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.LinkMapEntity;
+import ba.com.zira.praksa.dao.model.LocationEntity;
+import ba.com.zira.praksa.dao.model.MediaStoreEntity;
+import ba.com.zira.praksa.dao.model.ObjectEntity;
+import ba.com.zira.praksa.dao.model.PersonEntity;
 
 @Repository
 public class CharacterDAO extends AbstractDAO<CharacterEntity, Long> {
@@ -103,6 +109,61 @@ public class CharacterDAO extends AbstractDAO<CharacterEntity, Long> {
         if (list != null) {
             query.setParameter("list", list);
         }
+
+        return query.getResultList();
+    }
+
+    public MediaStoreEntity getCoverImage(final Long characterId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(
+                "SELECT mse FROM MediaStoreEntity mse, MediaEntity me WHERE me.id = mse.media.id AND me.objectId = :objectId AND me.objectType = :objectType AND mse.type = :type");
+
+        TypedQuery<MediaStoreEntity> query = entityManager.createQuery(stringBuilder.toString(), MediaStoreEntity.class);
+        query.setParameter("objectId", characterId);
+        query.setParameter("objectType", ObjectType.CHARACTER.getValue());
+        query.setParameter("type", "COVER_IMAGE");
+
+        return query.getResultList().stream().findFirst().orElse(null);
+    }
+
+    public List<ConceptEntity> getConceptsByCharacter(final Long characterId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append("SELECT c FROM ConceptEntity c, LinkMapEntity lm WHERE lm.character.id = :characterId AND lm.concept.id = c.id");
+
+        TypedQuery<ConceptEntity> query = entityManager.createQuery(stringBuilder.toString(), ConceptEntity.class);
+        query.setParameter("characterId", characterId);
+
+        return query.getResultList();
+    }
+
+    public List<LocationEntity> getLocationsByCharacter(final Long characterId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append("SELECT l FROM LocationEntity l, LinkMapEntity lm WHERE lm.character.id = :characterId AND lm.location.id = l.id");
+
+        TypedQuery<LocationEntity> query = entityManager.createQuery(stringBuilder.toString(), LocationEntity.class);
+        query.setParameter("characterId", characterId);
+
+        return query.getResultList();
+    }
+
+    public List<ObjectEntity> getObjectsByCharacter(final Long characterId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT o FROM ObjectEntity o, LinkMapEntity lm WHERE lm.character.id = :characterId AND lm.object.id = o.id");
+
+        TypedQuery<ObjectEntity> query = entityManager.createQuery(stringBuilder.toString(), ObjectEntity.class);
+        query.setParameter("characterId", characterId);
+
+        return query.getResultList();
+    }
+
+    public List<PersonEntity> getPersonsByCharacter(final Long characterId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT p FROM PersonEntity p, LinkMapEntity lm WHERE lm.character.id = :characterId AND lm.person.id = p.id");
+
+        TypedQuery<PersonEntity> query = entityManager.createQuery(stringBuilder.toString(), PersonEntity.class);
+        query.setParameter("characterId", characterId);
 
         return query.getResultList();
     }

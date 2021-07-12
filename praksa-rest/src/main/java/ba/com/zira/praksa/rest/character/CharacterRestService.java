@@ -30,7 +30,11 @@ import ba.com.zira.praksa.api.model.character.CharacterSearchRequest;
 import ba.com.zira.praksa.api.model.character.CharacterSearchResponse;
 import ba.com.zira.praksa.api.model.character.CharacterUpdateRequest;
 import ba.com.zira.praksa.api.model.character.CompleteCharacterResponse;
+import ba.com.zira.praksa.api.model.concept.ConceptResponse;
 import ba.com.zira.praksa.api.model.game.GameCharacterResponse;
+import ba.com.zira.praksa.api.model.location.Location;
+import ba.com.zira.praksa.api.model.object.ObjectResponse;
+import ba.com.zira.praksa.api.model.person.Person;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -79,16 +83,6 @@ public class CharacterRestService {
         return characterService.findById(request);
     }
 
-    @ApiOperation(value = "Get games for character", consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping(value = "/get-games-for-character")
-    public PagedPayloadResponse<GameCharacterResponse> getCharacterGames(@RequestParam final Long id) throws ApiException {
-        EntityRequest<Long> request = new EntityRequest<>();
-        request.setEntity(id);
-
-        return characterService.getGamesForCharacter(request);
-    }
-
     @ApiOperation(value = "Create Character", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/create")
     public PayloadResponse<CompleteCharacterResponse> create(@RequestBody EntityRequest<CharacterCreateRequest> request)
@@ -128,4 +122,59 @@ public class CharacterRestService {
 
         return characterService.getLoVs(request);
     }
+
+    @ApiOperation(value = "Get Games by Character", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/games")
+    public ListPayloadResponse<GameCharacterResponse> getCharacterGames(@PathVariable final Long id) throws ApiException {
+        EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return characterService.getGamesForCharacter(request);
+    }
+
+    @ApiOperation(value = "Get Concepts by Character.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/concepts")
+    public ListPayloadResponse<ConceptResponse> getConceptsByConcept(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return characterService.getConceptsByCharacter(request);
+    }
+
+    @ApiOperation(value = "Get Persons by Character.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/persons")
+    public ListPayloadResponse<Person> getPersonsByConcept(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return characterService.getPersonsByCharacter(request);
+    }
+
+    @ApiOperation(value = "Get Objects by Character.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/objects")
+    public ListPayloadResponse<ObjectResponse> getObjectsByConcept(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return characterService.getObjectsByCharacter(request);
+    }
+
+    @ApiOperation(value = "Get Locations by Character.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/locations")
+    public ListPayloadResponse<Location> getLocationsByConcept(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return characterService.getLocationsByCharacter(request);
+    }
+
 }
