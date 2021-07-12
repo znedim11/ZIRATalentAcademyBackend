@@ -3,6 +3,7 @@
  */
 package ba.com.zira.praksa.core.validation;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import ba.com.zira.commons.message.request.EntityRequest;
@@ -10,6 +11,7 @@ import ba.com.zira.commons.message.response.ValidationResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.dao.CharacterDAO;
+import ba.com.zira.praksa.dao.model.CharacterEntity;
 
 /**
  * @author zira
@@ -38,4 +40,22 @@ public class CharacterRequestValidation {
         }
         return validationResponse;
     }
+
+    public ValidationResponse validateCharacterRequestFields(final EntityRequest<CharacterEntity> request,
+            final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+
+            if (StringUtils.isBlank(request.getEntity().getName())) {
+                errorDescription.append("Name is required.");
+            }
+
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+
+        return validationResponse;
+    }
+
 }

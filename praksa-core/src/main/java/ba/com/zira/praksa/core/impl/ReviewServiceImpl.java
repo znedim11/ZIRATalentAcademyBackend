@@ -97,11 +97,15 @@ public class ReviewServiceImpl implements ReviewService {
             reviewType = ReviewType.BOTH.getValue();
         }
 
+        if (reviewResponse == null) {
+            reviewResponse = new ArrayList<>();
+        }
+
         if (reviewType.equalsIgnoreCase(ReviewType.INTERNAL.getValue())) {
             reviewResponseList = reviewResponse;
         } else if (reviewType.equalsIgnoreCase(ReviewType.EXTERNAL.getValue())) {
             reviewResponseList = externalReviewResponse;
-        } else if (reviewType.equalsIgnoreCase(ReviewType.BOTH.getValue())) {
+        } else {
             reviewResponseList = reviewResponse;
             reviewResponseList.addAll(externalReviewResponse);
         }
@@ -127,11 +131,15 @@ public class ReviewServiceImpl implements ReviewService {
         Double sum = 0D;
 
         boolean isPlatformsEmpty = reviewDAO.getMostPopularPlatform(searchRequest).isEmpty();
+        Long mostPopularPlatformId = !isPlatformsEmpty ? reviewDAO.getMostPopularPlatform(searchRequest).get(0).getTopPlatformId() : null;
         boolean isTopGamesEmpty = reviewDAO.getTopGame(searchRequest).isEmpty();
+        Long topGameId = !isTopGamesEmpty ? reviewDAO.getTopGame(searchRequest).get(0).getTopGameId() : null;
         boolean isFlopGamesEmpty = reviewDAO.getFlopGame(searchRequest).isEmpty();
-        Long mostPopularPlatformId = reviewDAO.getMostPopularPlatform(searchRequest).get(0).getTopPlatformId();
-        Long topGameId = reviewDAO.getTopGame(searchRequest).get(0).getTopGameId();
-        Long flopGameId = reviewDAO.getFlopGame(searchRequest).get(0).getFlopGameId();
+        Long flopGameId = !isFlopGamesEmpty ? reviewDAO.getFlopGame(searchRequest).get(0).getFlopGameId() : null;
+        boolean isExternalPlatformsEmpty = externalReviewDAO.getMostPopularPlatform(searchRequest).isEmpty();
+        Long mostPopularExternalPlatformId = !isExternalPlatformsEmpty
+                ? externalReviewDAO.getMostPopularPlatform(searchRequest).get(0).getTopPlatformId()
+                : null;
 
         completeReviewResponse.setTotalReviews(totalReviews);
 
@@ -144,13 +152,14 @@ public class ReviewServiceImpl implements ReviewService {
                 sum += reviewResponse.get(i).getTotalRating();
             }
             completeReviewResponse.setAverageGrade(sum / reviewResponseSize);
+
             setTopPlatform(completeReviewResponse, isPlatformsEmpty, mostPopularPlatformId);
             setTopGame(completeReviewResponse, isTopGamesEmpty, topGameId);
             setFlopGame(completeReviewResponse, isFlopGamesEmpty, flopGameId);
 
         } else if (reviewType.equalsIgnoreCase(ReviewType.EXTERNAL.getValue())) {
-            setTopPlatform(completeReviewResponse, isPlatformsEmpty, mostPopularPlatformId);
-        } else {
+            setTopPlatform(completeReviewResponse, isExternalPlatformsEmpty, mostPopularExternalPlatformId);
+        } else if (reviewType.equalsIgnoreCase(ReviewType.BOTH.getValue())) {
             Long totalSize = 0L;
             for (int i = 0; i < totalReviews; i++) {
                 if (searchReviewResponse.get(i).getType().equalsIgnoreCase(ReviewType.INTERNAL.getValue())) {
@@ -162,7 +171,8 @@ public class ReviewServiceImpl implements ReviewService {
                 completeReviewResponse.setAverageGrade(sum / totalSize);
             }
 
-            setTopPlatform(completeReviewResponse, isPlatformsEmpty, mostPopularPlatformId, searchRequest);
+            setTopPlatform(mostPopularExternalPlatformId, isExternalPlatformsEmpty, completeReviewResponse, isPlatformsEmpty,
+                    mostPopularPlatformId, searchRequest);
             setTopGame(completeReviewResponse, isTopGamesEmpty, topGameId);
             setFlopGame(completeReviewResponse, isFlopGamesEmpty, flopGameId);
         }
@@ -179,12 +189,12 @@ public class ReviewServiceImpl implements ReviewService {
         return new PayloadResponse<>(request, ResponseCode.OK, completeReviewResponse);
     }
 
-    private void setTopPlatform(CompleteReviewResponse completeReviewResponse, boolean isPlatformsEmpty, Long mostPopularPlatformId,
+    private void setTopPlatform(Long mostPopularExternalPlatformId, boolean isExternalPlatformsEmpty,
+            CompleteReviewResponse completeReviewResponse, boolean isPlatformsEmpty, Long mostPopularPlatformId,
             ReviewSearchRequest searchRequest) {
-        boolean isExternalPlatformsEmpty = externalReviewDAO.getMostPopularPlatform(searchRequest).isEmpty();
-        Long mostPopularExternalPlatformId = externalReviewDAO.getMostPopularPlatform(searchRequest).get(0).getTopPlatformId();
-        Long totalIntReviews = reviewDAO.getMostPopularPlatform(searchRequest).get(0).getTotalReviews();
-        Long totalExtReviews = externalReviewDAO.getMostPopularPlatform(searchRequest).get(0).getTotalReviews();
+        Long totalIntReviews = !isPlatformsEmpty ? reviewDAO.getMostPopularPlatform(searchRequest).get(0).getTotalReviews() : 0;
+        Long totalExtReviews = !isExternalPlatformsEmpty ? externalReviewDAO.getMostPopularPlatform(searchRequest).get(0).getTotalReviews()
+                : 0;
 
         if (!isPlatformsEmpty && !isExternalPlatformsEmpty) {
             completeReviewResponse
@@ -194,6 +204,14 @@ public class ReviewServiceImpl implements ReviewService {
         } else if (!isPlatformsEmpty && isExternalPlatformsEmpty) {
             completeReviewResponse.setTopPlatformId(mostPopularPlatformId);
         }
+    }
+
+    private void setTopGame(CompleteReviewResponse completeReviewResponse, boolean isTopGamesEmpty, Long topGameId) {
+        completeReviewResponse.setTopGameId(!isTopGamesEmpty ? topGameId : null);
+    }
+
+    private void setTopPlatform(CompleteReviewResponse completeReviewResponse, boolean isPlatformsEmpty, Long mostPopularPlatformId) {
+        completeReviewResponse.setTopPlatformId(!isPlatformsEmpty ? mostPopularPlatformId : null);
     }
 
     private void setFlopGame(CompleteReviewResponse completeReviewResponse, boolean isFlopGamesEmpty, Long flopGameId) {
@@ -315,14 +333,6 @@ public class ReviewServiceImpl implements ReviewService {
         response.setTotalRating(totalGradeEntity.getGrade());
 
         return new PayloadResponse<>(request, ResponseCode.OK, response);
-    }
-
-    private void setTopGame(CompleteReviewResponse completeReviewResponse, boolean isTopGamesEmpty, Long topGameId) {
-        completeReviewResponse.setTopGameId(!isTopGamesEmpty ? topGameId : null);
-    }
-
-    private void setTopPlatform(CompleteReviewResponse completeReviewResponse, boolean isPlatformsEmpty, Long mostPopularPlatformId) {
-        completeReviewResponse.setTopPlatformId(!isPlatformsEmpty ? mostPopularPlatformId : null);
     }
 
     @Override

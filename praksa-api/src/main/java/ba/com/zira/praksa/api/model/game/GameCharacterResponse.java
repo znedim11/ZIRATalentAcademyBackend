@@ -10,8 +10,8 @@ public class GameCharacterResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long gameId;
-    private String gameName;
+    private Long id; // game id
+    private String name; // game name
     private LocalDateTime releaseDate;
     private String platformCode;
 
@@ -20,8 +20,8 @@ public class GameCharacterResponse implements Serializable {
     }
 
     public GameCharacterResponse(Long gameId, String gameName, String platformCode, LocalDateTime releaseDate) {
-        this.gameId = gameId;
-        this.gameName = gameName;
+        this.id = gameId;
+        this.name = gameName;
         this.releaseDate = releaseDate;
         this.platformCode = platformCode;
     }

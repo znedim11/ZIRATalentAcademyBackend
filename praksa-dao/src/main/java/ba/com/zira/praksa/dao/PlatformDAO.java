@@ -21,4 +21,17 @@ public class PlatformDAO extends AbstractDAO<PlatformEntity, Long> {
         List<LoV> lovs = query.getResultList();
         return lovs.stream().collect(Collectors.toMap(LoV::getId, LoV::getName));
     }
+
+    public List<LoV> getLoVs(List<Long> list) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(String.format("SELECT new ba.com.zira.praksa.api.model.LoV(p.id, p.fullName) FROM PlatformEntity p %s",
+                list != null ? "WHERE p.id IN :list" : ""));
+
+        TypedQuery<LoV> query = entityManager.createQuery(stringBuilder.toString(), LoV.class);
+        if (list != null) {
+            query.setParameter("list", list);
+        }
+
+        return query.getResultList();
+    }
 }
