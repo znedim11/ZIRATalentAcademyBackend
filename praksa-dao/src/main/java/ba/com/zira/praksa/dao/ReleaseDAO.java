@@ -26,11 +26,17 @@ public class ReleaseDAO extends AbstractDAO<ReleaseEntity, String> {
 
     }
 
-    public List<ReleaseEntity> getReleasesByPlatformDevPub(Long platformId, Long devId, Long pubId) {
+    public List<ReleaseEntity> getReleasesByGamePlatformDevPub(Long gameId, Long platformId, Long devId, Long pubId) {
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("SELECT r FROM ReleaseEntity r WHERE type = :type AND r.platform.id = :platformId");
+        stringBuilder.append("SELECT r FROM ReleaseEntity r WHERE type = :type");
 
+        if (gameId != null) {
+            stringBuilder.append(" AND r.game.id = :gameId");
+        }
+        if (platformId != null) {
+            stringBuilder.append(" AND r.platform.id = :platformId");
+        }
         if (devId != null) {
             stringBuilder.append(" AND r.developer.id = :devId");
         }
@@ -40,8 +46,17 @@ public class ReleaseDAO extends AbstractDAO<ReleaseEntity, String> {
         }
 
         TypedQuery<ReleaseEntity> query = entityManager.createQuery(stringBuilder.toString(), ReleaseEntity.class);
-        query.setParameter("type", ObjectType.PLATFORM.getValue());
-        query.setParameter("platformId", platformId);
+
+        if (gameId != null) {
+            query.setParameter("type", ObjectType.GAME.getValue());
+            query.setParameter("gameId", gameId);
+        } else {
+            query.setParameter("type", ObjectType.PLATFORM.getValue());
+        }
+
+        if (platformId != null) {
+            query.setParameter("platformId", platformId);
+        }
 
         if (devId != null) {
             query.setParameter("devId", devId);
@@ -61,6 +76,17 @@ public class ReleaseDAO extends AbstractDAO<ReleaseEntity, String> {
         TypedQuery<ReleaseEntity> query = entityManager.createQuery(stringBuilder.toString(), ReleaseEntity.class);
         query.setParameter("type", ObjectType.PLATFORM.getValue());
         query.setParameter("platformId", platformId);
+
+        return query.getResultList();
+    }
+
+    public List<ReleaseEntity> getReleasesByGame(Long gameId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT r FROM ReleaseEntity r WHERE type = :type AND r.game.id = :gameId");
+
+        TypedQuery<ReleaseEntity> query = entityManager.createQuery(stringBuilder.toString(), ReleaseEntity.class);
+        query.setParameter("type", ObjectType.GAME.getValue());
+        query.setParameter("gameId", gameId);
 
         return query.getResultList();
     }

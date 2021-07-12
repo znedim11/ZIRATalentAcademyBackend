@@ -69,4 +69,7 @@ public class TransferPlatformEntity implements Serializable {
     @Column(name = "platform_alternate_name")
     private String platformAlternateName;
 
+    public TransferPlatformEntity(String name) {
+        this.name = name;
+    }
 }

@@ -29,11 +29,19 @@ public class DataTransferRestService {
     @Autowired
     DataTransferService dataTransferService;
 
-    @ApiOperation(value = "Get platforms", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Transfer platforms", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/platform")
-    public PayloadResponse<String> delete() throws ApiException {
+    public PayloadResponse<String> platformHUSToPlatformHUT() throws ApiException {
         final EmptyRequest request = new EmptyRequest();
 
         return dataTransferService.platformHUSToPlatformHUT(request);
+    }
+
+    @ApiOperation(value = "Transfer games", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/game")
+    public PayloadResponse<String> gameHUSToGameHUTT() throws ApiException {
+        final EmptyRequest request = new EmptyRequest();
+
+        return dataTransferService.gameHUSToGameHUT(request);
     }
 }
