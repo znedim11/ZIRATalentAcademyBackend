@@ -3,17 +3,13 @@ package ba.com.zira.praksa.dao.model;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.GenericGenerator;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,9 +29,6 @@ public class ReleaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GenericGenerator(name = "hibernate-uuid", strategy = "uuid2")
-    @GeneratedValue(generator = "hibernate-uuid")
-    @Column(name = "UUID", unique = true)
     private String uuid;
 
     private LocalDateTime created;
@@ -54,12 +47,12 @@ public class ReleaseEntity implements Serializable {
     private String type;
 
     // bi-directional many-to-one association to CompanyEntity
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "developer_id")
     private CompanyEntity developer;
 
     // bi-directional many-to-one association to CompanyEntity
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "publisher_id")
     private CompanyEntity publisher;
 
@@ -69,7 +62,7 @@ public class ReleaseEntity implements Serializable {
     private GameEntity game;
 
     // bi-directional many-to-one association to PlatformEntity
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "platform_id")
     private PlatformEntity platform;
 
