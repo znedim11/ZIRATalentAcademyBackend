@@ -25,4 +25,13 @@ public class ReleaseDAO extends AbstractDAO<ReleaseEntity, String> {
 
     }
 
+    public List<ReleaseEntity> findByPlatformId(Long id) {
+        TypedQuery<ReleaseEntity> query = entityManager.createQuery("SELECT r FROM ReleaseEntity r WHERE r.platform.id = :id",
+                ReleaseEntity.class);
+
+        query.setParameter("id", id);
+
+        return query.getResultList();
+    }
+
 }
