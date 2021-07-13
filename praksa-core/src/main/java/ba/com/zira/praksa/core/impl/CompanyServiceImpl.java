@@ -9,7 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.PagedData;
@@ -17,6 +19,7 @@ import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.CompanyService;
 import ba.com.zira.praksa.api.MediaService;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.company.CompanyCreateRequest;
 import ba.com.zira.praksa.api.model.company.CompanyResponse;
 import ba.com.zira.praksa.api.model.company.CompanyUpdateRequest;
@@ -122,5 +125,13 @@ public class CompanyServiceImpl implements CompanyService {
 
         companyDAO.removeByPK(request.getEntity());
         return new PayloadResponse<>(request, ResponseCode.OK, "Company deleted!");
+    }
+
+    @Override
+    public ListPayloadResponse<LoV> lovs(final ListRequest<Long> request) throws ApiException {
+
+        List<LoV> loVs = companyDAO.getLoVs(request.getList());
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
     }
 }
