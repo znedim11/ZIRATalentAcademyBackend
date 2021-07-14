@@ -34,7 +34,7 @@ public class GameEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "HUT_GAME_ID_GENERATOR", sequenceName = "HUT_GAME_SEQ", allocationSize = 1)
+    @SequenceGenerator(name = "HUT_GAME_ID_GENERATOR", sequenceName = "HUT_GAME_SEQ", allocationSize = 100)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_GAME_ID_GENERATOR")
     private Long id;
 

@@ -327,10 +327,10 @@ public class GameServiceImpl implements GameService {
     public PayloadResponse<DlcAnalysisReport> dlcAnalysisReport(final EmptyRequest request) throws ApiException {
 
         DlcAnalysisReport dlcAnalysisReport = new DlcAnalysisReport();
-        dlcAnalysisReport.setDlcGames(gameDAO.getDlcGames());
-        dlcAnalysisReport.setDlcPlatforms(platformDAO.getDlcPlatforms());
-        dlcAnalysisReport.setDlcCompanies(companyDAO.getDlcCompanies());
-        dlcAnalysisReport.setDlcFranchises(franchiseDAO.getDlcFranchises());
+        dlcAnalysisReport.setDlcGames(gameDAO.getDlcGames("0"));
+        dlcAnalysisReport.setDlcPlatforms(platformDAO.getDlcPlatforms("1"));
+        dlcAnalysisReport.setDlcCompanies(companyDAO.getDlcCompanies("1"));
+        dlcAnalysisReport.setDlcFranchises(franchiseDAO.getDlcFranchises("0"));
         dlcAnalysisReport.setTotalNumberOfDlc(gameDAO.getCountOfDlcs());
 
         return new PayloadResponse<>(request, ResponseCode.OK, dlcAnalysisReport);
