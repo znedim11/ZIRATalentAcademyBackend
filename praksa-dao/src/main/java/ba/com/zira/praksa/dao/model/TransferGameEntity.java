@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -24,7 +23,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "hus_game")
-@NamedQuery(name = "TransferGameEntity.findAll", query = "SELECT g FROM TransferGameEntity g")
 public class TransferGameEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

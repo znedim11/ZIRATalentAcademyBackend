@@ -23,11 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EmptyRequest;
+import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.praksa.api.DataTransferService;
 import ba.com.zira.praksa.api.model.datatransfer.GamePlatformCompanyHelper;
 import ba.com.zira.praksa.api.model.datatransfer.PlatformCompanyHelper;
+import ba.com.zira.praksa.api.model.datatransfer.TransferGameHelper;
 import ba.com.zira.praksa.api.model.enums.ObjectType;
 import ba.com.zira.praksa.dao.CompanyDAO;
 import ba.com.zira.praksa.dao.GameDAO;
@@ -42,7 +44,6 @@ import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.dao.model.PlatformEntity;
 import ba.com.zira.praksa.dao.model.ReleaseEntity;
 import ba.com.zira.praksa.dao.model.TransferCompanyEntity;
-import ba.com.zira.praksa.dao.model.TransferGameEntity;
 import ba.com.zira.praksa.dao.model.TransferPlatformEntity;
 
 @Service
@@ -177,7 +178,7 @@ public class DataTransferServiceImpl implements DataTransferService {
             }
 
             platformsToAdd.add(platformEntity);
-            LOGGER.debug("Created Platform --> {}", platformEntity);
+            LOGGER.debug("Created Platform --> {}", platformEntity.getFullName());
 
             return platformEntity.getFullName();
         } else {
@@ -185,7 +186,7 @@ public class DataTransferServiceImpl implements DataTransferService {
             platformEntity.setModified(LocalDateTime.now());
             platformEntity.setModifiedBy("DTS");
             platformsToEdit.add(platformEntity);
-            LOGGER.debug("Existing Platform --> {}", platformEntity);
+            LOGGER.debug("Existing Platform --> {}", platformEntity.getFullName());
             return platformEntity.getFullName();
         }
     }
@@ -206,13 +207,13 @@ public class DataTransferServiceImpl implements DataTransferService {
                 companyEntity.setModified(LocalDateTime.now());
                 companyEntity.setModifiedBy("DTS");
                 companiesToEdit.add(companyEntites.get(rootCompanyName).get(0));
-                LOGGER.debug("Existing Company --> {}", companyEntites.get(rootCompanyName).get(0));
+                LOGGER.debug("Existing Company --> {}", companyEntites.get(rootCompanyName).get(0).getName());
             } else {
                 CompanyEntity companyEntity = companyEntites.get(companyName).get(0);
                 companyEntity.setModified(LocalDateTime.now());
                 companyEntity.setModifiedBy("DTS");
                 companiesToEdit.add(companyEntites.get(companyName).get(0));
-                LOGGER.debug("Existing Company --> {}", companyEntites.get(companyName).get(0));
+                LOGGER.debug("Existing Company --> {}", companyEntites.get(companyName).get(0).getName());
                 return companyName;
             }
 
@@ -226,7 +227,7 @@ public class DataTransferServiceImpl implements DataTransferService {
         company.setName(companyName);
         company.setCreated(LocalDateTime.now());
         company.setCreatedBy("DTS");
-        LOGGER.debug("Created Company --> {}", company);
+        LOGGER.debug("Created Company --> {}", company.getName());
 
         return company;
     }
@@ -238,17 +239,26 @@ public class DataTransferServiceImpl implements DataTransferService {
 
             if (words.length > 1) {
                 for (String word : words) {
-                    if (NumberUtils.isNumber(word)) {
+                    if (!word.equals("") && !word.trim().isEmpty() && NumberUtils.isNumber(word)) {
                         stringBuilder.append(word);
-                    } else {
+                    } else if (!word.equals("") && !word.trim().isEmpty() && !NumberUtils.isNumber(word)) {
                         stringBuilder.append(word.toUpperCase().charAt(0));
                     }
                 }
-            } else {
+
+            } else if (name.length() > 3) {
                 stringBuilder.append(words[0].toUpperCase().substring(0, 3));
+            } else {
+                stringBuilder.append(words[0].toUpperCase());
             }
         }
-        return stringBuilder.toString();
+
+        String abbrevation = stringBuilder.toString();
+        if (abbrevation.length() > 20) {
+            abbrevation = abbrevation.substring(0, 19);
+        }
+
+        return abbrevation;
     }
 
     private String createPlatformInformation(TransferPlatformEntity transferPlatform) {
@@ -350,11 +360,32 @@ public class DataTransferServiceImpl implements DataTransferService {
 
     @Override
     @Transactional(rollbackFor = ApiException.class)
-    public PayloadResponse<String> gameHUSToGameHUT(EmptyRequest request) throws ApiException {
+    public PayloadResponse<String> gameHUSToGameHUTWrapper(EntityRequest<Long> request) throws ApiException {
+        LOGGER.info("Start process --> {}",
+                Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime());
 
-        LOGGER.info("Start --> {}", Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime());
+        int numOfRecords = request.getEntity().intValue();
+        Long numOfTransferGameEntites = transferGameDAO.getCount();
+        Long numOfPages = (long) Math.ceil(numOfTransferGameEntites / (double) numOfRecords);
 
-        List<TransferGameEntity> transferGameEntities = transferGameDAO.findAll();
+        for (int page = 1; page <= numOfPages; page++) {
+            gameHUSToGameHUT(numOfRecords, page);
+        }
+
+        LOGGER.info("End process --> {}",
+                Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime());
+        return new PayloadResponse<>(request, ResponseCode.OK, "Games converted successfully!");
+    }
+
+    @Transactional(rollbackFor = ApiException.class)
+    public void gameHUSToGameHUT(int numOfRecords, int page) throws ApiException {
+
+        LOGGER.info("Start (page {}) --> {}", page,
+                Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime());
+
+        List<TransferGameHelper> transferGameEntities = new ArrayList<>();
+        transferGameEntities.addAll(transferGameDAO.findAllHelper(numOfRecords, page));
+
         List<TransferCompanyEntity> transferCompanyEntities = transferCompanyDAO.findAll();
 
         Map<String, List<GameEntity>> gameEntities = gameDAO.findAll().stream().collect(Collectors.groupingBy(GameEntity::getFullName));
@@ -376,10 +407,14 @@ public class DataTransferServiceImpl implements DataTransferService {
 
         Map<String, String> companyNamesMap = createCompanyNamesMap(transferCompanyEntities);
 
-        LOGGER.info("TransferPlatform --> Platform CONVERSION BEGINING");
-        transferGameEntities.stream().forEach(transferGame(gameEntities, platformEntities, companyEntites, companiesToAdd, companiesToEdit,
-                companyNamesMap, platformsToAdd, platformsToEdit, gamesToAdd, gamesToEdit, gamePlatformCompanyHelper));
+        LOGGER.info("TransferGame --> Game CONVERSION BEGINING");
+        Map<String, List<TransferGameHelper>> gameHelpersMap = transferGameEntities.stream()
+                .collect(Collectors.groupingBy(TransferGameHelper::getName));
 
+        for (Map.Entry<String, List<TransferGameHelper>> entry : gameHelpersMap.entrySet()) {
+            entry.getValue().stream().forEach(transferGame(gameEntities, platformEntities, companyEntites, companiesToAdd, companiesToEdit,
+                    companyNamesMap, platformsToAdd, platformsToEdit, gamesToAdd, gamesToEdit, gamePlatformCompanyHelper));
+        }
         Map<String, List<CompanyEntity>> newCompanyEntites = companiesToAdd.stream().collect(Collectors.groupingBy(CompanyEntity::getName));
         Map<String, List<PlatformEntity>> newPlatformEntities = platformsToAdd.stream()
                 .collect(Collectors.groupingBy(PlatformEntity::getFullName));
@@ -427,8 +462,8 @@ public class DataTransferServiceImpl implements DataTransferService {
         gamesToEdit.stream().forEach(
                 createRelease(platformEntities, newPlatformEntities, companyEntites, newCompanyEntites, gamePlatformCompanyHelperMap));
 
-        LOGGER.info("End --> {}", Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime());
-        return new PayloadResponse<>(request, ResponseCode.OK, "Platforms converted successfully!");
+        LOGGER.info("End --> (page {}) --> {}", page,
+                Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime());
     }
 
     private Consumer<? super GameEntity> createRelease(Map<String, List<PlatformEntity>> oldPlatformEntities,
@@ -436,21 +471,23 @@ public class DataTransferServiceImpl implements DataTransferService {
             Map<String, List<CompanyEntity>> newCompanyEntites, Map<String, List<GamePlatformCompanyHelper>> gamePlatformCompanyHelperMap) {
         return game -> {
             if (gamePlatformCompanyHelperMap.get(game.getFullName()) != null) {
-                GamePlatformCompanyHelper helper = gamePlatformCompanyHelperMap.get(game.getFullName()).get(0);
-
-                CompanyEntity developer = getCompanyEntity(helper.getDeveloperName(), newCompanyEntites, oldCompanyEntites);
-                CompanyEntity publisher = getCompanyEntity(helper.getPublisherName(), newCompanyEntites, oldCompanyEntites);
-                PlatformEntity platform = getPlatformEntity(helper.getPlatformName(), newPlatformEntities, oldPlatformEntities);
-
-                Long devId = developer != null ? developer.getId() : null;
-                Long pubId = publisher != null ? publisher.getId() : null;
-                Long plId = platform != null ? platform.getId() : null;
-
-                List<ReleaseEntity> releasesByDevPub = releaseDAO.getReleasesByGamePlatformDevPub(game.getId(), plId, devId, pubId);
+                List<GamePlatformCompanyHelper> helperList = gamePlatformCompanyHelperMap.get(game.getFullName());
                 List<ReleaseEntity> releases = releaseDAO.getReleasesByGame(game.getId());
 
-                populateReleaseEntity(helper, game, platform, developer, publisher, releases, releasesByDevPub);
+                LOGGER.debug("Found {} releases for game {}", helperList.size(), game.getFullName());
+                for (GamePlatformCompanyHelper helper : helperList) {
+                    CompanyEntity developer = getCompanyEntity(helper.getDeveloperName(), newCompanyEntites, oldCompanyEntites);
+                    CompanyEntity publisher = getCompanyEntity(helper.getPublisherName(), newCompanyEntites, oldCompanyEntites);
+                    PlatformEntity platform = getPlatformEntity(helper.getPlatformName(), newPlatformEntities, oldPlatformEntities);
 
+                    Long devId = developer != null ? developer.getId() : null;
+                    Long pubId = publisher != null ? publisher.getId() : null;
+                    Long plId = platform != null ? platform.getId() : null;
+
+                    List<ReleaseEntity> releasesByDevPub = releaseDAO.getReleasesByGamePlatformDevPub(game.getId(), plId, devId, pubId);
+
+                    populateReleaseEntity(helper, game, platform, developer, publisher, releases, releasesByDevPub);
+                }
             }
         };
     }
@@ -505,7 +542,7 @@ public class DataTransferServiceImpl implements DataTransferService {
         }
     }
 
-    private Consumer<? super TransferGameEntity> transferGame(Map<String, List<GameEntity>> gameEntities,
+    private Consumer<? super TransferGameHelper> transferGame(Map<String, List<GameEntity>> gameEntities,
             Map<String, List<PlatformEntity>> platformEntities, Map<String, List<CompanyEntity>> companyEntites,
             List<CompanyEntity> companiesToAdd, List<CompanyEntity> companiesToEdit, Map<String, String> companyNamesMap,
             List<PlatformEntity> platformsToAdd, List<PlatformEntity> platformsToEdit, List<GameEntity> gamesToAdd,
@@ -516,15 +553,17 @@ public class DataTransferServiceImpl implements DataTransferService {
                     companyNamesMap);
             String manufacturer = checkCompanyName(transferGame.getPublisher(), companyEntites, companiesToAdd, companiesToEdit,
                     companyNamesMap);
-            String platform = createPlatform(new TransferPlatformEntity(transferGame.getName()), platformEntities, platformsToAdd,
+            String platform = createPlatform(new TransferPlatformEntity(transferGame.getPlatform()), platformEntities, platformsToAdd,
                     platformsToEdit, null);
 
-            if (platformEntities.get(transferGame.getName()) == null) {
+            if (gameEntities.get(transferGame.getName()) == null) {
                 gameEntity.setCreated(LocalDateTime.now());
                 gameEntity.setCreatedBy("DTS");
                 gameEntity.setFullName(transferGame.getName());
                 gameEntity.setGenre(transferGame.getGenres());
+                LOGGER.info("Name -> {}", transferGame.getName());
                 gameEntity.setAbbriviation(makeAbbrevation(transferGame.getName()));
+                LOGGER.info("Abbr -> {}", gameEntity.getAbbriviation());
                 gameEntity.setInformation(createGameInformation(transferGame));
 
                 if (manufacturer != null) {
@@ -532,13 +571,13 @@ public class DataTransferServiceImpl implements DataTransferService {
                 }
 
                 gamesToAdd.add(gameEntity);
-                LOGGER.debug("Created Game --> {}", gameEntity);
+                LOGGER.debug("Created Game --> {}", gameEntity.getFullName());
             } else {
                 gameEntity = gameEntities.get(transferGame.getName()).get(0);
                 gameEntity.setModified(LocalDateTime.now());
                 gameEntity.setModifiedBy("DTS");
                 gamesToEdit.add(gameEntity);
-                LOGGER.debug("Existing Game --> {}", gameEntity);
+                LOGGER.debug("Existing Game --> {}", gameEntity.getFullName());
             }
 
             releaseHelper.add(new GamePlatformCompanyHelper(gameEntity.getFullName(), platform, developer, manufacturer,
@@ -547,7 +586,7 @@ public class DataTransferServiceImpl implements DataTransferService {
         };
     }
 
-    private String createGameInformation(TransferGameEntity transferGame) {
+    private String createGameInformation(TransferGameHelper transferGame) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder
                 .append(String.format("<p>%s<p><br/>", transferGame.getOverview() != null ? transferGame.getOverview() : NO_INFORMATION));
