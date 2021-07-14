@@ -3,6 +3,7 @@ package ba.com.zira.praksa.core.impl;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,6 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EmptyRequest;
@@ -168,8 +172,8 @@ public class DataTransferServiceImpl implements DataTransferService {
             platformEntity.setCreated(LocalDateTime.now());
             platformEntity.setCreatedBy("DTS");
             platformEntity.setFullName(transferPlatform.getName());
-            platformEntity.setCode(makeAbbrevation(transferPlatform.getName()));
-            platformEntity.setAbbriviation(makeAbbrevation(transferPlatform.getName()));
+            platformEntity.setCode(makeAbbreviation(transferPlatform.getName()));
+            platformEntity.setAbbriviation(makeAbbreviation(transferPlatform.getName()));
             platformEntity.setAliases(transferPlatform.getPlatformAlternateName());
             platformEntity.setInformation(createPlatformInformation(transferPlatform));
 
@@ -232,7 +236,7 @@ public class DataTransferServiceImpl implements DataTransferService {
         return company;
     }
 
-    private String makeAbbrevation(String name) {
+    private String makeAbbreviation(String name) {
         StringBuilder stringBuilder = new StringBuilder();
         if (name != null && !name.equals("") && !name.trim().isEmpty()) {
             String[] words = name.split(" ");
@@ -361,38 +365,44 @@ public class DataTransferServiceImpl implements DataTransferService {
     @Override
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<String> gameHUSToGameHUTWrapper(EntityRequest<Long> request) throws ApiException {
-        LOGGER.info("Start process --> {}",
-                Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime());
+        LocalDateTime startTime = Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LOGGER.info("Start process --> {}", startTime);
 
         int numOfRecords = request.getEntity().intValue();
         Long numOfTransferGameEntites = transferGameDAO.getCount();
         Long numOfPages = (long) Math.ceil(numOfTransferGameEntites / (double) numOfRecords);
 
+        // List<PlatformEntity> platformEntities = platformDAO.findAll();
+        // List<CompanyEntity> companyEntites = companyDAO.findAll();
+        // List<GameEntity> gameEntites = gameDAO.findAll();
+
         for (int page = 1; page <= numOfPages; page++) {
+            // gameHUSToGameHUT(numOfRecords, page, platformEntities,
+            // companyEntites, gameEntites);
             gameHUSToGameHUT(numOfRecords, page);
         }
 
-        LOGGER.info("End process --> {}",
-                Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime());
+        LocalDateTime endTime = Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LOGGER.info("End process --> {}", endTime);
+        LOGGER.info("TOTAL TIME --> (PROCESS) --> {} minutes", ChronoUnit.MINUTES.between(startTime, endTime));
         return new PayloadResponse<>(request, ResponseCode.OK, "Games converted successfully!");
     }
 
-    @Transactional(rollbackFor = ApiException.class)
-    public void gameHUSToGameHUT(int numOfRecords, int page) throws ApiException {
+    public void gameHUSToGameHUT(int numOfRecords, int page) {
+        LocalDateTime startTime = Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime();
 
-        LOGGER.info("Start (page {}) --> {}", page,
-                Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime());
+        LOGGER.info("Start (page {}) --> {}", page, startTime);
 
         List<TransferGameHelper> transferGameEntities = new ArrayList<>();
         transferGameEntities.addAll(transferGameDAO.findAllHelper(numOfRecords, page));
 
         List<TransferCompanyEntity> transferCompanyEntities = transferCompanyDAO.findAll();
 
-        Map<String, List<GameEntity>> gameEntities = gameDAO.findAll().stream().collect(Collectors.groupingBy(GameEntity::getFullName));
-        Map<String, List<PlatformEntity>> platformEntities = platformDAO.findAll().stream()
+        Map<String, List<PlatformEntity>> platformEntitiesMap = platformDAO.findAll().stream()
                 .collect(Collectors.groupingBy(PlatformEntity::getFullName));
-        Map<String, List<CompanyEntity>> companyEntites = companyDAO.findAll().stream()
+        Map<String, List<CompanyEntity>> companyEntitesMap = companyDAO.findAll().stream()
                 .collect(Collectors.groupingBy(CompanyEntity::getName));
+        Map<String, List<GameEntity>> gameEntitiesMap = gameDAO.findAll().stream().collect(Collectors.groupingBy(GameEntity::getFullName));
 
         List<GameEntity> gamesToAdd = new ArrayList<>();
         List<GameEntity> gamesToEdit = new ArrayList<>();
@@ -412,8 +422,8 @@ public class DataTransferServiceImpl implements DataTransferService {
                 .collect(Collectors.groupingBy(TransferGameHelper::getName));
 
         for (Map.Entry<String, List<TransferGameHelper>> entry : gameHelpersMap.entrySet()) {
-            entry.getValue().stream().forEach(transferGame(gameEntities, platformEntities, companyEntites, companiesToAdd, companiesToEdit,
-                    companyNamesMap, platformsToAdd, platformsToEdit, gamesToAdd, gamesToEdit, gamePlatformCompanyHelper));
+            entry.getValue().stream().forEach(transferGame(gameEntitiesMap, platformEntitiesMap, companyEntitesMap, companiesToAdd,
+                    companiesToEdit, companyNamesMap, platformsToAdd, platformsToEdit, gamesToAdd, gamesToEdit, gamePlatformCompanyHelper));
         }
         Map<String, List<CompanyEntity>> newCompanyEntites = companiesToAdd.stream().collect(Collectors.groupingBy(CompanyEntity::getName));
         Map<String, List<PlatformEntity>> newPlatformEntities = platformsToAdd.stream()
@@ -426,53 +436,71 @@ public class DataTransferServiceImpl implements DataTransferService {
 
         LOGGER.info("ADDING NEW COMPANIES --> {}", newCompanyEntites.size());
         for (Map.Entry<String, List<CompanyEntity>> entry : newCompanyEntites.entrySet()) {
-            companyDAO.persist(entry.getValue().get(0));
+            CompanyEntity entity = entry.getValue().get(0);
+            companyDAO.persist(entity);
+            // companyEntites.add(entity);
         }
 
         LOGGER.info("ADDING NEW PLATFORMS --> {}", newPlatformEntities.size());
         for (Map.Entry<String, List<PlatformEntity>> entry : newPlatformEntities.entrySet()) {
-            platformDAO.persist(entry.getValue().get(0));
+            PlatformEntity entity = entry.getValue().get(0);
+            platformDAO.persist(entity);
+            // platformEntities.add(entity);
         }
 
         LOGGER.info("ADDING NEW GAMES --> {}", newGameEntities.size());
         for (Map.Entry<String, List<GameEntity>> entry : newGameEntities.entrySet()) {
-            gameDAO.persist(entry.getValue().get(0));
+            GameEntity entity = entry.getValue().get(0);
+            gameDAO.persist(entity);
+            // gameEntites.add(entity);
         }
 
         LOGGER.info("EDITING EXISTING COMPANIES --> {}", companiesToEdit.size());
         for (CompanyEntity company : companiesToEdit) {
             companyDAO.merge(company);
+            // companyEntites.replaceAll(c -> c.getId().equals(company.getId())
+            // ? company : c);
         }
         LOGGER.info("EDITING EXISTING PLATFORMS --> {}", platformsToEdit.size());
         for (PlatformEntity platform : platformsToEdit) {
             platformDAO.merge(platform);
+            // platformEntities.replaceAll(p ->
+            // p.getId().equals(platform.getId()) ? platform : p);
         }
         LOGGER.info("EDITING EXISTING GAMES --> {}", gamesToEdit.size());
-        for (GameEntity platform : gamesToEdit) {
-            gameDAO.merge(platform);
+        for (GameEntity game : gamesToEdit) {
+            gameDAO.merge(game);
+            // gameEntites.replaceAll(g -> g.getId().equals(game.getId()) ? game
+            // : g);
         }
 
         Map<String, List<GamePlatformCompanyHelper>> gamePlatformCompanyHelperMap = gamePlatformCompanyHelper.stream()
                 .collect(Collectors.groupingBy(GamePlatformCompanyHelper::getGameName));
 
-        LOGGER.info("CREATING RELEASES FOR NEW GAMES");
-        gamesToAdd.stream().filter(g -> g.getId() != null).forEach(
-                createRelease(platformEntities, newPlatformEntities, companyEntites, newCompanyEntites, gamePlatformCompanyHelperMap));
-        LOGGER.info("CREATING RELEASES FOR EXISTING GAMES");
-        gamesToEdit.stream().forEach(
-                createRelease(platformEntities, newPlatformEntities, companyEntites, newCompanyEntites, gamePlatformCompanyHelperMap));
+        List<Long> gameIds = gamesToAdd.stream().map(GameEntity::getId).collect(Collectors.toList());
+        gameIds.addAll(gamesToEdit.stream().map(GameEntity::getId).collect(Collectors.toList()));
+        List<List<Long>> idLists = Lists.newArrayList(Iterables.partition(gameIds, 1000));
+        List<ReleaseEntity> releases = releaseDAO.findReleases(idLists);
 
-        LOGGER.info("End --> (page {}) --> {}", page,
-                Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime());
+        LOGGER.info("CREATING RELEASES FOR NEW GAMES");
+        gamesToAdd.stream().filter(g -> g.getId() != null).forEach(createRelease(platformEntitiesMap, newPlatformEntities,
+                companyEntitesMap, newCompanyEntites, gamePlatformCompanyHelperMap, releases));
+        LOGGER.info("CREATING RELEASES FOR EXISTING GAMES");
+        gamesToEdit.stream().forEach(createRelease(platformEntitiesMap, newPlatformEntities, companyEntitesMap, newCompanyEntites,
+                gamePlatformCompanyHelperMap, releases));
+
+        LocalDateTime endTime = Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LOGGER.info("End --> (page {}) --> {}", page, endTime);
+        LOGGER.info("TOTAL TIME --> (page {}) --> {} minutes", page, ChronoUnit.MINUTES.between(startTime, endTime));
     }
 
     private Consumer<? super GameEntity> createRelease(Map<String, List<PlatformEntity>> oldPlatformEntities,
             Map<String, List<PlatformEntity>> newPlatformEntities, Map<String, List<CompanyEntity>> oldCompanyEntites,
-            Map<String, List<CompanyEntity>> newCompanyEntites, Map<String, List<GamePlatformCompanyHelper>> gamePlatformCompanyHelperMap) {
+            Map<String, List<CompanyEntity>> newCompanyEntites, Map<String, List<GamePlatformCompanyHelper>> gamePlatformCompanyHelperMap,
+            List<ReleaseEntity> releases) {
         return game -> {
             if (gamePlatformCompanyHelperMap.get(game.getFullName()) != null) {
                 List<GamePlatformCompanyHelper> helperList = gamePlatformCompanyHelperMap.get(game.getFullName());
-                List<ReleaseEntity> releases = releaseDAO.getReleasesByGame(game.getId());
 
                 LOGGER.debug("Found {} releases for game {}", helperList.size(), game.getFullName());
                 for (GamePlatformCompanyHelper helper : helperList) {
@@ -480,15 +508,43 @@ public class DataTransferServiceImpl implements DataTransferService {
                     CompanyEntity publisher = getCompanyEntity(helper.getPublisherName(), newCompanyEntites, oldCompanyEntites);
                     PlatformEntity platform = getPlatformEntity(helper.getPlatformName(), newPlatformEntities, oldPlatformEntities);
 
-                    Long devId = developer != null ? developer.getId() : null;
-                    Long pubId = publisher != null ? publisher.getId() : null;
-                    Long plId = platform != null ? platform.getId() : null;
+                    String developerName = developer == null ? null : developer.getName();
+                    String publisherName = publisher == null ? null : publisher.getName();
+                    String platformName = platform == null ? null : platform.getFullName();
 
-                    List<ReleaseEntity> releasesByDevPub = releaseDAO.getReleasesByGamePlatformDevPub(game.getId(), plId, devId, pubId);
+                    List<ReleaseEntity> releaseList = releases.stream().filter(r -> r.getGame().getId() == game.getId())
+                            .collect(Collectors.toList());
 
-                    populateReleaseEntity(helper, game, platform, developer, publisher, releases, releasesByDevPub);
+                    List<ReleaseEntity> filteredReleases = releaseList.stream().filter(isSame(developerName, publisherName, platformName))
+                            .collect(Collectors.toList());
+
+                    populateReleaseEntity(helper, game, platform, developer, publisher, releases, filteredReleases);
                 }
             }
+        };
+    }
+
+    private Predicate<? super ReleaseEntity> isSame(String developer, String publisher, String platform) {
+        return release -> {
+            Boolean isDeveloperNull = (developer == null || developer.equals("") || developer.trim().length() != 0)
+                    && (release.getDeveloper() == null || release.getDeveloper().getName() == null
+                            || release.getDeveloper().getName().equals("") || release.getDeveloper().getName().trim().length() != 0);
+            Boolean isDeveloperSame = developer != null
+                    && developer.equalsIgnoreCase(release.getDeveloper() == null ? null : release.getDeveloper().getName());
+
+            Boolean isPublisherNull = (publisher == null || publisher.equals("") || publisher.trim().length() != 0)
+                    && (release.getPublisher() == null || release.getPublisher().getName() == null
+                            || release.getPublisher().getName().equals("") || release.getPublisher().getName().trim().length() != 0);
+            Boolean isPublisherSame = publisher != null
+                    && publisher.equalsIgnoreCase(release.getPublisher() == null ? null : release.getPublisher().getName());
+
+            Boolean isPlatformNull = (platform == null || platform.equals("") || platform.trim().length() != 0)
+                    && (release.getPlatform() == null || release.getPlatform().getFullName() == null
+                            || release.getPlatform().getFullName().equals("") || release.getPlatform().getFullName().trim().length() != 0);
+            Boolean isPlatformSame = platform != null
+                    && platform.equalsIgnoreCase(release.getPlatform() == null ? null : release.getPlatform().getFullName());
+
+            return (isDeveloperNull || isDeveloperSame) && (isPublisherNull || isPublisherSame) && (isPlatformNull || isPlatformSame);
         };
     }
 
@@ -562,7 +618,7 @@ public class DataTransferServiceImpl implements DataTransferService {
                 gameEntity.setFullName(transferGame.getName());
                 gameEntity.setGenre(transferGame.getGenres());
                 LOGGER.info("Name -> {}", transferGame.getName());
-                gameEntity.setAbbriviation(makeAbbrevation(transferGame.getName()));
+                gameEntity.setAbbriviation(makeAbbreviation(transferGame.getName()));
                 LOGGER.info("Abbr -> {}", gameEntity.getAbbriviation());
                 gameEntity.setInformation(createGameInformation(transferGame));
 

@@ -100,4 +100,22 @@ public class ReleaseDAO extends AbstractDAO<ReleaseEntity, String> {
         return query.getResultList();
     }
 
+    public List<ReleaseEntity> findReleases(List<List<Long>> idLists) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT r FROM ReleaseEntity r WHERE type = :type AND r.game.id IN :list1");
+
+        for (int i = 1; i < idLists.size(); i++) {
+            stringBuilder.append(String.format(" OR r.game.id IN :list%d", i + 1));
+        }
+
+        TypedQuery<ReleaseEntity> query = entityManager.createQuery(stringBuilder.toString(), ReleaseEntity.class);
+        query.setParameter("type", ObjectType.GAME.getValue());
+        // query.setParameter("list1", idLists.get(0));
+        for (int i = 0; i < idLists.size(); i++) {
+            query.setParameter(String.format("list%d", i + 1), idLists.get(i));
+        }
+
+        return query.getResultList();
+    }
+
 }

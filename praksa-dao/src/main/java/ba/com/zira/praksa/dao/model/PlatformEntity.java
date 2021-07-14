@@ -32,7 +32,7 @@ public class PlatformEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "HUT_PLATFORM_ID_GENERATOR", sequenceName = "HUT_PLATFORM_SEQ", allocationSize = 1)
+    @SequenceGenerator(name = "HUT_PLATFORM_ID_GENERATOR", sequenceName = "HUT_PLATFORM_SEQ", allocationSize = 50)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_PLATFORM_ID_GENERATOR")
     private Long id;
 
