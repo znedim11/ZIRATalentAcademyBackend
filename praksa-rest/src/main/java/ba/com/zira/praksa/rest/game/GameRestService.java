@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ba.com.zira.commons.exception.ApiException;
+import ba.com.zira.commons.message.request.EmptyRequest;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
@@ -158,6 +159,13 @@ public class GameRestService {
         request.setList(ids);
 
         return gameService.getLoVs(request);
+    }
+
+    @ApiOperation(value = "Get all Main Games", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/main")
+    public ListPayloadResponse<LoV> getMainGames() throws ApiException {
+        EmptyRequest request = new EmptyRequest();
+        return gameService.getMainGames(request);
     }
 
     @ApiOperation(value = "Get Objects by Game", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

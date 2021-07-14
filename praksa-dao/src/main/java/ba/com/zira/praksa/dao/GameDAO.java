@@ -75,6 +75,12 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         return query.getResultList();
     }
 
+    public List<LoV> getMainGames() {
+        String jpql = "SELECT new ba.com.zira.praksa.api.model.LoV(g1.id, g1.fullName) FROM GameEntity g1 where g1.dlc='0' order by 2";
+        TypedQuery<LoV> mainGames = entityManager.createQuery(jpql, LoV.class);
+        return mainGames.getResultList();
+    }
+
     public List<ObjectEntity> getObjectsByGame(Long gameId) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("SELECT o FROM ObjectEntity o, LinkMapEntity lm WHERE lm.game.id = :gId AND lm.object.id = o.id");

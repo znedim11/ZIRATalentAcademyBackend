@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ba.com.zira.commons.exception.ApiException;
+import ba.com.zira.commons.message.request.EmptyRequest;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
@@ -125,7 +126,12 @@ public class GameServiceImpl implements GameService {
     public PayloadResponse<GameResponse> create(EntityRequest<GameCreateRequest> request) throws ApiException {
         requestValidator.validate(request);
         GameEntity entity = gameMapper.dtoToEntity(request.getEntity());
+
+        entity.setCreated(LocalDateTime.now());
+        entity.setCreatedBy(request.getUserId());
+
         gameDAO.persist(entity);
+
         GameResponse response = gameMapper.gameEntityToGame(entity);
         return new PayloadResponse<>(request, ResponseCode.OK, response);
     }
@@ -135,8 +141,14 @@ public class GameServiceImpl implements GameService {
         requestValidator.validate(request);
 
         final GameEntity gameEntity = gameDAO.findByPK(request.getEntity());
-
         final GameResponse game = gameMapper.gameEntityToGame(gameEntity);
+        if (gameEntity.getFranchise() != null) {
+            game.setFranchiseId(gameEntity.getFranchise().getId());
+        }
+        if (gameEntity.getDlc().equals("1")) {
+            game.setParentGameId(gameEntity.getParentGame().getId());
+        }
+
         return new PayloadResponse<>(request, ResponseCode.OK, game);
     }
 
@@ -196,6 +208,14 @@ public class GameServiceImpl implements GameService {
         }
 
         List<LoV> loVs = gameDAO.getLoVs(request.getList());
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
+    }
+
+    @Override
+    public ListPayloadResponse<LoV> getMainGames(EmptyRequest request) throws ApiException {
+
+        List<LoV> loVs = gameDAO.getMainGames();
 
         return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
     }
@@ -307,4 +327,5 @@ public class GameServiceImpl implements GameService {
 
         return new PayloadResponse<>(request, ResponseCode.OK, gameOverview);
     }
+
 }
