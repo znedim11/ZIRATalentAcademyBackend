@@ -372,14 +372,13 @@ public class DataTransferServiceImpl implements DataTransferService {
         Long numOfTransferGameEntites = transferGameDAO.getCount();
         Long numOfPages = (long) Math.ceil(numOfTransferGameEntites / (double) numOfRecords);
 
-        // List<PlatformEntity> platformEntities = platformDAO.findAll();
-        // List<CompanyEntity> companyEntites = companyDAO.findAll();
-        // List<GameEntity> gameEntites = gameDAO.findAll();
+        List<PlatformEntity> platformEntities = platformDAO.findAll();
+        List<CompanyEntity> companyEntites = companyDAO.findAll();
+        List<GameEntity> gameEntites = gameDAO.findAll();
 
         for (int page = 1; page <= numOfPages; page++) {
-            // gameHUSToGameHUT(numOfRecords, page, platformEntities,
-            // companyEntites, gameEntites);
-            gameHUSToGameHUT(numOfRecords, page);
+            gameHUSToGameHUT(numOfRecords, page, platformEntities, companyEntites, gameEntites);
+            // gameHUSToGameHUT(numOfRecords, page);
         }
 
         LocalDateTime endTime = Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -388,7 +387,8 @@ public class DataTransferServiceImpl implements DataTransferService {
         return new PayloadResponse<>(request, ResponseCode.OK, "Games converted successfully!");
     }
 
-    public void gameHUSToGameHUT(int numOfRecords, int page) {
+    public void gameHUSToGameHUT(int numOfRecords, int page, List<PlatformEntity> platformEntities, List<CompanyEntity> companyEntites,
+            List<GameEntity> gameEntites) {
         LocalDateTime startTime = Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime();
 
         LOGGER.info("Start (page {}) --> {}", page, startTime);
@@ -398,11 +398,10 @@ public class DataTransferServiceImpl implements DataTransferService {
 
         List<TransferCompanyEntity> transferCompanyEntities = transferCompanyDAO.findAll();
 
-        Map<String, List<PlatformEntity>> platformEntitiesMap = platformDAO.findAll().stream()
+        Map<String, List<PlatformEntity>> platformEntitiesMap = platformEntities.stream()
                 .collect(Collectors.groupingBy(PlatformEntity::getFullName));
-        Map<String, List<CompanyEntity>> companyEntitesMap = companyDAO.findAll().stream()
-                .collect(Collectors.groupingBy(CompanyEntity::getName));
-        Map<String, List<GameEntity>> gameEntitiesMap = gameDAO.findAll().stream().collect(Collectors.groupingBy(GameEntity::getFullName));
+        Map<String, List<CompanyEntity>> companyEntitesMap = companyEntites.stream().collect(Collectors.groupingBy(CompanyEntity::getName));
+        Map<String, List<GameEntity>> gameEntitiesMap = gameEntites.stream().collect(Collectors.groupingBy(GameEntity::getFullName));
 
         List<GameEntity> gamesToAdd = new ArrayList<>();
         List<GameEntity> gamesToEdit = new ArrayList<>();
@@ -438,41 +437,53 @@ public class DataTransferServiceImpl implements DataTransferService {
         for (Map.Entry<String, List<CompanyEntity>> entry : newCompanyEntites.entrySet()) {
             CompanyEntity entity = entry.getValue().get(0);
             companyDAO.persist(entity);
-            // companyEntites.add(entity);
+            companyEntites.add(entity);
         }
 
         LOGGER.info("ADDING NEW PLATFORMS --> {}", newPlatformEntities.size());
         for (Map.Entry<String, List<PlatformEntity>> entry : newPlatformEntities.entrySet()) {
             PlatformEntity entity = entry.getValue().get(0);
             platformDAO.persist(entity);
-            // platformEntities.add(entity);
+            platformEntities.add(entity);
         }
 
         LOGGER.info("ADDING NEW GAMES --> {}", newGameEntities.size());
         for (Map.Entry<String, List<GameEntity>> entry : newGameEntities.entrySet()) {
             GameEntity entity = entry.getValue().get(0);
             gameDAO.persist(entity);
-            // gameEntites.add(entity);
+            gameEntites.add(entity);
         }
 
         LOGGER.info("EDITING EXISTING COMPANIES --> {}", companiesToEdit.size());
         for (CompanyEntity company : companiesToEdit) {
             companyDAO.merge(company);
-            // companyEntites.replaceAll(c -> c.getId().equals(company.getId())
-            // ? company : c);
         }
         LOGGER.info("EDITING EXISTING PLATFORMS --> {}", platformsToEdit.size());
         for (PlatformEntity platform : platformsToEdit) {
             platformDAO.merge(platform);
-            // platformEntities.replaceAll(p ->
-            // p.getId().equals(platform.getId()) ? platform : p);
         }
         LOGGER.info("EDITING EXISTING GAMES --> {}", gamesToEdit.size());
         for (GameEntity game : gamesToEdit) {
             gameDAO.merge(game);
-            // gameEntites.replaceAll(g -> g.getId().equals(game.getId()) ? game
-            // : g);
         }
+
+        Map<Long, List<PlatformEntity>> existingPlatformEntitiesMap = platformEntities.stream()
+                .collect(Collectors.groupingBy(PlatformEntity::getId));
+        Map<Long, List<CompanyEntity>> existingCompanyEntitesMap = companyEntites.stream()
+                .collect(Collectors.groupingBy(CompanyEntity::getId));
+        Map<Long, List<GameEntity>> existingGameEntitiesMap = gameEntites.stream().collect(Collectors.groupingBy(GameEntity::getId));
+
+        Map<Long, List<CompanyEntity>> companiesToEditMap = companiesToEdit.stream().collect(Collectors.groupingBy(CompanyEntity::getId));
+        Map<Long, List<PlatformEntity>> platformsToEditMap = platformsToEdit.stream().collect(Collectors.groupingBy(PlatformEntity::getId));
+        Map<Long, List<GameEntity>> gamesToEditMap = gamesToEdit.stream().collect(Collectors.groupingBy(GameEntity::getId));
+
+        existingPlatformEntitiesMap.putAll(platformsToEditMap);
+        existingCompanyEntitesMap.putAll(companiesToEditMap);
+        existingGameEntitiesMap.putAll(gamesToEditMap);
+
+        companyEntites = existingCompanyEntitesMap.values().stream().flatMap(c -> c.stream()).collect(Collectors.toList());
+        platformEntities = existingPlatformEntitiesMap.values().stream().flatMap(p -> p.stream()).collect(Collectors.toList());
+        gameEntites = existingGameEntitiesMap.values().stream().flatMap(g -> g.stream()).collect(Collectors.toList());
 
         Map<String, List<GamePlatformCompanyHelper>> gamePlatformCompanyHelperMap = gamePlatformCompanyHelper.stream()
                 .collect(Collectors.groupingBy(GamePlatformCompanyHelper::getGameName));
@@ -518,7 +529,7 @@ public class DataTransferServiceImpl implements DataTransferService {
                     List<ReleaseEntity> filteredReleases = releaseList.stream().filter(isSame(developerName, publisherName, platformName))
                             .collect(Collectors.toList());
 
-                    populateReleaseEntity(helper, game, platform, developer, publisher, releases, filteredReleases);
+                    populateReleaseEntity(helper, game, platform, developer, publisher, releaseList, filteredReleases);
                 }
             }
         };
