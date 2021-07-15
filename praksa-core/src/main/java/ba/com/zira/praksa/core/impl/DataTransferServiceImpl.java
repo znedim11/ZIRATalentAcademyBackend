@@ -55,6 +55,7 @@ public class DataTransferServiceImpl implements DataTransferService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataTransferServiceImpl.class);
     private static final String NO_INFORMATION = "No information";
+    private static final String IRMA = "Irma";
 
     TransferPlatformDAO transferPlatformDAO;
     TransferCompanyDAO transferCompanyDAO;
@@ -170,7 +171,7 @@ public class DataTransferServiceImpl implements DataTransferService {
 
         if (platformEntities.get(transferPlatform.getName()) == null) {
             platformEntity.setCreated(LocalDateTime.now());
-            platformEntity.setCreatedBy("DTS");
+            platformEntity.setCreatedBy(IRMA);
             platformEntity.setFullName(transferPlatform.getName());
             platformEntity.setCode(makeAbbreviation(transferPlatform.getName()));
             platformEntity.setAbbriviation(makeAbbreviation(transferPlatform.getName()));
@@ -188,7 +189,7 @@ public class DataTransferServiceImpl implements DataTransferService {
         } else {
             platformEntity = platformEntities.get(transferPlatform.getName()).get(0);
             platformEntity.setModified(LocalDateTime.now());
-            platformEntity.setModifiedBy("DTS");
+            platformEntity.setModifiedBy(IRMA);
             platformsToEdit.add(platformEntity);
             LOGGER.debug("Existing Platform --> {}", platformEntity.getFullName());
             return platformEntity.getFullName();
@@ -209,13 +210,13 @@ public class DataTransferServiceImpl implements DataTransferService {
             } else if (rootCompanyName != null && companyEntites.get(rootCompanyName) != null) {
                 CompanyEntity companyEntity = companyEntites.get(rootCompanyName).get(0);
                 companyEntity.setModified(LocalDateTime.now());
-                companyEntity.setModifiedBy("DTS");
+                companyEntity.setModifiedBy(IRMA);
                 companiesToEdit.add(companyEntites.get(rootCompanyName).get(0));
                 LOGGER.debug("Existing Company --> {}", companyEntites.get(rootCompanyName).get(0).getName());
             } else {
                 CompanyEntity companyEntity = companyEntites.get(companyName).get(0);
                 companyEntity.setModified(LocalDateTime.now());
-                companyEntity.setModifiedBy("DTS");
+                companyEntity.setModifiedBy(IRMA);
                 companiesToEdit.add(companyEntites.get(companyName).get(0));
                 LOGGER.debug("Existing Company --> {}", companyEntites.get(companyName).get(0).getName());
                 return companyName;
@@ -230,7 +231,7 @@ public class DataTransferServiceImpl implements DataTransferService {
         CompanyEntity company = new CompanyEntity();
         company.setName(companyName);
         company.setCreated(LocalDateTime.now());
-        company.setCreatedBy("DTS");
+        company.setCreatedBy(IRMA);
         LOGGER.debug("Created Company --> {}", company.getName());
 
         return company;
@@ -344,7 +345,7 @@ public class DataTransferServiceImpl implements DataTransferService {
             releaseEntity.setRegion(regionDAO.findByPK(1L));
             releaseEntity.setType(ObjectType.PLATFORM.getValue());
             releaseEntity.setCreated(LocalDateTime.now());
-            releaseEntity.setCreatedBy("DTS");
+            releaseEntity.setCreatedBy(IRMA);
             releaseEntity.setUuid(UUID.randomUUID().toString());
             releaseEntity.setDeveloper(developer);
             releaseEntity.setPublisher(publisher);
@@ -353,7 +354,7 @@ public class DataTransferServiceImpl implements DataTransferService {
         } else if (!releases.isEmpty()) {
             for (ReleaseEntity releaseEntity : releases) {
                 releaseEntity.setModified(LocalDateTime.now());
-                releaseEntity.setModifiedBy("DTS");
+                releaseEntity.setModifiedBy(IRMA);
 
                 releaseDAO.merge(releaseEntity);
             }
@@ -579,7 +580,7 @@ public class DataTransferServiceImpl implements DataTransferService {
             releaseEntity.setRegion(regionDAO.findByPK(1L));
             releaseEntity.setType(ObjectType.GAME.getValue());
             releaseEntity.setCreated(LocalDateTime.now());
-            releaseEntity.setCreatedBy("DTS");
+            releaseEntity.setCreatedBy(IRMA);
             releaseEntity.setUuid(UUID.randomUUID().toString());
             releaseEntity.setDeveloper(developer);
             releaseEntity.setPublisher(publisher);
@@ -588,7 +589,7 @@ public class DataTransferServiceImpl implements DataTransferService {
         } else if (!releases.isEmpty()) {
             for (ReleaseEntity releaseEntity : releases) {
                 releaseEntity.setModified(LocalDateTime.now());
-                releaseEntity.setModifiedBy("DTS");
+                releaseEntity.setModifiedBy(IRMA);
 
                 releaseDAO.merge(releaseEntity);
             }
@@ -624,7 +625,7 @@ public class DataTransferServiceImpl implements DataTransferService {
 
             if (gameEntities.get(transferGame.getName()) == null) {
                 gameEntity.setCreated(LocalDateTime.now());
-                gameEntity.setCreatedBy("DTS");
+                gameEntity.setCreatedBy(IRMA);
                 gameEntity.setFullName(transferGame.getName());
                 gameEntity.setGenre(transferGame.getGenres());
                 LOGGER.info("Name -> {}", transferGame.getName());
@@ -641,7 +642,7 @@ public class DataTransferServiceImpl implements DataTransferService {
             } else {
                 gameEntity = gameEntities.get(transferGame.getName()).get(0);
                 gameEntity.setModified(LocalDateTime.now());
-                gameEntity.setModifiedBy("DTS");
+                gameEntity.setModifiedBy(IRMA);
                 gamesToEdit.add(gameEntity);
                 LOGGER.debug("Existing Game --> {}", gameEntity.getFullName());
             }
