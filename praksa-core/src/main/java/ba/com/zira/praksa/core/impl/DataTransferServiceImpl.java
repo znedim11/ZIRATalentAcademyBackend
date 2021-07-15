@@ -378,7 +378,6 @@ public class DataTransferServiceImpl implements DataTransferService {
 
         for (int page = 1; page <= numOfPages; page++) {
             gameHUSToGameHUT(numOfRecords, page, platformEntities, companyEntites, gameEntites);
-            // gameHUSToGameHUT(numOfRecords, page);
         }
 
         LocalDateTime endTime = Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -523,7 +522,7 @@ public class DataTransferServiceImpl implements DataTransferService {
                     String publisherName = publisher == null ? null : publisher.getName();
                     String platformName = platform == null ? null : platform.getFullName();
 
-                    List<ReleaseEntity> releaseList = releases.stream().filter(r -> r.getGame().getId() == game.getId())
+                    List<ReleaseEntity> releaseList = releases.stream().filter(r -> r.getGame().getId().equals(game.getId()))
                             .collect(Collectors.toList());
 
                     List<ReleaseEntity> filteredReleases = releaseList.stream().filter(isSame(developerName, publisherName, platformName))
