@@ -32,7 +32,7 @@ public class CompanyEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "HUT_COMPANY_ID_GENERATOR", sequenceName = "HUT_COMPANY_SEQ", allocationSize = 1)
+    @SequenceGenerator(name = "HUT_COMPANY_ID_GENERATOR", sequenceName = "HUT_COMPANY_SEQ", allocationSize = 50)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HUT_COMPANY_ID_GENERATOR")
     private Long id;
 
