@@ -4,7 +4,9 @@ public enum ReleaseType {
     /** GAME */
     GAME("GAME"),
     /** PLATFORM */
-    PLATFORM("PLATFORM");
+    PLATFORM("PLATFORM"),
+    /** BOTH */
+    BOTH("BOTH");
 
     private final String value;
 

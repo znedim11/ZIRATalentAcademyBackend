@@ -129,8 +129,10 @@ public class ReleaseServiceImpl implements ReleaseService {
         LocalDateTime localDate = LocalDateTime.now();
         LocalDateTime startDate = request.getEntity().getStartDate() == null ? localDate : request.getEntity().getStartDate();
         LocalDateTime endDate = request.getEntity().getEndDate() == null ? localDate : request.getEntity().getEndDate();
+        String releaseType = request.getEntity().getReleaseType();
 
-        List<ReleaseEntity> listOfReleasesInRange = releaseDAO.getReleasesPerTimetable(startDate, endDate);
+        List<ReleaseEntity> listOfReleasesInRange = releaseDAO.getReleasesPerTimetable(startDate, endDate, releaseType);
+
         List<IntervalHelper> helpers = createSplitHelpers(request.getEntity().getTimeSegment(), startDate, endDate);
 
         releasesByTimetableResponse.setMapOfReleasesByIntervals(mapReleaseEntitiesToIntervals(helpers, listOfReleasesInRange));
