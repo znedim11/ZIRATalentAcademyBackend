@@ -94,7 +94,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         final ReleaseEntity releaseEntity = releaseDAO.findByPK(request.getEntity());
 
-        return new PayloadResponse<>(request, ResponseCode.OK, releaseMapper.entityToDto(releaseEntity));
+        return new PayloadResponse<>(request, ResponseCode.OK, releaseMapper.releaseEntityToRelease(releaseEntity));
     }
 
     @Override

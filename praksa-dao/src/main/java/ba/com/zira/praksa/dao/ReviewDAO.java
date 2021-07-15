@@ -7,6 +7,7 @@ import javax.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 
 import ba.com.zira.commons.dao.AbstractDAO;
+import ba.com.zira.praksa.api.model.enums.ReviewType;
 import ba.com.zira.praksa.api.model.review.CompleteReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewResponse;
 import ba.com.zira.praksa.api.model.review.ReviewSearchRequest;
@@ -19,12 +20,13 @@ public class ReviewDAO extends AbstractDAO<ReviewEntity, Long> {
 
         StringBuilder jpql = new StringBuilder();
         jpql.append(
-                "SELECT DISTINCT new ba.com.zira.praksa.api.model.review.ReviewResponse(g.fullName, g.id, p.abbriviation, p.id, r.title, r.createdBy, rg.grade, r.id)");
+                "SELECT DISTINCT new ba.com.zira.praksa.api.model.review.ReviewResponse(g.fullName, g.id, p.fullName, p.id, r.title , r.createdBy, rg.grade , r.id, ");
+        jpql.append(String.format("'%s' )", ReviewType.INTERNAL.getValue()));
         jpql.append(" FROM ReviewEntity r");
-        jpql.append(" JOIN GameEntity g on g.id=r.game.id");
-        jpql.append(" JOIN ReleaseEntity re on re.game.id=g.id");
-        jpql.append(" JOIN PlatformEntity p on p.id =re.platform.id");
-        jpql.append(" JOIN ReviewGradeEntity rg on rg.review.id =r.id");
+        jpql.append(" LEFT JOIN GameEntity g on g.id=r.game.id");
+        jpql.append(" LEFT JOIN ReleaseEntity re on re.game.id=g.id");
+        jpql.append(" LEFT JOIN PlatformEntity p on p.id =re.platform.id");
+        jpql.append(" LEFT JOIN ReviewGradeEntity rg on rg.review.id =r.id");
         jpql.append(" WHERE 1=1");
 
         jpql.append(searchRequestCheck(searchRequest));
@@ -121,10 +123,10 @@ public class ReviewDAO extends AbstractDAO<ReviewEntity, Long> {
             jpql.append(" AND rg.grade BETWEEN :lowestRating AND :highestRating");
         }
         if (searchRequest.getLowestRating() == null && searchRequest.getHighestRating() != null) {
-            jpql.append(" AND rg.grade < :highestRating");
+            jpql.append(" AND rg.grade <= :highestRating");
         }
         if (searchRequest.getLowestRating() != null && searchRequest.getHighestRating() == null) {
-            jpql.append(" AND rg.grade > :lowestRating");
+            jpql.append(" AND rg.grade >= :lowestRating");
         }
 
         return jpql;
@@ -150,5 +152,15 @@ public class ReviewDAO extends AbstractDAO<ReviewEntity, Long> {
         }
 
         return query.getResultList();
+    }
+
+    public Long getNumberOfReviewsByReviewer(final String reviewer) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT COUNT(r) FROM ReviewEntity r WHERE r.createdBy = :reviewer");
+
+        TypedQuery<Long> query = entityManager.createQuery(stringBuilder.toString(), Long.class);
+        query.setParameter("reviewer", reviewer);
+
+        return query.getSingleResult();
     }
 }

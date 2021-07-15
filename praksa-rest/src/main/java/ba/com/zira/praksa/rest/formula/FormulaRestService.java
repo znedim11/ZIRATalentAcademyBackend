@@ -3,6 +3,7 @@
  */
 package ba.com.zira.praksa.rest.formula;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.FormulaService;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.formula.FormulaCreateRequest;
 import ba.com.zira.praksa.api.model.formula.FormulaResponse;
 import ba.com.zira.praksa.api.model.formula.FormulaUpdateRequest;
@@ -51,7 +55,7 @@ public class FormulaRestService {
         return formulaService.find(request);
     }
 
-    @ApiOperation(value = "Get Concept by Id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Formula by Id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}")
     public PayloadResponse<FormulaResponse> findById(@PathVariable final Long id) throws ApiException {
 
@@ -61,13 +65,13 @@ public class FormulaRestService {
         return formulaService.findById(request);
     }
 
-    @ApiOperation(value = "Create Concept", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Create Formula", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/create")
     public PayloadResponse<FormulaResponse> create(@RequestBody EntityRequest<FormulaCreateRequest> request) throws ApiException {
         return formulaService.create(request);
     }
 
-    @ApiOperation(value = "Update Concept", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Update Formula", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PutMapping(value = "/{id}")
     public PayloadResponse<FormulaResponse> update(@PathVariable final Long id,
             @RequestBody final EntityRequest<FormulaUpdateRequest> request) throws ApiException {
@@ -91,4 +95,25 @@ public class FormulaRestService {
         return formulaService.getNumberOfReviewsGamesByFormula(request);
     }
 
+    @ApiOperation(value = "Get Formula names by Ids.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/lovs")
+    public ListPayloadResponse<LoV> getLoVs(@RequestParam(required = false) final List<Long> ids) throws ApiException {
+
+        final ListRequest<Long> request = new ListRequest<>();
+        request.setList(ids);
+
+        return formulaService.getLoVs(request);
+    }
+
+    @ApiOperation(value = "Get grade types by Formula.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/grades")
+    public ListPayloadResponse<String> getGradesByFormula(@PathVariable final Long id) throws ApiException {
+
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+
+        return formulaService.getGradesByFormula(request);
+    }
 }

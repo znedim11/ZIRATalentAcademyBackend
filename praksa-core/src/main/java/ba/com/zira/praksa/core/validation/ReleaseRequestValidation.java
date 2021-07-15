@@ -7,19 +7,9 @@ import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.response.ValidationResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
-import ba.com.zira.praksa.api.ReleaseService;
 import ba.com.zira.praksa.api.model.release.ReleaseRequest;
 import ba.com.zira.praksa.api.model.release.ReleasesByTimetableRequest;
 import lombok.AllArgsConstructor;
-
-/**
- * SampleRequestValidation is used for validation of {@link ReleaseService}
- * requests.<br>
- *
- *
- * @author zira
- *
- */
 
 @Component("releaseRequestValidation")
 @AllArgsConstructor

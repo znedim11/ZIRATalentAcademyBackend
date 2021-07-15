@@ -14,6 +14,7 @@ import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.dao.model.LocationEntity;
+import ba.com.zira.praksa.dao.model.MediaStoreEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
 
@@ -148,4 +149,16 @@ public class ConceptDAO extends AbstractDAO<ConceptEntity, Long> {
         return query.getResultList().isEmpty() ? null : query.getResultList().get(0);
     }
 
+    public MediaStoreEntity getCoverByConcept(final Long conceptId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(
+                "SELECT mse FROM MediaStoreEntity mse, MediaEntity me WHERE me.id = mse.media.id AND me.objectId = :objectId AND me.objectType = :objectType AND mse.type = :type");
+
+        TypedQuery<MediaStoreEntity> query = entityManager.createQuery(stringBuilder.toString(), MediaStoreEntity.class);
+        query.setParameter("objectId", conceptId);
+        query.setParameter("objectType", "CONCEPT");
+        query.setParameter("type", "COVER_IMAGE");
+
+        return query.getResultList().stream().findFirst().orElse(null);
+    }
 }

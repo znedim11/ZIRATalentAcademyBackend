@@ -9,14 +9,15 @@ import lombok.Data;
 
 @Data
 public class CompleteCharacterResponse implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
-    private String fullName;
+    private Long id;
+    private String name;
     private String realName;
+    private String aliases;
     private String gender;
     private LocalDateTime dob;
-    private Long characterId;
+    private LocalDateTime dod;
     private String outlineText;
     private String information;
     private String imageUrl;
