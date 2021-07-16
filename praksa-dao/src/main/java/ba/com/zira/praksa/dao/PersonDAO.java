@@ -7,6 +7,7 @@ import javax.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 
 import ba.com.zira.commons.dao.AbstractDAO;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
@@ -60,4 +61,17 @@ public class PersonDAO extends AbstractDAO<PersonEntity, Long> {
 
     }
 
+    public List<LoV> getLoVs(List<Long> list) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(String.format(
+                "SELECT new ba.com.zira.praksa.api.model.LoV(p.id, CONCAT(p.firstName,' ',p.lastName)) FROM PersonEntity p %s",
+                list != null ? "WHERE p.id IN :list" : ""));
+
+        TypedQuery<LoV> query = entityManager.createQuery(stringBuilder.toString(), LoV.class);
+        if (list != null) {
+            query.setParameter("list", list);
+        }
+
+        return query.getResultList();
+    }
 }
