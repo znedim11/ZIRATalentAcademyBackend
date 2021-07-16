@@ -1,19 +1,23 @@
 package ba.com.zira.praksa.core.impl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.ObjectService;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.object.ObjectCreateRequest;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.object.ObjectUpdateRequest;
@@ -109,6 +113,20 @@ public class ObjectServiceImpl implements ObjectService {
 
         objectDAO.removeByPK(request.getEntity());
         return new PayloadResponse<>(request, ResponseCode.OK, "Object deleted!");
+    }
+
+    @Override
+    public ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException {
+        if (request.getList() != null) {
+            for (Long item : request.getList()) {
+                EntityRequest<Long> longRequest = new EntityRequest<>(item, request);
+                objectRequestValidation.validateObjectExists(longRequest, "validateAbstractRequest");
+            }
+        }
+
+        List<LoV> loVs = objectDAO.getLoVs(request.getList());
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
     }
 
 }

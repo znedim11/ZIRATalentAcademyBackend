@@ -1,5 +1,7 @@
 package ba.com.zira.praksa.rest.location;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,10 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.LocationService;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.location.Location;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,12 +33,12 @@ import io.swagger.annotations.ApiOperation;
 public class LocationRestService {
 
     @Autowired
-    private LocationService sampleService;
+    private LocationService locationService;
 
     @ApiOperation(value = "Create Location", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/create")
     public PayloadResponse<Location> createLocation(@RequestBody EntityRequest<Location> request) throws ApiException {
-        return sampleService.create(request);
+        return locationService.create(request);
     }
 
     @ApiOperation(value = "Delete Location by Id", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -42,7 +47,7 @@ public class LocationRestService {
         final EntityRequest<Long> request = new EntityRequest<>();
         request.setEntity(id);
 
-        sampleService.delete(request);
+        locationService.delete(request);
     }
 
     @ApiOperation(value = "Find Locations", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -51,7 +56,7 @@ public class LocationRestService {
 
         SearchRequest<String> request = new SearchRequest<>();
         request.setPagination(pagination);
-        return sampleService.find(request);
+        return locationService.find(request);
     }
 
     @ApiOperation(value = "Get Location by Id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -61,7 +66,7 @@ public class LocationRestService {
         final SearchRequest<Long> request = new SearchRequest<>();
         request.setEntity(id);
 
-        return sampleService.findById(request);
+        return locationService.findById(request);
     }
 
     @ApiOperation(value = "Update Location", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -72,7 +77,18 @@ public class LocationRestService {
         final Location sample = request.getEntity();
         sample.setId(Long.decode(id));
 
-        return sampleService.update(request);
+        return locationService.update(request);
+    }
+
+    @ApiOperation(value = "Get Location names by Ids.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/lovs")
+    public ListPayloadResponse<LoV> getLoVs(@RequestParam(required = false) final List<Long> ids) throws ApiException {
+
+        final ListRequest<Long> request = new ListRequest<>();
+        request.setList(ids);
+
+        return locationService.getLoVs(request);
     }
 
 }
