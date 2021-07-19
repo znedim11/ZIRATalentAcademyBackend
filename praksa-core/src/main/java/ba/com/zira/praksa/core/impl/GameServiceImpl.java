@@ -20,9 +20,12 @@ import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.GameService;
+import ba.com.zira.praksa.api.MediaService;
+import ba.com.zira.praksa.api.MediaStoreService;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.character.CharacterResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
+import ba.com.zira.praksa.api.model.enums.ObjectType;
 import ba.com.zira.praksa.api.model.feature.FeatureResponse;
 import ba.com.zira.praksa.api.model.game.GameCreateRequest;
 import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
@@ -31,6 +34,8 @@ import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureResponse;
 import ba.com.zira.praksa.api.model.location.Location;
+import ba.com.zira.praksa.api.model.media.CreateMediaRequest;
+import ba.com.zira.praksa.api.model.media.MediaRetrivalRequest;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
 import ba.com.zira.praksa.api.model.platform.PlatformResponse;
@@ -40,12 +45,15 @@ import ba.com.zira.praksa.core.validation.GameRequestValidation;
 import ba.com.zira.praksa.dao.FeatureDAO;
 import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.GameFeatureDAO;
+import ba.com.zira.praksa.dao.MediaDAO;
+import ba.com.zira.praksa.dao.MediaStoreDAO;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.FeatureEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.dao.model.GameFeatureEntity;
 import ba.com.zira.praksa.dao.model.LocationEntity;
+import ba.com.zira.praksa.dao.model.MediaStoreEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
 import ba.com.zira.praksa.dao.model.ReleaseEntity;
@@ -72,6 +80,8 @@ public class GameServiceImpl implements GameService {
     GameDAO gameDAO;
     FeatureDAO featureDAO;
     GameFeatureDAO gameFeatureDAO;
+    MediaStoreDAO mediaStoreDAO;
+    MediaDAO mediaDAO;
 
     GameMapper gameMapper;
     ConceptMapper conceptMapper;
@@ -84,11 +94,15 @@ public class GameServiceImpl implements GameService {
     ReleaseMapper releaseMapper;
     PlatformMapper platformMapper;
 
+    MediaStoreService mediaStoreService;
+    MediaService mediaService;
+
     public GameServiceImpl(RequestValidator requestValidator, GameRequestValidation gameRequestValidation,
             FeatureRequestValidation featureRequestValidation, GameDAO gameDAO, FeatureDAO featureDAO, GameFeatureDAO gameFeatureDAO,
             GameMapper gameMapper, ConceptMapper conceptMapper, PersonMapper personMapper, ObjectMapper objectMapper,
             CharacterMapper characterMapper, LocationMapper locationMapper, FeatureMapper featureMapper,
-            GameFeatureMapper gameFeatureMapper, ReleaseMapper releaseMapper, PlatformMapper platformMapper) {
+            GameFeatureMapper gameFeatureMapper, ReleaseMapper releaseMapper, PlatformMapper platformMapper,
+            MediaStoreService mediaStoreService, MediaService mediaService, MediaStoreDAO mediaStoreDAO, MediaDAO mediaDAO) {
         super();
         this.requestValidator = requestValidator;
         this.gameRequestValidation = gameRequestValidation;
@@ -106,6 +120,10 @@ public class GameServiceImpl implements GameService {
         this.gameFeatureMapper = gameFeatureMapper;
         this.releaseMapper = releaseMapper;
         this.platformMapper = platformMapper;
+        this.mediaStoreService = mediaStoreService;
+        this.mediaService = mediaService;
+        this.mediaStoreDAO = mediaStoreDAO;
+        this.mediaDAO = mediaDAO;
     }
 
     @Override
@@ -123,14 +141,30 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
+    @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<GameResponse> create(EntityRequest<GameCreateRequest> request) throws ApiException {
         requestValidator.validate(request);
-        GameEntity entity = gameMapper.dtoToEntity(request.getEntity());
+
+        GameCreateRequest requestEntity = request.getEntity();
+        GameEntity entity = gameMapper.dtoToEntity(requestEntity);
+        if (requestEntity.getDlcGameId() != null) {
+            GameEntity parentGame = gameDAO.findByPK(requestEntity.getDlcGameId());
+            entity.setParentGame(parentGame);
+        }
 
         entity.setCreated(LocalDateTime.now());
         entity.setCreatedBy(request.getUserId());
 
-        gameDAO.persist(entity);
+        GameEntity createdEntity = gameDAO.persist(entity);
+
+        if (requestEntity.getImageCreateRequest() != null && requestEntity.getImageCreateRequest().getImageData() != null
+                && requestEntity.getImageCreateRequest().getImageName() != null) {
+            CreateMediaRequest mediaRequest = new CreateMediaRequest(ObjectType.GAME.getValue(), createdEntity.getId(),
+                    requestEntity.getImageCreateRequest().getImageData(), requestEntity.getImageCreateRequest().getImageName(), "IMAGE",
+                    "COVER_IMAGE");
+
+            mediaService.saveMedia(new EntityRequest<>(mediaRequest, request));
+        }
 
         GameResponse response = gameMapper.gameEntityToGame(entity);
         return new PayloadResponse<>(request, ResponseCode.OK, response);
@@ -141,15 +175,24 @@ public class GameServiceImpl implements GameService {
         requestValidator.validate(request);
 
         final GameEntity gameEntity = gameDAO.findByPK(request.getEntity());
-        final GameResponse game = gameMapper.gameEntityToGame(gameEntity);
+        final GameResponse gameResponse = gameMapper.gameEntityToGame(gameEntity);
+
+        MediaRetrivalRequest mrr = new MediaRetrivalRequest();
+        mrr.setObjectId(gameResponse.getId());
+        mrr.setObjectType(ObjectType.GAME.getValue());
+        mrr.setMediaType("COVER_IMAGE");
+        gameResponse.setImageUrl(mediaStoreService.getImageUrl(new EntityRequest<>(mrr, request)).getPayload().get(0));
+
         if (gameEntity.getFranchise() != null) {
-            game.setFranchiseId(gameEntity.getFranchise().getId());
+            gameResponse.setFranchiseId(gameEntity.getFranchise().getId());
         }
-        if (gameEntity.getDlc().equals("1")) {
-            game.setParentGameId(gameEntity.getParentGame().getId());
+        if (gameEntity.getDlc() != null) {
+            if (gameEntity.getDlc().equals("1")) {
+                gameResponse.setDlcGameId(gameEntity.getParentGame().getId());
+            }
         }
 
-        return new PayloadResponse<>(request, ResponseCode.OK, game);
+        return new PayloadResponse<>(request, ResponseCode.OK, gameResponse);
     }
 
     @Transactional(rollbackFor = ApiException.class)
@@ -157,9 +200,29 @@ public class GameServiceImpl implements GameService {
     public PayloadResponse<GameResponse> update(final EntityRequest<GameUpdateRequest> request) throws ApiException {
         requestValidator.validate(request);
 
-        final GameUpdateRequest game = request.getEntity();
-        GameEntity gameEntity = gameDAO.findByPK(game.getId());
-        gameMapper.updateForGameUpdate(game, gameEntity);
+        final GameUpdateRequest gameRequest = request.getEntity();
+        GameEntity gameEntity = gameDAO.findByPK(gameRequest.getId());
+        gameMapper.updateForGameUpdate(gameRequest, gameEntity);
+
+        gameEntity.setModified(LocalDateTime.now());
+        gameEntity.setModifiedBy(request.getUserId());
+
+        MediaStoreEntity mse = gameDAO.getCoverByGame(request.getEntity().getId());
+
+        if (mse != null) {
+            Long mediaId = mse.getMedia().getId();
+            mediaStoreDAO.remove(mse);
+            mediaDAO.removeByPK(mediaId);
+        }
+
+        if (gameRequest.getImageCreateRequest() != null && gameRequest.getImageCreateRequest().getImageData() != null
+                && gameRequest.getImageCreateRequest().getImageName() != null) {
+            CreateMediaRequest mediaRequest = new CreateMediaRequest(ObjectType.GAME.getValue(), gameEntity.getId(),
+                    gameRequest.getImageCreateRequest().getImageData(), gameRequest.getImageCreateRequest().getImageName(), "IMAGE",
+                    "COVER_IMAGE");
+
+            mediaService.saveMedia(new EntityRequest<>(mediaRequest, request));
+        }
 
         gameDAO.merge(gameEntity);
 

@@ -12,6 +12,8 @@ import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.GameService;
+import ba.com.zira.praksa.api.MediaService;
+import ba.com.zira.praksa.api.MediaStoreService;
 import ba.com.zira.praksa.api.model.game.Game;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.core.impl.GameServiceImpl;
@@ -20,6 +22,8 @@ import ba.com.zira.praksa.core.validation.GameRequestValidation;
 import ba.com.zira.praksa.dao.FeatureDAO;
 import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.GameFeatureDAO;
+import ba.com.zira.praksa.dao.MediaDAO;
+import ba.com.zira.praksa.dao.MediaStoreDAO;
 import ba.com.zira.praksa.mapper.CharacterMapper;
 import ba.com.zira.praksa.mapper.ConceptMapper;
 import ba.com.zira.praksa.mapper.FeatureMapper;
@@ -46,10 +50,14 @@ public class SampleServiceTest extends BasicTestConfiguration {
     private GameDAO gameDAO;
     private FeatureDAO featureDAO;
     private GameFeatureDAO gameFeatureDAO;
+    private MediaStoreDAO mediaStoreDAO;
+    private MediaDAO mediaDAO;
     private RequestValidator requestValidator;
     private GameRequestValidation sampleRequestValidation;
     private FeatureRequestValidation featureRequestValidation;
     private GameService gameService;
+    private MediaStoreService mediaStoreService;
+    private MediaService mediaService;
 
     private ConceptMapper conceptMapper;
     private PersonMapper personMapper;
@@ -76,7 +84,7 @@ public class SampleServiceTest extends BasicTestConfiguration {
         this.releaseMapper = Mockito.mock(ReleaseMapper.class);
         this.gameService = new GameServiceImpl(requestValidator, sampleRequestValidation, featureRequestValidation, gameDAO, featureDAO,
                 gameFeatureDAO, sampleMapper, conceptMapper, personMapper, objectMapper, characterMapper, locationMapper, featureMapper,
-                gameFeatureMapper, releaseMapper, platformMapper);
+                gameFeatureMapper, releaseMapper, platformMapper, mediaStoreService, mediaService, mediaStoreDAO, mediaDAO);
     }
 
     @Test

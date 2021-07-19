@@ -16,6 +16,7 @@ import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.dao.model.LocationEntity;
+import ba.com.zira.praksa.dao.model.MediaStoreEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
 import ba.com.zira.praksa.dao.model.PlatformEntity;
@@ -165,5 +166,18 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         TypedQuery<LoV> query = entityManager.createQuery(jpql, LoV.class).setParameter("ids", ids);
         List<LoV> lovs = query.getResultList();
         return lovs.stream().collect(Collectors.toMap(LoV::getId, LoV::getName));
+    }
+
+    public MediaStoreEntity getCoverByGame(final Long gameId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(
+                "SELECT mse FROM MediaStoreEntity mse, MediaEntity me WHERE me.id = mse.media.id AND me.objectId = :objectId AND me.objectType = :objectType AND mse.type = :type");
+
+        TypedQuery<MediaStoreEntity> query = entityManager.createQuery(stringBuilder.toString(), MediaStoreEntity.class);
+        query.setParameter("objectId", gameId);
+        query.setParameter("objectType", "GAME");
+        query.setParameter("type", "COVER_IMAGE");
+
+        return query.getResultList().stream().findFirst().orElse(null);
     }
 }
