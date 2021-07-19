@@ -161,4 +161,28 @@ public class ConceptDAO extends AbstractDAO<ConceptEntity, Long> {
 
         return query.getResultList().stream().findFirst().orElse(null);
     }
+
+    public List<LoV> getLoVsNotConnectedTo(String field, String idField, Long id) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append(String.format(
+                "SELECT DISTINCT c.id FROM ConceptEntity c LEFT OUTER JOIN LinkMapEntity lm ON lm.concept.id= c.id WHERE lm.%s.%s = :id",
+                field, idField));
+
+        TypedQuery<Long> listQuery = entityManager.createQuery(stringBuilder.toString(), Long.class);
+        listQuery.setParameter("id", id);
+        List<Long> list = listQuery.getResultList();
+
+        stringBuilder.setLength(0);
+        stringBuilder.append(String.format("SELECT new ba.com.zira.praksa.api.model.LoV(c.id, c.name) FROM ConceptEntity c %s",
+                !list.isEmpty() ? "WHERE c.id NOT IN :list" : ""));
+
+        TypedQuery<LoV> query = entityManager.createQuery(stringBuilder.toString(), LoV.class);
+        if (!list.isEmpty()) {
+            query.setParameter("list", list);
+        }
+
+        return query.getResultList();
+    }
+
 }

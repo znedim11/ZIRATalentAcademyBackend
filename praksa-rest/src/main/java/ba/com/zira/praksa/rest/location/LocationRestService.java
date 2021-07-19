@@ -91,4 +91,15 @@ public class LocationRestService {
         return locationService.getLoVs(request);
     }
 
+    @ApiOperation(value = "Get Locations not Connected to ...", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/lovnotnonnected")
+    public ListPayloadResponse<LoV> getLoVNotConnectedTo(@RequestParam(required = true) final String type,
+            @RequestParam(required = true) final Long id) throws ApiException {
+
+        final EntityRequest<LoV> request = new EntityRequest<>();
+        request.setEntity(new LoV(id, type));
+
+        return locationService.getLoVsNotConnectedTo(request);
+    }
 }

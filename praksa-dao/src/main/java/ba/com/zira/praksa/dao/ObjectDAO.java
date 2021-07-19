@@ -24,4 +24,27 @@ public class ObjectDAO extends AbstractDAO<ObjectEntity, Long> {
 
         return query.getResultList();
     }
+
+    public List<LoV> getLoVsNotConnectedTo(String field, String idField, Long id) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append(String.format(
+                "SELECT DISTINCT o.id FROM ObjectEntity o LEFT OUTER JOIN LinkMapEntity lm ON lm.object.id = o.id WHERE lm.%s.%s = :id",
+                field, idField));
+
+        TypedQuery<Long> listQuery = entityManager.createQuery(stringBuilder.toString(), Long.class);
+        listQuery.setParameter("id", id);
+        List<Long> list = listQuery.getResultList();
+
+        stringBuilder.setLength(0);
+        stringBuilder.append(String.format("SELECT new ba.com.zira.praksa.api.model.LoV(o.id, o.name) FROM ObjectEntity o %s",
+                !list.isEmpty() ? "WHERE o.id NOT IN :list" : ""));
+
+        TypedQuery<LoV> query = entityManager.createQuery(stringBuilder.toString(), LoV.class);
+        if (!list.isEmpty()) {
+            query.setParameter("list", list);
+        }
+
+        return query.getResultList();
+    }
 }

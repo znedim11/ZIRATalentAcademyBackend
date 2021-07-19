@@ -102,4 +102,6 @@ public interface ObjectService {
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
 
     public ListPayloadResponse<LoV> getLoVs(ListRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<LoV> getLoVsNotConnectedTo(EntityRequest<LoV> request) throws ApiException;
 }

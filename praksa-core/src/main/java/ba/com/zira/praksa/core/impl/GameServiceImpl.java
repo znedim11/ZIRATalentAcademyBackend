@@ -23,6 +23,7 @@ import ba.com.zira.praksa.api.GameService;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.character.CharacterResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
+import ba.com.zira.praksa.api.model.enums.ObjectType;
 import ba.com.zira.praksa.api.model.feature.FeatureResponse;
 import ba.com.zira.praksa.api.model.game.GameCreateRequest;
 import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
@@ -46,13 +47,19 @@ import ba.com.zira.praksa.dao.GameFeatureDAO;
 import ba.com.zira.praksa.dao.PlatformDAO;
 import ba.com.zira.praksa.dao.ReleaseDAO;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
+import ba.com.zira.praksa.dao.model.CharacterEntity_;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
+import ba.com.zira.praksa.dao.model.ConceptEntity_;
 import ba.com.zira.praksa.dao.model.FeatureEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.dao.model.GameFeatureEntity;
+import ba.com.zira.praksa.dao.model.LinkMapEntity_;
 import ba.com.zira.praksa.dao.model.LocationEntity;
+import ba.com.zira.praksa.dao.model.LocationEntity_;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
+import ba.com.zira.praksa.dao.model.ObjectEntity_;
 import ba.com.zira.praksa.dao.model.PersonEntity;
+import ba.com.zira.praksa.dao.model.PersonEntity_;
 import ba.com.zira.praksa.dao.model.ReleaseEntity;
 import ba.com.zira.praksa.mapper.CharacterMapper;
 import ba.com.zira.praksa.mapper.ConceptMapper;
@@ -336,4 +343,36 @@ public class GameServiceImpl implements GameService {
         return new PayloadResponse<>(request, ResponseCode.OK, dlcAnalysisReport);
     }
 
+    @Override
+    public ListPayloadResponse<LoV> getLoVsNotConnectedTo(final EntityRequest<LoV> request) throws ApiException {
+        requestValidator.validate(request);
+
+        String field = null;
+        String idField = null;
+        Long id = request.getEntity().getId();
+
+        if (ObjectType.CHARACTER.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.character.getName();
+            idField = CharacterEntity_.id.getName();
+        } else if (ObjectType.CONCEPT.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.concept.getName();
+            idField = ConceptEntity_.id.getName();
+        } else if (ObjectType.LOCATION.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.location.getName();
+            idField = LocationEntity_.id.getName();
+        } else if (ObjectType.OBJECT.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.object.getName();
+            idField = ObjectEntity_.id.getName();
+        } else if (ObjectType.PERSON.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.person.getName();
+            idField = PersonEntity_.id.getName();
+        }
+
+        List<LoV> loVs = null;
+        if (field != null) {
+            loVs = gameDAO.getLoVsNotConnectedTo(field, idField, id);
+        }
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
+    }
 }

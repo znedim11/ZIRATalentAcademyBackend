@@ -45,12 +45,18 @@ import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.MediaDAO;
 import ba.com.zira.praksa.dao.MediaStoreDAO;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
+import ba.com.zira.praksa.dao.model.CharacterEntity_;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
+import ba.com.zira.praksa.dao.model.GameEntity_;
+import ba.com.zira.praksa.dao.model.LinkMapEntity_;
 import ba.com.zira.praksa.dao.model.LocationEntity;
+import ba.com.zira.praksa.dao.model.LocationEntity_;
 import ba.com.zira.praksa.dao.model.MediaStoreEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
+import ba.com.zira.praksa.dao.model.ObjectEntity_;
 import ba.com.zira.praksa.dao.model.PersonEntity;
+import ba.com.zira.praksa.dao.model.PersonEntity_;
 import ba.com.zira.praksa.dao.model.ReleaseEntity;
 import ba.com.zira.praksa.mapper.CharacterMapper;
 import ba.com.zira.praksa.mapper.ConceptMapper;
@@ -351,6 +357,39 @@ public class ConceptServiceImpl implements ConceptService {
         LocalDateTime releaseDate = conceptDAO.getFirstReleaseDateByConcept(request.getEntity());
 
         return new PayloadResponse<>(request, ResponseCode.OK, releaseDate);
+    }
+
+    @Override
+    public ListPayloadResponse<LoV> getLoVsNotConnectedTo(final EntityRequest<LoV> request) throws ApiException {
+        requestValidator.validate(request);
+
+        String field = null;
+        String idField = null;
+        Long id = request.getEntity().getId();
+
+        if (ObjectType.CHARACTER.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.character.getName();
+            idField = CharacterEntity_.id.getName();
+        } else if (ObjectType.GAME.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.game.getName();
+            idField = GameEntity_.id.getName();
+        } else if (ObjectType.LOCATION.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.location.getName();
+            idField = LocationEntity_.id.getName();
+        } else if (ObjectType.OBJECT.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.object.getName();
+            idField = ObjectEntity_.id.getName();
+        } else if (ObjectType.PERSON.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.person.getName();
+            idField = PersonEntity_.id.getName();
+        }
+
+        List<LoV> loVs = null;
+        if (field != null) {
+            loVs = conceptDAO.getLoVsNotConnectedTo(field, idField, id);
+        }
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
     }
 
 }

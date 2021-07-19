@@ -186,4 +186,27 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         TypedQuery<Long> query = entityManager.createQuery(jpql.toString(), Long.class);
         return query.getSingleResult();
     }
+
+    public List<LoV> getLoVsNotConnectedTo(String field, String idField, Long id) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append(String.format(
+                "SELECT DISTINCT g.id FROM GameEntity g LEFT OUTER JOIN LinkMapEntity lm ON lm.game.id= g.id WHERE lm.%s.%s = :id", field,
+                idField));
+
+        TypedQuery<Long> listQuery = entityManager.createQuery(stringBuilder.toString(), Long.class);
+        listQuery.setParameter("id", id);
+        List<Long> list = listQuery.getResultList();
+
+        stringBuilder.setLength(0);
+        stringBuilder.append(String.format("SELECT new ba.com.zira.praksa.api.model.LoV(g.id, g.name) FROM GameEntity g %s",
+                !list.isEmpty() ? "WHERE g.id NOT IN :list" : ""));
+
+        TypedQuery<LoV> query = entityManager.createQuery(stringBuilder.toString(), LoV.class);
+        if (!list.isEmpty()) {
+            query.setParameter("list", list);
+        }
+
+        return query.getResultList();
+    }
 }

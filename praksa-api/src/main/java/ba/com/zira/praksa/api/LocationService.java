@@ -96,4 +96,6 @@ public interface LocationService {
     PayloadResponse<Location> update(final EntityRequest<Location> request) throws ApiException;
 
     ListPayloadResponse<LoV> getLoVs(ListRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<LoV> getLoVsNotConnectedTo(EntityRequest<LoV> request) throws ApiException;
 }

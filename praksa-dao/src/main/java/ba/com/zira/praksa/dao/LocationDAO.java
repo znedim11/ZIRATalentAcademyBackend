@@ -25,4 +25,27 @@ public class LocationDAO extends AbstractDAO<LocationEntity, Long> {
         return query.getResultList();
     }
 
+    public List<LoV> getLoVsNotConnectedTo(String field, String idField, Long id) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append(String.format(
+                "SELECT DISTINCT l.id FROM LocationEntity l LEFT OUTER JOIN LinkMapEntity lm ON lm.location.id= l.id WHERE lm.%s.%s = :id",
+                field, idField));
+
+        TypedQuery<Long> listQuery = entityManager.createQuery(stringBuilder.toString(), Long.class);
+        listQuery.setParameter("id", id);
+        List<Long> list = listQuery.getResultList();
+
+        stringBuilder.setLength(0);
+        stringBuilder.append(String.format("SELECT new ba.com.zira.praksa.api.model.LoV(l.id, l.name) FROM LocationEntity l %s",
+                !list.isEmpty() ? "WHERE l.id NOT IN :list" : ""));
+
+        TypedQuery<LoV> query = entityManager.createQuery(stringBuilder.toString(), LoV.class);
+        if (!list.isEmpty()) {
+            query.setParameter("list", list);
+        }
+
+        return query.getResultList();
+    }
+
 }
