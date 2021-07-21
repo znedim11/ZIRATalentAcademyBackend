@@ -21,5 +21,6 @@ public class GameResponse implements Serializable {
     private String outlineText;
     private Long franchiseId;
     private GameResponse dlcGame;
+    private Long dlcGameId;
     private String imageUrl;
 }
