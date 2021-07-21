@@ -80,7 +80,7 @@ public class ReleaseRestService {
     public PayloadResponse<ReleasesByTimetableResponse> getReleasesByTimetable(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate endDate,
-            @RequestParam(required = false) final String timeSegment) throws ApiException {
+            @RequestParam(required = false) final String timeSegment, final String releaseType) throws ApiException {
 
         final EntityRequest<ReleasesByTimetableRequest> request = new EntityRequest<>();
         ReleasesByTimetableRequest releasesByTimetableRequest = new ReleasesByTimetableRequest();
@@ -88,6 +88,7 @@ public class ReleaseRestService {
         releasesByTimetableRequest.setStartDate(startDate != null ? startDate.atStartOfDay() : null);
         releasesByTimetableRequest.setEndDate(endDate != null ? endDate.atStartOfDay() : null);
         releasesByTimetableRequest.setTimeSegment(timeSegment);
+        releasesByTimetableRequest.setReleaseType(releaseType);
 
         request.setEntity(releasesByTimetableRequest);
         User user = new User("System");

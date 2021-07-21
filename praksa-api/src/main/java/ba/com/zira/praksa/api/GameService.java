@@ -18,6 +18,7 @@ import ba.com.zira.praksa.api.model.game.GameCreateRequest;
 import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
+import ba.com.zira.praksa.api.model.game.dlc.DlcAnalysisReport;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureResponse;
 import ba.com.zira.praksa.api.model.location.Location;
@@ -168,5 +169,7 @@ public interface GameService {
     PayloadResponse<String> removeFeature(EntityRequest<String> request) throws ApiException;
 
     PayloadResponse<GameOverviewResponse> getOverview(final EntityRequest<Long> request) throws ApiException;
+
+    public PayloadResponse<DlcAnalysisReport> dlcAnalysisReport(final EmptyRequest request) throws ApiException;
 
 }

@@ -12,6 +12,7 @@ import ba.com.zira.commons.dao.AbstractDAO;
 import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.game.GameCharacterResponse;
+import ba.com.zira.praksa.api.model.game.dlc.DlcGame;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
@@ -168,6 +169,30 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         return lovs.stream().collect(Collectors.toMap(LoV::getId, LoV::getName));
     }
 
+    public List<DlcGame> getDlcGames(String dlc) {
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("SELECT new ba.com.zira.praksa.api.model.game.dlc.DlcGame(game.id, game.fullName, ");
+        jpql.append("(SELECT COUNT(*) FROM GameEntity dlc WHERE dlc.parentGame = game.id), MIN(r.releaseDate)) ");
+        jpql.append("FROM GameEntity game ");
+        jpql.append("LEFT JOIN ReleaseEntity r ON game.id = r.game.id ");
+        jpql.append("WHERE game.dlc like :dlc AND (SELECT COUNT(*) FROM GameEntity dlc WHERE dlc.parentGame = game.id) <> 0 ");
+        jpql.append("GROUP BY 1");
+
+        TypedQuery<DlcGame> query = entityManager.createQuery(jpql.toString(), DlcGame.class);
+        query.setParameter("dlc", dlc);
+
+        return query.getResultList();
+    }
+
+    public Long getCountOfDlcs() {
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("SELECT COUNT(*) ");
+        jpql.append("FROM GameEntity game ");
+        jpql.append("WHERE game.dlc like '1' AND game.parentGame IS NOT NULL");
+
+        TypedQuery<Long> query = entityManager.createQuery(jpql.toString(), Long.class);
+        return query.getSingleResult();
+        }
     public MediaStoreEntity getCoverByGame(final Long gameId) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(

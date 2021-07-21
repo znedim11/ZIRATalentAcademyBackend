@@ -174,6 +174,13 @@ public class SwaggerConfiguration {
                 .globalOperationParameters(operationParameters);
     }
 
+    @Bean
+    public Docket dataTransferApi() {
+        return new Docket(DocumentationType.SWAGGER_2).groupName("data-transfer-api").apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("ba.com.zira.praksa.rest.datatransfer")).build()
+                .tags(new Tag("data-transfer", "Data transfer APIs")).globalOperationParameters(operationParameters);
+    }
+
     private static ApiInfo apiInfo() {
         final Contact contact = new Contact("ZIRA", "http://www.zira.com.ba", "info@zira.com.ba");
         ApiInfoBuilder builder = new ApiInfoBuilder();

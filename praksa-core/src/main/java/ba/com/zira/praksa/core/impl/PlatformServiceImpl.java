@@ -2,6 +2,7 @@ package ba.com.zira.praksa.core.impl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -19,12 +20,18 @@ import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.PlatformService;
 import ba.com.zira.praksa.api.model.LoV;
+import ba.com.zira.praksa.api.model.game.GameDetailResponse;
 import ba.com.zira.praksa.api.model.platform.PlatformCreateRequest;
+import ba.com.zira.praksa.api.model.platform.PlatformOverviewResponse;
 import ba.com.zira.praksa.api.model.platform.PlatformResponse;
 import ba.com.zira.praksa.api.model.platform.PlatformUpdateRequest;
+import ba.com.zira.praksa.api.model.region.Region;
 import ba.com.zira.praksa.core.validation.PlatformRequestValidation;
+import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.PlatformDAO;
+import ba.com.zira.praksa.dao.ReleaseDAO;
 import ba.com.zira.praksa.dao.model.PlatformEntity;
+import ba.com.zira.praksa.dao.model.ReleaseEntity;
 import ba.com.zira.praksa.mapper.PlatformMapper;
 
 @Service
@@ -34,14 +41,18 @@ public class PlatformServiceImpl implements PlatformService {
     RequestValidator requestValidator;
     PlatformDAO platformDAO;
     PlatformMapper platformMapper;
+    ReleaseDAO releaseDAO;
+    GameDAO gameDAO;
 
     public PlatformServiceImpl(PlatformRequestValidation platformRequestValidation, RequestValidator requestValidator,
-            PlatformDAO platformDAO, PlatformMapper platformMapper) {
+            PlatformDAO platformDAO, PlatformMapper platformMapper, ReleaseDAO releaseDAO, GameDAO gameDAO) {
         super();
         this.platformRequestValidation = platformRequestValidation;
         this.requestValidator = requestValidator;
         this.platformDAO = platformDAO;
         this.platformMapper = platformMapper;
+        this.releaseDAO = releaseDAO;
+        this.gameDAO = gameDAO;
     }
 
     @Override
@@ -111,5 +122,93 @@ public class PlatformServiceImpl implements PlatformService {
         List<LoV> loVs = platformDAO.getLoVs(request.getList());
 
         return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
+    }
+
+    @Override
+    public PayloadResponse<PlatformOverviewResponse> detail(SearchRequest<Long> request) throws ApiException {
+        final List<GameDetailResponse> games = new ArrayList<>();
+        final List<Region> regions = new ArrayList<>();
+        List<LocalDateTime> dateList = new ArrayList<>();
+        int counter = 0;
+
+        final PlatformEntity platform = platformDAO.findByPK(request.getEntity());
+        List<ReleaseEntity> releaseModelEntities = releaseDAO.findByPlatformId(platform.getId());
+
+        for (final ReleaseEntity releaseEntity : releaseModelEntities) {
+            dateList.add(releaseEntity.getReleaseDate());
+            if (releaseEntity.getGame() != null && counter < 5) {
+                boolean idFound = false;
+
+                for (final GameDetailResponse Game : games) {
+                    if (Game.getId().equals(releaseEntity.getGame().getId())) {
+                        idFound = true;
+                    }
+                }
+
+                if (!idFound) {
+                    games.add(setGame(releaseEntity));
+                    counter++;
+                }
+
+            }
+            if (releaseEntity.getRegion() != null) {
+                boolean idFound = false;
+
+                for (final Region region : regions) {
+                    if (region.getId().equals(releaseEntity.getRegion().getId())) {
+                        idFound = true;
+                    }
+                }
+
+                if (!idFound) {
+                    regions.add(setRegion(releaseEntity));
+                }
+            }
+        }
+
+        PlatformOverviewResponse response = setResponse(platform, Collections.max(dateList).toString(),
+                Collections.min(dateList).toString(), gameDAO.countAll(), games, regions);
+
+        return new PayloadResponse<>(request, ResponseCode.OK, response);
+    }
+
+    private Region setRegion(ReleaseEntity releaseEntity) {
+        Region region = new Region();
+
+        region.setId(releaseEntity.getRegion().getId());
+        region.setCode(releaseEntity.getRegion().getName());
+        region.setName(releaseEntity.getRegion().getName());
+        region.setReleaseDate(releaseEntity.getReleaseDate());
+
+        return region;
+    }
+
+    private GameDetailResponse setGame(ReleaseEntity releaseEntity) {
+        GameDetailResponse game = new GameDetailResponse();
+        game.setId(releaseEntity.getGame().getId());
+        game.setName(releaseEntity.getGame().getFullName());
+        game.setDeveloperId(releaseEntity.getDeveloper().getId());
+        game.setDeveloperName(releaseEntity.getDeveloper().getName());
+        game.setPublisherId(releaseEntity.getPublisher().getId());
+        game.setPublisherName(releaseEntity.getPublisher().getName());
+        game.setReleaseDate(releaseEntity.getReleaseDate());
+
+        return game;
+    }
+
+    private PlatformOverviewResponse setResponse(PlatformEntity platform, String latestGameRelease, String firstGameRelease,
+            int totalNumOfGames, List<GameDetailResponse> games, List<Region> regions) {
+        PlatformOverviewResponse response = new PlatformOverviewResponse();
+
+        response.setId(platform.getId());
+        response.setAbbriviation(platform.getAbbriviation());
+        response.setCode(platform.getCode());
+        response.setFullName(platform.getFullName());
+        response.setInformation(platform.getInformation());
+        response.setOutlineText(platform.getOutlineText());
+        response.setGames(games);
+        response.setRegions(regions);
+
+        return response;
     }
 }

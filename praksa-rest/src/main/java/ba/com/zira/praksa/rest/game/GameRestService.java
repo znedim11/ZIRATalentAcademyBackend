@@ -33,6 +33,7 @@ import ba.com.zira.praksa.api.model.game.GameCreateRequest;
 import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
+import ba.com.zira.praksa.api.model.game.dlc.DlcAnalysisReport;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureResponse;
 import ba.com.zira.praksa.api.model.location.Location;
@@ -220,4 +221,11 @@ public class GameRestService {
         return gameService.getOverview(request);
     }
 
+    @ApiOperation(value = "Get DLC Analysis Report", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/dlc-analysis-report")
+    public PayloadResponse<DlcAnalysisReport> dlcAnalysisReport() throws ApiException {
+        EmptyRequest request = new EmptyRequest();
+        return gameService.dlcAnalysisReport(request);
+    }
 }

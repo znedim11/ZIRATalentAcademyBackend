@@ -13,5 +13,6 @@ public class ReleasesByTimetableRequest implements Serializable {
     LocalDateTime startDate;
     LocalDateTime endDate;
     String timeSegment;
+    String releaseType;
 
 }

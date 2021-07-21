@@ -26,6 +26,7 @@ import ba.com.zira.praksa.api.ReleaseService;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.enums.ReleaseType;
 import ba.com.zira.praksa.api.model.platform.PlatformCreateRequest;
+import ba.com.zira.praksa.api.model.platform.PlatformOverviewResponse;
 import ba.com.zira.praksa.api.model.platform.PlatformResponse;
 import ba.com.zira.praksa.api.model.platform.PlatformUpdateRequest;
 import ba.com.zira.praksa.api.model.release.ReleaseRequest;
@@ -103,5 +104,16 @@ public class PlatformRestService {
         final ReleaseRequest addReleaseRequest = request.getEntity();
         addReleaseRequest.setType(ReleaseType.PLATFORM.getValue());
         return releaseService.addRelease(request);
+    }
+
+    @ApiOperation(value = "Get Platform Details by Id.", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/details/{id}")
+    public PayloadResponse<PlatformOverviewResponse> detailsById(@PathVariable final Long id) throws ApiException {
+
+        final SearchRequest<Long> request = new SearchRequest<>();
+        request.setEntity(id);
+
+        return platformService.detail(request);
     }
 }

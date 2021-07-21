@@ -32,4 +32,5 @@ public class PlatformRequestValidation {
 
         return validationResponse;
     }
+
 }
