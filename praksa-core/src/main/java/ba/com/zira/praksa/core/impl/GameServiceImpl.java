@@ -48,10 +48,10 @@ import ba.com.zira.praksa.dao.FeatureDAO;
 import ba.com.zira.praksa.dao.FranchiseDAO;
 import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.GameFeatureDAO;
-import ba.com.zira.praksa.dao.PlatformDAO;
-import ba.com.zira.praksa.dao.ReleaseDAO;
 import ba.com.zira.praksa.dao.MediaDAO;
 import ba.com.zira.praksa.dao.MediaStoreDAO;
+import ba.com.zira.praksa.dao.PlatformDAO;
+import ba.com.zira.praksa.dao.ReleaseDAO;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.FeatureEntity;
@@ -111,7 +111,8 @@ public class GameServiceImpl implements GameService {
             ReleaseDAO releaseDAO, PlatformDAO platformDAO, CompanyDAO companyDAO, FranchiseDAO franchiseDAO, GameMapper gameMapper,
             ConceptMapper conceptMapper, PersonMapper personMapper, ObjectMapper objectMapper, CharacterMapper characterMapper,
             LocationMapper locationMapper, FeatureMapper featureMapper, GameFeatureMapper gameFeatureMapper, ReleaseMapper releaseMapper,
-            PlatformMapper platformMapper, MediaStoreService mediaStoreService, MediaService mediaService, MediaStoreDAO mediaStoreDAO, MediaDAO mediaDAO) {
+            PlatformMapper platformMapper, MediaStoreService mediaStoreService, MediaService mediaService, MediaStoreDAO mediaStoreDAO,
+            MediaDAO mediaDAO) {
         super();
         this.requestValidator = requestValidator;
         this.gameRequestValidation = gameRequestValidation;
@@ -389,6 +390,12 @@ public class GameServiceImpl implements GameService {
         List<PlatformResponse> platforms = platformMapper.entityListToDtoList(gameDAO.getPlatformsByGame(request.getEntity()));
         List<ReleaseEntity> entity = gameDAO.getFirstReleaseByGame(request.getEntity());
 
+        MediaRetrivalRequest mrr = new MediaRetrivalRequest();
+        mrr.setObjectId(gameOverview.getId());
+        mrr.setObjectType(ObjectType.GAME.getValue());
+        mrr.setMediaType("COVER_IMAGE");
+        gameOverview.setImageUrl(mediaStoreService.getImageUrl(new EntityRequest<>(mrr, request)).getPayload().get(0));
+
         if (!entity.isEmpty()) {
             ReleaseResponseLight release = releaseMapper.releaseEntityToRelease(entity.get(0));
             release.setDeveloperName(entity.get(0).getDeveloper().getName());
@@ -399,6 +406,7 @@ public class GameServiceImpl implements GameService {
             gameOverview.setPublisher(release.getPublisherName());
             gameOverview.setDeveloper(release.getDeveloperName());
             gameOverview.setPlatformName(release.getPlatformName());
+
         }
 
         return new PayloadResponse<>(request, ResponseCode.OK, gameOverview);
