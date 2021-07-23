@@ -162,6 +162,13 @@ public class GameRestService {
         return gameService.getLoVs(request);
     }
 
+    @ApiOperation(value = "Get all Main Games", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/main")
+    public ListPayloadResponse<LoV> getMainGames() throws ApiException {
+        EmptyRequest request = new EmptyRequest();
+        return gameService.getMainGames(request);
+    }
+
     @ApiOperation(value = "Get Objects by Game", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}/objects")
     public ListPayloadResponse<ObjectResponse> getObjectsByGame(@PathVariable final Long id) throws ApiException {

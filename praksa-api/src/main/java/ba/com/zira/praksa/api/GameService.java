@@ -115,6 +115,8 @@ public interface GameService {
 
     ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException;
 
+    ListPayloadResponse<LoV> getMainGames(final EmptyRequest request) throws ApiException;
+
     ListPayloadResponse<ObjectResponse> getObjectsByGame(final EntityRequest<Long> request) throws ApiException;
 
     ListPayloadResponse<CharacterResponse> getCharactersByGame(final EntityRequest<Long> request) throws ApiException;

@@ -9,13 +9,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.FranchiseService;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.franchise.FranchiseCreateRequest;
 import ba.com.zira.praksa.api.model.franchise.FranchiseResponse;
 import ba.com.zira.praksa.api.model.franchise.FranchiseUpdateRequest;
@@ -88,6 +91,14 @@ public class FranchiseServiceImpl implements FranchiseService {
         final FranchiseResponse response = franchiseMapper.entityToDto(existingFranchiseEntity);
         return new PayloadResponse<>(request, ResponseCode.OK, response);
 
+    }
+
+    @Override
+    public ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException {
+
+        List<LoV> loVs = franchiseDAO.getLoVs(request.getList());
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
     }
 
     @Override

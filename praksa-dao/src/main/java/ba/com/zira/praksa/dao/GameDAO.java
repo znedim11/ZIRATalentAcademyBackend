@@ -23,6 +23,7 @@ import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.dao.model.GameEntity_;
 import ba.com.zira.praksa.dao.model.LinkMapEntity;
 import ba.com.zira.praksa.dao.model.LocationEntity;
+import ba.com.zira.praksa.dao.model.MediaStoreEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
 import ba.com.zira.praksa.dao.model.PlatformEntity;
@@ -87,6 +88,12 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         }
 
         return query.getResultList();
+    }
+
+    public List<LoV> getMainGames() {
+        String jpql = "SELECT new ba.com.zira.praksa.api.model.LoV(g1.id, g1.fullName) FROM GameEntity g1 where g1.dlc='0' order by 2";
+        TypedQuery<LoV> mainGames = entityManager.createQuery(jpql, LoV.class);
+        return mainGames.getResultList();
     }
 
     public List<ObjectEntity> getObjectsByGame(Long gameId) {
@@ -198,6 +205,19 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
 
         TypedQuery<Long> query = entityManager.createQuery(jpql.toString(), Long.class);
         return query.getSingleResult();
+    }
+
+    public MediaStoreEntity getCoverByGame(final Long gameId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(
+                "SELECT mse FROM MediaStoreEntity mse, MediaEntity me WHERE me.id = mse.media.id AND me.objectId = :objectId AND me.objectType = :objectType AND mse.type = :type");
+
+        TypedQuery<MediaStoreEntity> query = entityManager.createQuery(stringBuilder.toString(), MediaStoreEntity.class);
+        query.setParameter("objectId", gameId);
+        query.setParameter("objectType", "GAME");
+        query.setParameter("type", "COVER_IMAGE");
+
+        return query.getResultList().stream().findFirst().orElse(null);
     }
 
     public PagedData<LoV> getLoVsNotConnectedTo(Filter filter, String field, String idField, Long id, String entityName) {

@@ -48,6 +48,8 @@ public class PlatformEntity implements Serializable {
     @Column(name = "full_name")
     private String fullName;
 
+    private String aliases;
+
     private String information;
 
     private LocalDateTime modified;
@@ -61,5 +63,12 @@ public class PlatformEntity implements Serializable {
     // bi-directional many-to-one association to ReleaseEntity
     @OneToMany(mappedBy = "platform")
     private List<ReleaseEntity> releases;
+
+    @Override
+    public String toString() {
+        return "PlatformEntity [id=" + id + ", abbriviation=" + abbriviation + ", code=" + code + ", created=" + created + ", createdBy="
+                + createdBy + ", fullName=" + fullName + ", aliases=" + aliases + ", information=" + information + ", modified=" + modified
+                + ", modifiedBy=" + modifiedBy + ", outlineText=" + outlineText + ", releases=" + releases + "]";
+    }
 
 }
