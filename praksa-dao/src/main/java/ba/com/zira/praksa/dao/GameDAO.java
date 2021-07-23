@@ -5,10 +5,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
 
 import ba.com.zira.commons.dao.AbstractDAO;
+import ba.com.zira.commons.model.Filter;
 import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.game.GameCharacterResponse;
@@ -16,6 +20,8 @@ import ba.com.zira.praksa.api.model.game.dlc.DlcGame;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
+import ba.com.zira.praksa.dao.model.GameEntity_;
+import ba.com.zira.praksa.dao.model.LinkMapEntity;
 import ba.com.zira.praksa.dao.model.LocationEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
@@ -24,6 +30,13 @@ import ba.com.zira.praksa.dao.model.ReleaseEntity;
 
 @Repository
 public class GameDAO extends AbstractDAO<GameEntity, Long> {
+
+    LoVDAO loVDAO;
+
+    public GameDAO(LoVDAO loVDAO) {
+        super();
+        this.loVDAO = loVDAO;
+    }
 
     public List<GameCharacterResponse> getGamesForCharacter(final Long characterId) {
         StringBuilder jpql = new StringBuilder();
@@ -187,26 +200,27 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         return query.getSingleResult();
     }
 
-    public List<LoV> getLoVsNotConnectedTo(String field, String idField, Long id) {
-        StringBuilder stringBuilder = new StringBuilder();
+    public PagedData<LoV> getLoVsNotConnectedTo(Filter filter, String field, String idField, Long id, String entityName) {
+        CriteriaQuery<LoV> criteriaQuery = builder.createQuery(LoV.class);
+        Root<GameEntity> root = criteriaQuery.from(GameEntity.class);
 
-        stringBuilder.append(String.format(
-                "SELECT DISTINCT g.id FROM GameEntity g LEFT OUTER JOIN LinkMapEntity lm ON lm.game.id= g.id WHERE lm.%s.%s = :id", field,
-                idField));
+        CriteriaQuery<Long> subquery = builder.createQuery(Long.class);
+        Root<GameEntity> subqueryRoot = subquery.from(GameEntity.class);
+        Join<GameEntity, LinkMapEntity> subqueryJoin = subqueryRoot.join(GameEntity_.linkMaps);
 
-        TypedQuery<Long> listQuery = entityManager.createQuery(stringBuilder.toString(), Long.class);
-        listQuery.setParameter("id", id);
-        List<Long> list = listQuery.getResultList();
+        subquery.where(builder.equal(subqueryJoin.get(field).get(idField), id)).select(subqueryRoot.get(GameEntity_.id));
 
-        stringBuilder.setLength(0);
-        stringBuilder.append(String.format("SELECT new ba.com.zira.praksa.api.model.LoV(g.id, g.name) FROM GameEntity g %s",
-                !list.isEmpty() ? "WHERE g.id NOT IN :list" : ""));
+        List<Long> list = entityManager.createQuery(subquery).getResultList();
 
-        TypedQuery<LoV> query = entityManager.createQuery(stringBuilder.toString(), LoV.class);
         if (!list.isEmpty()) {
-            query.setParameter("list", list);
+            criteriaQuery.where(builder.not(root.get(GameEntity_.id).in(list)));
         }
 
-        return query.getResultList();
+        criteriaQuery.multiselect(root.get(GameEntity_.id), root.get(GameEntity_.fullName))
+                .orderBy(builder.asc(root.get(GameEntity_.fullName)));
+
+        return loVDAO.handlePaginationFilter(filter, criteriaQuery, entityName);
+
     }
+
 }

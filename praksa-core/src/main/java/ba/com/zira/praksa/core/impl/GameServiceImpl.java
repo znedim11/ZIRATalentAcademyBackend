@@ -344,35 +344,41 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public ListPayloadResponse<LoV> getLoVsNotConnectedTo(final EntityRequest<LoV> request) throws ApiException {
+    public PagedPayloadResponse<LoV> getLoVsNotConnectedTo(final SearchRequest<LoV> request) throws ApiException {
         requestValidator.validate(request);
 
         String field = null;
         String idField = null;
+        String entityName = null;
         Long id = request.getEntity().getId();
 
         if (ObjectType.CHARACTER.getValue().equalsIgnoreCase(request.getEntity().getName())) {
             field = LinkMapEntity_.character.getName();
             idField = CharacterEntity_.id.getName();
+            entityName = CharacterEntity.class.getSimpleName();
         } else if (ObjectType.CONCEPT.getValue().equalsIgnoreCase(request.getEntity().getName())) {
             field = LinkMapEntity_.concept.getName();
             idField = ConceptEntity_.id.getName();
+            entityName = ConceptEntity.class.getSimpleName();
         } else if (ObjectType.LOCATION.getValue().equalsIgnoreCase(request.getEntity().getName())) {
             field = LinkMapEntity_.location.getName();
             idField = LocationEntity_.id.getName();
+            entityName = LocationEntity.class.getSimpleName();
         } else if (ObjectType.OBJECT.getValue().equalsIgnoreCase(request.getEntity().getName())) {
             field = LinkMapEntity_.object.getName();
             idField = ObjectEntity_.id.getName();
+            entityName = ObjectEntity.class.getSimpleName();
         } else if (ObjectType.PERSON.getValue().equalsIgnoreCase(request.getEntity().getName())) {
             field = LinkMapEntity_.person.getName();
             idField = PersonEntity_.id.getName();
+            entityName = PersonEntity.class.getSimpleName();
         }
 
-        List<LoV> loVs = null;
+        PagedData<LoV> loVs = null;
         if (field != null) {
-            loVs = gameDAO.getLoVsNotConnectedTo(field, idField, id);
+            loVs = gameDAO.getLoVsNotConnectedTo(request.getFilter(), field, idField, id, entityName);
         }
 
-        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, loVs);
     }
 }

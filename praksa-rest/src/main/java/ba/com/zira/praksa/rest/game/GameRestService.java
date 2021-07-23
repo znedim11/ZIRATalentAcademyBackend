@@ -224,12 +224,13 @@ public class GameRestService {
 
     @ApiOperation(value = "Get Games not Connected to ...", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping(value = "/lovnotnonnected")
-    public ListPayloadResponse<LoV> getLoVNotConnectedTo(@RequestParam(required = true) final String type,
-            @RequestParam(required = true) final Long id) throws ApiException {
+    @GetMapping(value = "/lov-not-connected")
+    public PagedPayloadResponse<LoV> getLoVNotConnectedTo(@RequestParam(required = true) final String type,
+            @RequestParam(required = true) final Long id, @RequestParam(required = false) final String pagination) throws ApiException {
 
-        final EntityRequest<LoV> request = new EntityRequest<>();
+        final SearchRequest<LoV> request = new SearchRequest<>();
         request.setEntity(new LoV(id, type));
+        request.setPagination(pagination);
 
         return gameService.getLoVsNotConnectedTo(request);
     }
