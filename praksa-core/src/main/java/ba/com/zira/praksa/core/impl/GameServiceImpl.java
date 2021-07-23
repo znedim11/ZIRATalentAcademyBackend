@@ -48,10 +48,10 @@ import ba.com.zira.praksa.dao.FeatureDAO;
 import ba.com.zira.praksa.dao.FranchiseDAO;
 import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.GameFeatureDAO;
-import ba.com.zira.praksa.dao.PlatformDAO;
-import ba.com.zira.praksa.dao.ReleaseDAO;
 import ba.com.zira.praksa.dao.MediaDAO;
 import ba.com.zira.praksa.dao.MediaStoreDAO;
+import ba.com.zira.praksa.dao.PlatformDAO;
+import ba.com.zira.praksa.dao.ReleaseDAO;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
 import ba.com.zira.praksa.dao.model.FeatureEntity;
@@ -111,7 +111,8 @@ public class GameServiceImpl implements GameService {
             ReleaseDAO releaseDAO, PlatformDAO platformDAO, CompanyDAO companyDAO, FranchiseDAO franchiseDAO, GameMapper gameMapper,
             ConceptMapper conceptMapper, PersonMapper personMapper, ObjectMapper objectMapper, CharacterMapper characterMapper,
             LocationMapper locationMapper, FeatureMapper featureMapper, GameFeatureMapper gameFeatureMapper, ReleaseMapper releaseMapper,
-            PlatformMapper platformMapper, MediaStoreService mediaStoreService, MediaService mediaService, MediaStoreDAO mediaStoreDAO, MediaDAO mediaDAO) {
+            PlatformMapper platformMapper, MediaStoreService mediaStoreService, MediaService mediaService, MediaStoreDAO mediaStoreDAO,
+            MediaDAO mediaDAO) {
         super();
         this.requestValidator = requestValidator;
         this.gameRequestValidation = gameRequestValidation;
@@ -411,7 +412,7 @@ public class GameServiceImpl implements GameService {
         dlcAnalysisReport.setDlcGames(gameDAO.getDlcGames("0"));
         dlcAnalysisReport.setDlcPlatforms(platformDAO.getDlcPlatforms("1"));
         dlcAnalysisReport.setDlcCompanies(companyDAO.getDlcCompanies("1"));
-        dlcAnalysisReport.setDlcFranchises(franchiseDAO.getDlcFranchises("0"));
+        // dlcAnalysisReport.setDlcFranchises(franchiseDAO.getDlcFranchises("0"));
         dlcAnalysisReport.setTotalNumberOfDlc(gameDAO.getCountOfDlcs());
 
         return new PayloadResponse<>(request, ResponseCode.OK, dlcAnalysisReport);
