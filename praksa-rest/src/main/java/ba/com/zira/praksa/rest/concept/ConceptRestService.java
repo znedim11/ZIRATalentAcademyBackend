@@ -209,4 +209,16 @@ public class ConceptRestService {
         return conceptService.getOldestReleaseDateByConcept(request);
     }
 
+    @ApiOperation(value = "Get Concept not Connected to ...", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/lov-not-connected")
+    public ListPayloadResponse<LoV> getLoVNotConnectedTo(@RequestParam(required = true) final String type,
+            @RequestParam(required = true) final Long id) throws ApiException {
+
+        final EntityRequest<LoV> request = new EntityRequest<>();
+        request.setEntity(new LoV(id, type));
+
+        return conceptService.getLoVsNotConnectedTo(request);
+    }
+
 }

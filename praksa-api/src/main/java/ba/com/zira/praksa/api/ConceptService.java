@@ -122,4 +122,6 @@ public interface ConceptService {
     ListPayloadResponse<ConceptResponse> searchConcepts(EntityRequest<ConceptSearchRequest> request) throws ApiException;
 
     PayloadResponse<LocalDateTime> getOldestReleaseDateByConcept(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<LoV> getLoVsNotConnectedTo(EntityRequest<LoV> request) throws ApiException;
 }

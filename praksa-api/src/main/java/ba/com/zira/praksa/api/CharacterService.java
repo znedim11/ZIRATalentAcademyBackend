@@ -26,7 +26,7 @@ import ba.com.zira.praksa.api.model.person.Person;
  * <ul>
  * <li>{@link #searchCharacters}</li>
  * </ul>
- * 
+ *
  * @author zira
  *
  */
@@ -76,4 +76,6 @@ public interface CharacterService {
     ListPayloadResponse<ObjectResponse> getObjectsByCharacter(final EntityRequest<Long> request) throws ApiException;
 
     ListPayloadResponse<Location> getLocationsByCharacter(final EntityRequest<Long> request) throws ApiException;
+
+    ListPayloadResponse<LoV> getLoVsNotConnectedTo(EntityRequest<LoV> request) throws ApiException;
 }

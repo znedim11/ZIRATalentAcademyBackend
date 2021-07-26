@@ -43,11 +43,17 @@ import ba.com.zira.praksa.dao.MediaDAO;
 import ba.com.zira.praksa.dao.MediaStoreDAO;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
+import ba.com.zira.praksa.dao.model.ConceptEntity_;
+import ba.com.zira.praksa.dao.model.GameEntity_;
 import ba.com.zira.praksa.dao.model.LinkMapEntity;
+import ba.com.zira.praksa.dao.model.LinkMapEntity_;
 import ba.com.zira.praksa.dao.model.LocationEntity;
+import ba.com.zira.praksa.dao.model.LocationEntity_;
 import ba.com.zira.praksa.dao.model.MediaStoreEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
+import ba.com.zira.praksa.dao.model.ObjectEntity_;
 import ba.com.zira.praksa.dao.model.PersonEntity;
+import ba.com.zira.praksa.dao.model.PersonEntity_;
 import ba.com.zira.praksa.mapper.CharacterMapper;
 import ba.com.zira.praksa.mapper.ConceptMapper;
 import ba.com.zira.praksa.mapper.LocationMapper;
@@ -301,5 +307,38 @@ public class CharacterServiceImpl implements CharacterService {
         List<Person> personList = personMapper.entityListToDtoList(entityList);
 
         return new ListPayloadResponse<>(request, ResponseCode.OK, personList);
+    }
+
+    @Override
+    public ListPayloadResponse<LoV> getLoVsNotConnectedTo(final EntityRequest<LoV> request) throws ApiException {
+        requestValidator.validate(request);
+
+        String field = null;
+        String idField = null;
+        Long id = request.getEntity().getId();
+
+        if (ObjectType.CONCEPT.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.concept.getName();
+            idField = ConceptEntity_.id.getName();
+        } else if (ObjectType.GAME.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.game.getName();
+            idField = GameEntity_.id.getName();
+        } else if (ObjectType.LOCATION.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.location.getName();
+            idField = LocationEntity_.id.getName();
+        } else if (ObjectType.OBJECT.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.object.getName();
+            idField = ObjectEntity_.id.getName();
+        } else if (ObjectType.PERSON.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.person.getName();
+            idField = PersonEntity_.id.getName();
+        }
+
+        List<LoV> loVs = null;
+        if (field != null) {
+            loVs = characterDAO.getLoVsNotConnectedTo(field, idField, id);
+        }
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
     }
 }
