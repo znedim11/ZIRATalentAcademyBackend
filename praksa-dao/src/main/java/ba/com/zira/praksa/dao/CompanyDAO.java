@@ -3,16 +3,28 @@ package ba.com.zira.praksa.dao;
 import java.util.List;
 
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
 
 import ba.com.zira.commons.dao.AbstractDAO;
+import ba.com.zira.commons.model.Filter;
+import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.game.dlc.DlcCompany;
 import ba.com.zira.praksa.dao.model.CompanyEntity;
+import ba.com.zira.praksa.dao.model.CompanyEntity_;
 
 @Repository
 public class CompanyDAO extends AbstractDAO<CompanyEntity, Long> {
+
+    LoVDAO loVDAO;
+
+    public CompanyDAO(LoVDAO loVDAO) {
+        super();
+        this.loVDAO = loVDAO;
+    }
 
     public List<DlcCompany> getDlcCompanies(String dlc) {
         StringBuilder jpql = new StringBuilder();
@@ -32,17 +44,15 @@ public class CompanyDAO extends AbstractDAO<CompanyEntity, Long> {
         return query.getResultList();
     }
 
-    public List<LoV> getLoVs(List<Long> list) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(String.format("SELECT new ba.com.zira.praksa.api.model.LoV(c.id, c.name) FROM CompanyEntity c %s",
-                list != null ? "WHERE c.id IN :list" : ""));
+    public PagedData<LoV> getLoVs(Filter filter) {
+        CriteriaQuery<LoV> criteriaQuery = builder.createQuery(LoV.class);
+        Root<CompanyEntity> root = criteriaQuery.from(CompanyEntity.class);
 
-        TypedQuery<LoV> query = entityManager.createQuery(stringBuilder.toString(), LoV.class);
-        if (list != null) {
-            query.setParameter("list", list);
-        }
+        criteriaQuery.multiselect(root.get(CompanyEntity_.id), root.get(CompanyEntity_.name))
+                .orderBy(builder.asc(root.get(CompanyEntity_.name)));
 
-        return query.getResultList();
+        loVDAO.handleFilterExpressions(filter, criteriaQuery);
+        return loVDAO.handlePaginationFilter(filter, criteriaQuery, CompanyEntity.class);
     }
 
 }

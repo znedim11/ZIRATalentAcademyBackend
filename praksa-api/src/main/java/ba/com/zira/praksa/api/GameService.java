@@ -3,7 +3,6 @@ package ba.com.zira.praksa.api;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EmptyRequest;
 import ba.com.zira.commons.message.request.EntityRequest;
-import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
@@ -113,7 +112,7 @@ public interface GameService {
 
     ListPayloadResponse<Person> getPersonsByGame(final EntityRequest<Long> request) throws ApiException;
 
-    ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException;
+    PagedPayloadResponse<LoV> getLoVs(final SearchRequest<Long> request) throws ApiException;
 
     ListPayloadResponse<LoV> getMainGames(final EmptyRequest request) throws ApiException;
 

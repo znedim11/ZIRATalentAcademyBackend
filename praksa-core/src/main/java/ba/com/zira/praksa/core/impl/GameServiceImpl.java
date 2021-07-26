@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EmptyRequest;
 import ba.com.zira.commons.message.request.EntityRequest;
-import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
@@ -282,17 +281,12 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException {
-        if (request.getList() != null) {
-            for (Long item : request.getList()) {
-                EntityRequest<Long> longRequest = new EntityRequest<>(item, request);
-                gameRequestValidation.validateIfGameExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
-            }
-        }
+    public PagedPayloadResponse<LoV> getLoVs(final SearchRequest<Long> request) throws ApiException {
+        requestValidator.validate(request);
 
-        List<LoV> loVs = gameDAO.getLoVs(request.getList());
+        PagedData<LoV> loVs = gameDAO.getLoVs(request.getFilter());
 
-        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, loVs);
     }
 
     @Override

@@ -77,17 +77,15 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         return query.getResultList();
     }
 
-    public List<LoV> getLoVs(List<Long> list) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(String.format("SELECT new ba.com.zira.praksa.api.model.LoV(g.id, g.fullName) FROM GameEntity g %s",
-                list != null ? "WHERE g.id IN :list" : ""));
+    public PagedData<LoV> getLoVs(Filter filter) {
+        CriteriaQuery<LoV> criteriaQuery = builder.createQuery(LoV.class);
+        Root<GameEntity> root = criteriaQuery.from(GameEntity.class);
 
-        TypedQuery<LoV> query = entityManager.createQuery(stringBuilder.toString(), LoV.class);
-        if (list != null) {
-            query.setParameter("list", list);
-        }
+        criteriaQuery.multiselect(root.get(GameEntity_.id), root.get(GameEntity_.fullName))
+                .orderBy(builder.asc(root.get(GameEntity_.fullName)));
 
-        return query.getResultList();
+        loVDAO.handleFilterExpressions(filter, criteriaQuery);
+        return loVDAO.handlePaginationFilter(filter, criteriaQuery, GameEntity.class);
     }
 
     public List<LoV> getMainGames() {
