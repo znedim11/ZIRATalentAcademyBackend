@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
@@ -16,6 +17,7 @@ import ba.com.zira.commons.model.Filter;
 import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.game.GameCharacterResponse;
+import ba.com.zira.praksa.api.model.game.GameSearchRequest;
 import ba.com.zira.praksa.api.model.game.dlc.DlcGame;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
@@ -240,6 +242,28 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         loVDAO.handleFilterExpressions(filter, criteriaQuery);
         return loVDAO.handlePaginationFilter(filter, criteriaQuery, GameEntity.class);
 
+    }
+
+    public PagedData<GameEntity> searchGames(Filter filter, GameSearchRequest entity) {
+        CriteriaQuery<GameEntity> criteriaQuery = builder.createQuery(GameEntity.class);
+        Root<GameEntity> root = criteriaQuery.from(GameEntity.class);
+        Join<GameEntity, ReleaseEntity> releaseJoin = root.join(GameEntity_.releases, JoinType.LEFT);
+        // Join<ReleaseEntity, RegionEntity> regionJoin =
+        // releaseJoin.join(ReleaseEntity_.region, JoinType.LEFT);
+        // Join<ReleaseEntity, CompanyEntity> developerJoin =
+        // releaseJoin.join(ReleaseEntity_.developer, JoinType.LEFT);
+        // Join<ReleaseEntity, CompanyEntity> publisherJoin =
+        // releaseJoin.join(ReleaseEntity_.publisher, JoinType.LEFT);
+        // Join<GameEntity, GameFeatureEntity> gameFeatureJoin =
+        // root.join(GameEntity_.gameFeatures, JoinType.LEFT);
+        // Join<GameFeatureEntity, FeatureEntity> featureJoin =
+        // gameFeatureJoin.join(GameFeatureEntity_.feature, JoinType.LEFT);
+
+        // criteriaQuery.where(builder.equal(featureJoin.get(FeatureEntity_.name),
+        // "VR Support"));
+        criteriaQuery.select(root).orderBy(builder.asc(root.get(GameEntity_.fullName))).distinct(true);
+
+        return handlePaginationFilter(filter, criteriaQuery);
     }
 
 }

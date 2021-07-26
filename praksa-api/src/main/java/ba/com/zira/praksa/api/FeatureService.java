@@ -10,6 +10,7 @@ import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.feature.FeatureCreateRequest;
 import ba.com.zira.praksa.api.model.feature.FeatureResponse;
 import ba.com.zira.praksa.api.model.feature.FeatureUpdateRequest;
@@ -27,7 +28,7 @@ import ba.com.zira.praksa.api.model.game.Game;
  * <li>{@link #getGamesByFeature}</li>
  * <li>{@link #getSetOfGames}</li>
  * </ul>
- * 
+ *
  * @author zira
  *
  */
@@ -131,4 +132,6 @@ public interface FeatureService {
      *             corresponding error message and {@link ResponseCode}.
      */
     PayloadResponse<Map<String, Set<Game>>> getSetOfGames(ListRequest<Long> request) throws ApiException;
+
+    public PagedPayloadResponse<LoV> getLoVs(SearchRequest<Long> request) throws ApiException;
 }

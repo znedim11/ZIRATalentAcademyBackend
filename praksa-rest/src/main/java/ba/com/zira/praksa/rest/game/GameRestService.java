@@ -1,5 +1,7 @@
 package ba.com.zira.praksa.rest.game;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,6 +31,7 @@ import ba.com.zira.praksa.api.model.feature.FeatureResponse;
 import ba.com.zira.praksa.api.model.game.GameCreateRequest;
 import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.game.GameResponse;
+import ba.com.zira.praksa.api.model.game.GameSearchRequest;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
 import ba.com.zira.praksa.api.model.game.dlc.DlcAnalysisReport;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
@@ -241,5 +244,24 @@ public class GameRestService {
         request.setFilterExpression(filter);
 
         return gameService.getLoVsNotConnectedTo(request);
+    }
+
+    @ApiOperation(value = "Search Games.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/search")
+    public PagedPayloadResponse<GameResponse> searchGames(@RequestParam(required = false) final String name,
+            @RequestParam(required = false) final String genre, @RequestParam(required = false) final String releasedBefore,
+            @RequestParam(required = false) final String releasedAfter, @RequestParam(required = false) final List<Long> regionIds,
+            @RequestParam(required = false) final List<Long> featureIds, @RequestParam(required = false) final Long developerId,
+            @RequestParam(required = false) final Long publisherId, @RequestParam(required = false) final String pagination,
+            @RequestParam(required = false) final String filter) throws ApiException {
+
+        final SearchRequest<GameSearchRequest> request = new SearchRequest<>();
+        final GameSearchRequest entity = new GameSearchRequest(releasedBefore, releasedAfter, name, genre, developerId, publisherId,
+                regionIds, featureIds);
+        request.setEntity(entity);
+        request.setPagination(pagination);
+        request.setFilterExpression(filter);
+
+        return gameService.searchGames(request);
     }
 }

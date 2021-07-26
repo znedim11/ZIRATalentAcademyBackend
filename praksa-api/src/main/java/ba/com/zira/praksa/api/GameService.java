@@ -16,6 +16,7 @@ import ba.com.zira.praksa.api.model.game.Game;
 import ba.com.zira.praksa.api.model.game.GameCreateRequest;
 import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.game.GameResponse;
+import ba.com.zira.praksa.api.model.game.GameSearchRequest;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
 import ba.com.zira.praksa.api.model.game.dlc.DlcAnalysisReport;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
@@ -172,5 +173,7 @@ public interface GameService {
     public PayloadResponse<DlcAnalysisReport> dlcAnalysisReport(final EmptyRequest request) throws ApiException;
 
     PagedPayloadResponse<LoV> getLoVsNotConnectedTo(SearchRequest<LoV> request) throws ApiException;
+
+    PagedPayloadResponse<GameResponse> searchGames(SearchRequest<GameSearchRequest> request) throws ApiException;
 
 }

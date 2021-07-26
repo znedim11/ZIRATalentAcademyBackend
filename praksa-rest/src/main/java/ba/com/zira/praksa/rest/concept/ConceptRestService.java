@@ -182,7 +182,7 @@ public class ConceptRestService {
 
     @ApiOperation(value = "Search Concepts.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/search")
-    public ListPayloadResponse<ConceptResponse> getPersonsByConcept(@RequestParam(required = false) final String name,
+    public ListPayloadResponse<ConceptResponse> searchConcepts(@RequestParam(required = false) final String name,
             @RequestParam(required = false) final String sortBy, @RequestParam(required = false) final List<Long> gameIds,
             @RequestParam(required = false) final List<Long> characterIds) throws ApiException {
 

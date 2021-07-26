@@ -17,6 +17,7 @@ import ba.com.zira.praksa.api.MediaStoreService;
 import ba.com.zira.praksa.api.model.game.Game;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.core.impl.GameServiceImpl;
+import ba.com.zira.praksa.core.utils.LookupService;
 import ba.com.zira.praksa.core.validation.FeatureRequestValidation;
 import ba.com.zira.praksa.core.validation.GameRequestValidation;
 import ba.com.zira.praksa.dao.CompanyDAO;
@@ -24,10 +25,10 @@ import ba.com.zira.praksa.dao.FeatureDAO;
 import ba.com.zira.praksa.dao.FranchiseDAO;
 import ba.com.zira.praksa.dao.GameDAO;
 import ba.com.zira.praksa.dao.GameFeatureDAO;
-import ba.com.zira.praksa.dao.PlatformDAO;
-import ba.com.zira.praksa.dao.ReleaseDAO;
 import ba.com.zira.praksa.dao.MediaDAO;
 import ba.com.zira.praksa.dao.MediaStoreDAO;
+import ba.com.zira.praksa.dao.PlatformDAO;
+import ba.com.zira.praksa.dao.ReleaseDAO;
 import ba.com.zira.praksa.mapper.CharacterMapper;
 import ba.com.zira.praksa.mapper.ConceptMapper;
 import ba.com.zira.praksa.mapper.FeatureMapper;
@@ -52,6 +53,7 @@ public class SampleServiceTest extends BasicTestConfiguration {
     private GameFeatureMapper gameFeatureMapper;
 
     private GameDAO gameDAO;
+    private GameRequestValidation gameRequestValidation;
     private FeatureDAO featureDAO;
     private GameFeatureDAO gameFeatureDAO;
     private ReleaseDAO releaseDAO;
@@ -74,6 +76,8 @@ public class SampleServiceTest extends BasicTestConfiguration {
     private LocationMapper locationMapper;
     private PlatformMapper platformMapper;
     private ReleaseMapper releaseMapper;
+    private GameMapper gameMapper;
+    private LookupService lookupService;
 
     @BeforeMethod
     public void beforeMethod() throws ApiException {
@@ -94,9 +98,13 @@ public class SampleServiceTest extends BasicTestConfiguration {
         this.locationMapper = Mockito.mock(LocationMapper.class);
         this.platformMapper = Mockito.mock(PlatformMapper.class);
         this.releaseMapper = Mockito.mock(ReleaseMapper.class);
-        this.gameService = new GameServiceImpl(requestValidator, sampleRequestValidation, featureRequestValidation, gameDAO, featureDAO,
-                gameFeatureDAO, releaseDAO, platformDAO, companyDAO, franchiseDAO, sampleMapper, conceptMapper, personMapper, objectMapper,
-                characterMapper, locationMapper, featureMapper, gameFeatureMapper, releaseMapper, platformMapper, mediaStoreService, mediaService, mediaStoreDAO, mediaDAO);
+        this.lookupService = Mockito.mock(LookupService.class);
+        this.gameRequestValidation = Mockito.mock(GameRequestValidation.class);
+        this.gameMapper = Mockito.mock(GameMapper.class);
+        this.gameService = new GameServiceImpl(requestValidator, gameRequestValidation, featureRequestValidation, gameDAO, featureDAO,
+                gameFeatureDAO, releaseDAO, platformDAO, companyDAO, franchiseDAO, mediaStoreDAO, mediaDAO, lookupService, gameMapper,
+                conceptMapper, personMapper, objectMapper, characterMapper, locationMapper, featureMapper, gameFeatureMapper, releaseMapper,
+                platformMapper, mediaStoreService, mediaService);
     }
 
     @Test

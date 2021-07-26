@@ -223,4 +223,13 @@ public class FeatureServiceImpl implements FeatureService {
         }
     }
 
+    @Override
+    public PagedPayloadResponse<LoV> getLoVs(final SearchRequest<Long> request) throws ApiException {
+        requestValidator.validate(request);
+
+        PagedData<LoV> loVs = featureDAO.getLoVs(request.getFilter());
+
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, loVs);
+    }
+
 }

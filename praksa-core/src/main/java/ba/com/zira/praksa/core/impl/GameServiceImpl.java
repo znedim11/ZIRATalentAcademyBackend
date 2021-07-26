@@ -29,6 +29,7 @@ import ba.com.zira.praksa.api.model.feature.FeatureResponse;
 import ba.com.zira.praksa.api.model.game.GameCreateRequest;
 import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.game.GameResponse;
+import ba.com.zira.praksa.api.model.game.GameSearchRequest;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
 import ba.com.zira.praksa.api.model.game.dlc.DlcAnalysisReport;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
@@ -40,6 +41,7 @@ import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
 import ba.com.zira.praksa.api.model.platform.PlatformResponse;
 import ba.com.zira.praksa.api.model.release.ReleaseResponseLight;
+import ba.com.zira.praksa.core.utils.LookupService;
 import ba.com.zira.praksa.core.validation.FeatureRequestValidation;
 import ba.com.zira.praksa.core.validation.GameRequestValidation;
 import ba.com.zira.praksa.dao.CompanyDAO;
@@ -96,6 +98,7 @@ public class GameServiceImpl implements GameService {
     FranchiseDAO franchiseDAO;
     MediaStoreDAO mediaStoreDAO;
     MediaDAO mediaDAO;
+    LookupService lookupService;
 
     GameMapper gameMapper;
     ConceptMapper conceptMapper;
@@ -113,11 +116,11 @@ public class GameServiceImpl implements GameService {
 
     public GameServiceImpl(RequestValidator requestValidator, GameRequestValidation gameRequestValidation,
             FeatureRequestValidation featureRequestValidation, GameDAO gameDAO, FeatureDAO featureDAO, GameFeatureDAO gameFeatureDAO,
-            ReleaseDAO releaseDAO, PlatformDAO platformDAO, CompanyDAO companyDAO, FranchiseDAO franchiseDAO, GameMapper gameMapper,
-            ConceptMapper conceptMapper, PersonMapper personMapper, ObjectMapper objectMapper, CharacterMapper characterMapper,
-            LocationMapper locationMapper, FeatureMapper featureMapper, GameFeatureMapper gameFeatureMapper, ReleaseMapper releaseMapper,
-            PlatformMapper platformMapper, MediaStoreService mediaStoreService, MediaService mediaService, MediaStoreDAO mediaStoreDAO,
-            MediaDAO mediaDAO) {
+            ReleaseDAO releaseDAO, PlatformDAO platformDAO, CompanyDAO companyDAO, FranchiseDAO franchiseDAO, MediaStoreDAO mediaStoreDAO,
+            MediaDAO mediaDAO, LookupService lookupService, GameMapper gameMapper, ConceptMapper conceptMapper, PersonMapper personMapper,
+            ObjectMapper objectMapper, CharacterMapper characterMapper, LocationMapper locationMapper, FeatureMapper featureMapper,
+            GameFeatureMapper gameFeatureMapper, ReleaseMapper releaseMapper, PlatformMapper platformMapper,
+            MediaStoreService mediaStoreService, MediaService mediaService) {
         super();
         this.requestValidator = requestValidator;
         this.gameRequestValidation = gameRequestValidation;
@@ -129,6 +132,9 @@ public class GameServiceImpl implements GameService {
         this.platformDAO = platformDAO;
         this.companyDAO = companyDAO;
         this.franchiseDAO = franchiseDAO;
+        this.mediaStoreDAO = mediaStoreDAO;
+        this.mediaDAO = mediaDAO;
+        this.lookupService = lookupService;
         this.gameMapper = gameMapper;
         this.conceptMapper = conceptMapper;
         this.personMapper = personMapper;
@@ -141,12 +147,9 @@ public class GameServiceImpl implements GameService {
         this.platformMapper = platformMapper;
         this.mediaStoreService = mediaStoreService;
         this.mediaService = mediaService;
-        this.mediaStoreDAO = mediaStoreDAO;
-        this.mediaDAO = mediaDAO;
     }
 
     @Override
-
     public PagedPayloadResponse<GameResponse> find(final SearchRequest<String> request) throws ApiException {
         requestValidator.validate(request);
 
@@ -456,5 +459,23 @@ public class GameServiceImpl implements GameService {
         }
 
         return new PagedPayloadResponse<>(request, ResponseCode.OK, loVs);
+    }
+
+    @Override
+    public PagedPayloadResponse<GameResponse> searchGames(SearchRequest<GameSearchRequest> request) throws ApiException {
+        requestValidator.validate(request);
+
+        PagedData<GameEntity> gameEntites = gameDAO.searchGames(request.getFilter(), request.getEntity());
+        List<GameResponse> gameList = gameMapper.gameEntitesToGames(gameEntites.getRecords());
+        lookupService.lookupCoverImage(gameList, GameResponse::getId, ObjectType.GAME.getValue(), GameResponse::setImageUrl);
+
+        PagedData<GameResponse> games = new PagedData<>();
+        games.setNumberOfPages(gameEntites.getNumberOfPages());
+        games.setNumberOfRecords(gameEntites.getNumberOfRecords());
+        games.setPage(gameEntites.getPage());
+        games.setRecords(gameList);
+        games.setRecordsPerPage(gameEntites.getRecordsPerPage());
+
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, games);
     }
 }
