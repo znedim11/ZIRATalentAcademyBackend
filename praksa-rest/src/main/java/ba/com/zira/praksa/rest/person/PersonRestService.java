@@ -141,7 +141,7 @@ public class PersonRestService {
 
     @ApiOperation(value = "Get Persons not Connected to ...", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping(value = "/lovnotnonnected")
+    @GetMapping(value = "/lov-not-connected")
     public ListPayloadResponse<LoV> getLoVNotConnectedTo(@RequestParam(required = true) final String type,
             @RequestParam(required = true) final Long id) throws ApiException {
 
