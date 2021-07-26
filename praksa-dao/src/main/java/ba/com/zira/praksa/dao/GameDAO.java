@@ -220,7 +220,7 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         return query.getResultList().stream().findFirst().orElse(null);
     }
 
-    public PagedData<LoV> getLoVsNotConnectedTo(Filter filter, String field, String idField, Long id, String entityName) {
+    public PagedData<LoV> getLoVsNotConnectedTo(Filter filter, String field, String idField, Long id) {
         CriteriaQuery<LoV> criteriaQuery = builder.createQuery(LoV.class);
         Root<GameEntity> root = criteriaQuery.from(GameEntity.class);
 
@@ -239,7 +239,8 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         criteriaQuery.multiselect(root.get(GameEntity_.id), root.get(GameEntity_.fullName))
                 .orderBy(builder.asc(root.get(GameEntity_.fullName)));
 
-        return loVDAO.handlePaginationFilter(filter, criteriaQuery, entityName);
+        loVDAO.handleFilterExpressions(filter, criteriaQuery);
+        return loVDAO.handlePaginationFilter(filter, criteriaQuery, GameEntity.class);
 
     }
 
