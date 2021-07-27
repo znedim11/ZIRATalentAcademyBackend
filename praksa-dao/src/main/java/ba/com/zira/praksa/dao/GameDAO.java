@@ -1,5 +1,7 @@
 package ba.com.zira.praksa.dao;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -8,6 +10,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
@@ -20,16 +23,25 @@ import ba.com.zira.praksa.api.model.game.GameCharacterResponse;
 import ba.com.zira.praksa.api.model.game.GameSearchRequest;
 import ba.com.zira.praksa.api.model.game.dlc.DlcGame;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
+import ba.com.zira.praksa.dao.model.CompanyEntity;
+import ba.com.zira.praksa.dao.model.CompanyEntity_;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
+import ba.com.zira.praksa.dao.model.FeatureEntity;
+import ba.com.zira.praksa.dao.model.FeatureEntity_;
 import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.dao.model.GameEntity_;
+import ba.com.zira.praksa.dao.model.GameFeatureEntity;
+import ba.com.zira.praksa.dao.model.GameFeatureEntity_;
 import ba.com.zira.praksa.dao.model.LinkMapEntity;
 import ba.com.zira.praksa.dao.model.LocationEntity;
 import ba.com.zira.praksa.dao.model.MediaStoreEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
 import ba.com.zira.praksa.dao.model.PersonEntity;
 import ba.com.zira.praksa.dao.model.PlatformEntity;
+import ba.com.zira.praksa.dao.model.RegionEntity;
+import ba.com.zira.praksa.dao.model.RegionEntity_;
 import ba.com.zira.praksa.dao.model.ReleaseEntity;
+import ba.com.zira.praksa.dao.model.ReleaseEntity_;
 
 @Repository
 public class GameDAO extends AbstractDAO<GameEntity, Long> {
@@ -248,19 +260,52 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         CriteriaQuery<GameEntity> criteriaQuery = builder.createQuery(GameEntity.class);
         Root<GameEntity> root = criteriaQuery.from(GameEntity.class);
         Join<GameEntity, ReleaseEntity> releaseJoin = root.join(GameEntity_.releases, JoinType.LEFT);
-        // Join<ReleaseEntity, RegionEntity> regionJoin =
-        // releaseJoin.join(ReleaseEntity_.region, JoinType.LEFT);
-        // Join<ReleaseEntity, CompanyEntity> developerJoin =
-        // releaseJoin.join(ReleaseEntity_.developer, JoinType.LEFT);
-        // Join<ReleaseEntity, CompanyEntity> publisherJoin =
-        // releaseJoin.join(ReleaseEntity_.publisher, JoinType.LEFT);
-        // Join<GameEntity, GameFeatureEntity> gameFeatureJoin =
-        // root.join(GameEntity_.gameFeatures, JoinType.LEFT);
-        // Join<GameFeatureEntity, FeatureEntity> featureJoin =
-        // gameFeatureJoin.join(GameFeatureEntity_.feature, JoinType.LEFT);
+        Join<ReleaseEntity, RegionEntity> regionJoin = releaseJoin.join(ReleaseEntity_.region);
+        Join<ReleaseEntity, CompanyEntity> developerJoin = releaseJoin.join(ReleaseEntity_.developer);
+        Join<ReleaseEntity, CompanyEntity> publisherJoin = releaseJoin.join(ReleaseEntity_.publisher);
+        Join<GameEntity, GameFeatureEntity> gameFeatureJoin = root.join(GameEntity_.gameFeatures, JoinType.LEFT);
+        Join<GameFeatureEntity, FeatureEntity> featureJoin = gameFeatureJoin.join(GameFeatureEntity_.feature, JoinType.LEFT);
 
-        // criteriaQuery.where(builder.equal(featureJoin.get(FeatureEntity_.name),
-        // "VR Support"));
+        Predicate namePredicate = builder.and();
+        Predicate genrePredicate = builder.and();
+
+        if (entity.getName() != null && !entity.getName().equals("")) {
+            namePredicate = builder.like(builder.lower(root.get(GameEntity_.fullName)),
+                    String.format("%%%s%%", entity.getName()).toLowerCase());
+        }
+        if (entity.getGenre() != null && !entity.getGenre().equals("")) {
+            genrePredicate = builder.like(builder.lower(root.get(GameEntity_.genre)),
+                    String.format("%%%s%%", entity.getGenre()).toLowerCase());
+        }
+        if (entity.getReleasedAfter() != null && !entity.getReleasedAfter().equals("")) {
+            Predicate releasedAfterPredicate = builder.greaterThanOrEqualTo(releaseJoin.get(ReleaseEntity_.releaseDate),
+
+                    LocalDate.parse(entity.getReleasedAfter(), DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay());
+            releaseJoin.on(releasedAfterPredicate);
+        }
+        if (entity.getReleasedBefore() != null && !entity.getReleasedBefore().equals("")) {
+            Predicate releasedBeforePredicate = builder.lessThanOrEqualTo(releaseJoin.get(ReleaseEntity_.releaseDate),
+                    LocalDate.parse(entity.getReleasedBefore(), DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay());
+            releaseJoin.on(releasedBeforePredicate);
+        }
+        if (entity.getRegionIds() != null && !entity.getRegionIds().isEmpty()) {
+            Predicate regionPredicate = regionJoin.get(RegionEntity_.id).in(entity.getRegionIds());
+            regionJoin.on(regionPredicate);
+        }
+        if (entity.getFeatureIds() != null && !entity.getFeatureIds().isEmpty()) {
+            Predicate featurePredicate = featureJoin.get(FeatureEntity_.id).in(entity.getFeatureIds());
+            featureJoin.on(featurePredicate);
+        }
+        if (entity.getDeveloperId() != null) {
+            Predicate developerPredicate = builder.equal(developerJoin.get(CompanyEntity_.id), entity.getDeveloperId());
+            developerJoin.on(developerPredicate);
+        }
+        if (entity.getPublisherId() != null) {
+            Predicate publisherPredicate = builder.equal(publisherJoin.get(CompanyEntity_.id), entity.getPublisherId());
+            publisherJoin.on(publisherPredicate);
+        }
+
+        criteriaQuery.where(builder.and(namePredicate, genrePredicate));
         criteriaQuery.select(root).orderBy(builder.asc(root.get(GameEntity_.fullName))).distinct(true);
 
         return handlePaginationFilter(filter, criteriaQuery);
