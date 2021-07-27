@@ -35,4 +35,6 @@ public interface ReleaseMapper {
 
     List<ReleaseResponse> entityListToResponseList(List<ReleaseEntity> entityList);
 
+    List<ReleaseResponse> entitiesToDtos(List<ReleaseEntity> rEntities);
+
 }

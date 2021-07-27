@@ -1,7 +1,7 @@
 package ba.com.zira.praksa.api.model.franchise;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.Data;
 
@@ -12,9 +12,8 @@ public class FranchiseUpdateRequest implements Serializable {
     private Long id;
     private String aliases;
     private String information;
-    private LocalDateTime modified;
-    private String modifiedBy;
     private String name;
     private String outlineText;
+    private List<Long> gamesIds;
 
 }

@@ -3,6 +3,7 @@ package ba.com.zira.praksa.core.validation;
 import org.springframework.stereotype.Component;
 
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.ValidationResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
@@ -135,6 +136,16 @@ public class GameRequestValidation {
             validationResponse = requestValidator.createResponse(request, errorDescription);
         }
 
+        return validationResponse;
+    }
+
+    public ValidationResponse validateGameExist(final SearchRequest<Long> rq, String validationRuleMessage) {
+        ValidationResponse validationResponse = new ValidationResponse(rq, ResponseCode.OK);
+        StringBuilder errorDescription = new StringBuilder();
+        if (!gameDAO.existsByPK(rq.getEntity())) {
+            errorDescription.append("Game with id: ").append(rq.getEntity()).append(" does not exist!");
+        }
+        validationResponse = requestValidator.createResponse(rq, errorDescription);
         return validationResponse;
     }
 }

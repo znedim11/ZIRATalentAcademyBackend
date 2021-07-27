@@ -9,6 +9,7 @@ import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.franchise.FranchiseCreateRequest;
+import ba.com.zira.praksa.api.model.franchise.FranchiseOverviewResponse;
 import ba.com.zira.praksa.api.model.franchise.FranchiseResponse;
 import ba.com.zira.praksa.api.model.franchise.FranchiseUpdateRequest;
 
@@ -24,5 +25,7 @@ public interface FranchiseService {
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
 
     ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException;
+
+    public PayloadResponse<FranchiseOverviewResponse> getInformationById(EntityRequest<Long> request) throws ApiException;
 
 }
