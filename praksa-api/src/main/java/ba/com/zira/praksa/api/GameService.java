@@ -176,4 +176,6 @@ public interface GameService {
 
     PagedPayloadResponse<GameResponse> searchGames(SearchRequest<GameSearchRequest> request) throws ApiException;
 
+    ListPayloadResponse<String> getGenres(final SearchRequest<Long> request) throws ApiException;
+
 }

@@ -264,4 +264,12 @@ public class GameRestService {
 
         return gameService.searchGames(request);
     }
+
+    @ApiOperation(value = "Get all genres", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/genres")
+    public ListPayloadResponse<String> getGenres() throws ApiException {
+        SearchRequest<Long> request = new SearchRequest<>();
+
+        return gameService.getGenres(request);
+    }
 }

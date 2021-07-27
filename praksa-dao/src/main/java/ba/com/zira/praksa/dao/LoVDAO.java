@@ -113,4 +113,5 @@ public class LoVDAO extends AbstractDAO<GameEntity, Long> {
         return entityManager.createQuery(query).getSingleResult() == null ? 0
                 : entityManager.createQuery(query).getSingleResult().intValue();
     }
+
 }

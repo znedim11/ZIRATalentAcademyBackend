@@ -2,8 +2,12 @@ package ba.com.zira.praksa.core.impl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -478,4 +482,23 @@ public class GameServiceImpl implements GameService {
 
         return new PagedPayloadResponse<>(request, ResponseCode.OK, games);
     }
+
+    @Override
+    public ListPayloadResponse<String> getGenres(final SearchRequest<Long> request) throws ApiException {
+        requestValidator.validate(request);
+
+        List<String> genres = gameDAO.getGenres();
+        Map<String, String> genresMap = new HashMap<>();
+
+        for (String genre : genres) {
+            Map<String, String> namesMap = Arrays.stream(genre.trim().split("\\s*;\\s*")).filter(g -> g.length() > 0).sorted()
+                    .collect(Collectors.toMap(g -> g, g -> g));
+            genresMap.putAll(namesMap);
+        }
+
+        List<String> genresList = new ArrayList<>(genresMap.keySet());
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, genresList.stream().sorted().collect(Collectors.toList()));
+    }
+
 }

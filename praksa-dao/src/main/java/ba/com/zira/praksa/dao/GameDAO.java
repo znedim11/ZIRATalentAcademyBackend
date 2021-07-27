@@ -311,4 +311,13 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         return handlePaginationFilter(filter, criteriaQuery);
     }
 
+    public List<String> getGenres() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT DISTINCT g.genre FROM GameEntity g WHERE g.genre IS NOT NULL");
+
+        TypedQuery<String> query = entityManager.createQuery(stringBuilder.toString(), String.class);
+
+        return query.getResultList();
+    }
+
 }
