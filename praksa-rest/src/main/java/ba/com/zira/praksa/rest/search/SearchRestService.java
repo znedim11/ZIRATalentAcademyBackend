@@ -8,10 +8,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ba.com.zira.commons.exception.ApiException;
+import ba.com.zira.commons.message.request.EmptyRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.praksa.api.MultiSearchService;
 import ba.com.zira.praksa.api.model.MultiSearchResponse;
+import ba.com.zira.praksa.api.model.WikiStatsResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -30,5 +33,13 @@ public class SearchRestService {
         request.setEntity(searchTerm);
         request.setPagination(pagination);
         return multiSearchService.findByName(request);
+    }
+
+    @ApiOperation(value = "Get wiki stats", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/wiki-stats")
+    public ListPayloadResponse<WikiStatsResponse> findWikiStats() throws ApiException {
+        EmptyRequest request = new EmptyRequest();
+
+        return multiSearchService.findWikiStats(request);
     }
 }

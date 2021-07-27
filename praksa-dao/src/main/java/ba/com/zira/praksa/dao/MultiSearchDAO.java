@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import ba.com.zira.commons.dao.AbstractDAO;
 import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.praksa.api.model.MultiSearchResponse;
+import ba.com.zira.praksa.api.model.WikiStatsResponse;
 import ba.com.zira.praksa.dao.model.MultiSearchViewEntity;
 
 @Repository
@@ -24,7 +25,11 @@ public class MultiSearchDAO extends AbstractDAO<MultiSearchViewEntity, Long> {
     }
 
     void refreshView() {
-        String nativeQuery = "create or replace table HUW_MULTI_SEARCH as select   hg.id,   hg.full_name,"
+
+        String nativeQuery1 = "drop table HUW_MULTI_SEARCH";
+        Query q1 = entityManager.createNativeQuery(nativeQuery1);
+        q1.executeUpdate();
+        String nativeQuery2 = "create table HUW_MULTI_SEARCH as select   hg.id,   hg.full_name,"
                 + "    'GAME' as \"type\" from   hut_game hg union select    hcc.id ,   hcc.\"name\",     'CHARACTER'"
                 + "from   hut_character hcc union select   hc.id,   hc.\"name\",     'COMPANY' from   hut_company hc"
                 + "union select   ho.id,   ho.\"name\" ,   'OBJECT' from   hut_object ho union"
@@ -35,8 +40,14 @@ public class MultiSearchDAO extends AbstractDAO<MultiSearchViewEntity, Long> {
                 + "select   hp.id ,   hp.full_name ,   'PLATFORM' from     hut_platform hp union"
                 + "select   hp2.id ,   hp2.first_name || ' ' || hp2.last_name ,     'PERSON' from   hut_person hp2 union"
                 + "select   hf.id ,   hf.\"name\" ,   'FEATURE' from   hut_feature hf;";
-        Query q = entityManager.createNativeQuery(nativeQuery);
-        q.executeUpdate();
+        Query q2 = entityManager.createNativeQuery(nativeQuery2);
+        q2.executeUpdate();
+    }
+
+    public List<WikiStatsResponse> findWikiStats() {
+        String jqpl = "select new ba.com.zira.praksa.api.model.WikiStatsResponse(hw.type, count(hw.id)) from MultiSearchViewEntity hw group by hw.type";
+        TypedQuery<WikiStatsResponse> response = entityManager.createQuery(jqpl, WikiStatsResponse.class);
+        return response.getResultList();
     }
 
 }

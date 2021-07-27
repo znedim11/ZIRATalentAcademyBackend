@@ -7,11 +7,14 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import ba.com.zira.commons.exception.ApiException;
+import ba.com.zira.commons.message.request.EmptyRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.praksa.api.MultiSearchService;
 import ba.com.zira.praksa.api.model.MultiSearchResponse;
+import ba.com.zira.praksa.api.model.WikiStatsResponse;
 import ba.com.zira.praksa.api.model.enums.ObjectType;
 import ba.com.zira.praksa.core.utils.LookupService;
 import ba.com.zira.praksa.dao.MultiSearchDAO;
@@ -52,6 +55,13 @@ public class MultiSearchServiceImpl implements MultiSearchService {
 
     private Predicate<? super MultiSearchResponse> isType(ObjectType game) {
         return s -> game.getValue().equalsIgnoreCase(s.getObjectType());
+    }
+
+    @Override
+    public ListPayloadResponse<WikiStatsResponse> findWikiStats(EmptyRequest request) {
+        List<WikiStatsResponse> responses = multiSearchDAO.findWikiStats();
+        return new ListPayloadResponse<>(request, ResponseCode.OK, responses);
+
     }
 
 }
