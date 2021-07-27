@@ -252,15 +252,14 @@ public class GameRestService {
             @RequestParam(required = false) final String genre, @RequestParam(required = false) final String releasedBefore,
             @RequestParam(required = false) final String releasedAfter, @RequestParam(required = false) final List<Long> regionIds,
             @RequestParam(required = false) final List<Long> featureIds, @RequestParam(required = false) final Long developerId,
-            @RequestParam(required = false) final Long publisherId, @RequestParam(required = false) final String pagination,
-            @RequestParam(required = false) final String filter) throws ApiException {
+            @RequestParam(required = false) final Long publisherId, @RequestParam(required = false) final String pagination)
+            throws ApiException {
 
         final SearchRequest<GameSearchRequest> request = new SearchRequest<>();
         final GameSearchRequest entity = new GameSearchRequest(releasedBefore, releasedAfter, name, genre, developerId, publisherId,
                 regionIds, featureIds);
         request.setEntity(entity);
         request.setPagination(pagination);
-        request.setFilterExpression(filter);
 
         return gameService.searchGames(request);
     }

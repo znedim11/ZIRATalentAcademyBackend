@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import ba.com.zira.commons.dao.AbstractDAO;
 import ba.com.zira.commons.model.Filter;
 import ba.com.zira.commons.model.PagedData;
+import ba.com.zira.commons.model.PaginationFilter;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.game.GameCharacterResponse;
 import ba.com.zira.praksa.api.model.game.GameSearchRequest;
@@ -279,7 +280,6 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         }
         if (entity.getReleasedAfter() != null && !entity.getReleasedAfter().equals("")) {
             Predicate releasedAfterPredicate = builder.greaterThanOrEqualTo(releaseJoin.get(ReleaseEntity_.releaseDate),
-
                     LocalDate.parse(entity.getReleasedAfter(), DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay());
             releaseJoin.on(releasedAfterPredicate);
         }
@@ -308,7 +308,9 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         criteriaQuery.where(builder.and(namePredicate, genrePredicate));
         criteriaQuery.select(root).orderBy(builder.asc(root.get(GameEntity_.fullName))).distinct(true);
 
-        return handlePaginationFilter(filter, criteriaQuery);
+        root.alias("query");
+
+        return handlePaginationFilterGame(filter, criteriaQuery);
     }
 
     public List<String> getGenres() {
@@ -320,4 +322,50 @@ public class GameDAO extends AbstractDAO<GameEntity, Long> {
         return query.getResultList();
     }
 
+    public PagedData<GameEntity> handlePaginationFilterGame(final Filter filter, final CriteriaQuery<GameEntity> criteriaQuery) {
+        TypedQuery<GameEntity> query = entityManager.createQuery(criteriaQuery);
+
+        PagedData<GameEntity> pagedData = new PagedData<>();
+        int numberOfRecords = countAllGame(criteriaQuery);
+
+        if (filter != null) {
+            PaginationFilter paginationFilter = filter.getPaginationFilter();
+            if (paginationFilter != null && paginationFilter.getPage() >= 0 && paginationFilter.getEntitiesPerPage() > 0) {
+                pagedData.setPage(paginationFilter.getPage());
+                pagedData.setRecordsPerPage(paginationFilter.getEntitiesPerPage());
+                pagedData.setNumberOfPages((int) Math.ceil((float) numberOfRecords / paginationFilter.getEntitiesPerPage()));
+                pagedData.setNumberOfRecords(numberOfRecords);
+                query.setFirstResult((pagedData.getPage() - 1) * pagedData.getRecordsPerPage());
+                query.setMaxResults(pagedData.getRecordsPerPage());
+            } else {
+                pagedData.setPage(1);
+                pagedData.setRecordsPerPage(numberOfRecords);
+                pagedData.setNumberOfPages(1);
+                pagedData.setNumberOfRecords(numberOfRecords);
+            }
+        } else {
+            pagedData.setPage(1);
+            pagedData.setRecordsPerPage(numberOfRecords);
+            pagedData.setNumberOfPages(1);
+            pagedData.setNumberOfRecords(numberOfRecords);
+        }
+        pagedData.setRecords(query.getResultList());
+        return pagedData;
+    }
+
+    public int countAllGame(final CriteriaQuery<GameEntity> criteriaQuery) {
+        CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+        Root<?> root = countQuery.from(criteriaQuery.getResultType());
+
+        root.alias("query");
+        countQuery.select(builder.count(root));
+
+        Predicate restriction = criteriaQuery.getRestriction();
+
+        if (restriction != null) {
+            countQuery.where(restriction);
+        }
+
+        return entityManager.createQuery(countQuery).getSingleResult().intValue();
+    }
 }
