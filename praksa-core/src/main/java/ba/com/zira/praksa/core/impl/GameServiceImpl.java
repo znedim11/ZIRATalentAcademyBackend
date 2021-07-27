@@ -53,14 +53,20 @@ import ba.com.zira.praksa.dao.MediaStoreDAO;
 import ba.com.zira.praksa.dao.PlatformDAO;
 import ba.com.zira.praksa.dao.ReleaseDAO;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
+import ba.com.zira.praksa.dao.model.CharacterEntity_;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
+import ba.com.zira.praksa.dao.model.ConceptEntity_;
 import ba.com.zira.praksa.dao.model.FeatureEntity;
 import ba.com.zira.praksa.dao.model.GameEntity;
 import ba.com.zira.praksa.dao.model.GameFeatureEntity;
+import ba.com.zira.praksa.dao.model.LinkMapEntity_;
 import ba.com.zira.praksa.dao.model.LocationEntity;
+import ba.com.zira.praksa.dao.model.LocationEntity_;
 import ba.com.zira.praksa.dao.model.MediaStoreEntity;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
+import ba.com.zira.praksa.dao.model.ObjectEntity_;
 import ba.com.zira.praksa.dao.model.PersonEntity;
+import ba.com.zira.praksa.dao.model.PersonEntity_;
 import ba.com.zira.praksa.dao.model.ReleaseEntity;
 import ba.com.zira.praksa.mapper.CharacterMapper;
 import ba.com.zira.praksa.mapper.ConceptMapper;
@@ -390,6 +396,12 @@ public class GameServiceImpl implements GameService {
         List<PlatformResponse> platforms = platformMapper.entityListToDtoList(gameDAO.getPlatformsByGame(request.getEntity()));
         List<ReleaseEntity> entity = gameDAO.getFirstReleaseByGame(request.getEntity());
 
+        MediaRetrivalRequest mrr = new MediaRetrivalRequest();
+        mrr.setObjectId(gameOverview.getId());
+        mrr.setObjectType(ObjectType.GAME.getValue());
+        mrr.setMediaType("COVER_IMAGE");
+        gameOverview.setImageUrl(mediaStoreService.getImageUrl(new EntityRequest<>(mrr, request)).getPayload().get(0));
+
         if (!entity.isEmpty()) {
             ReleaseResponseLight release = releaseMapper.releaseEntityToRelease(entity.get(0));
             release.setDeveloperName(entity.get(0).getDeveloper().getName());
@@ -400,6 +412,7 @@ public class GameServiceImpl implements GameService {
             gameOverview.setPublisher(release.getPublisherName());
             gameOverview.setDeveloper(release.getDeveloperName());
             gameOverview.setPlatformName(release.getPlatformName());
+
         }
 
         return new PayloadResponse<>(request, ResponseCode.OK, gameOverview);
@@ -418,4 +431,36 @@ public class GameServiceImpl implements GameService {
         return new PayloadResponse<>(request, ResponseCode.OK, dlcAnalysisReport);
     }
 
+    @Override
+    public PagedPayloadResponse<LoV> getLoVsNotConnectedTo(final SearchRequest<LoV> request) throws ApiException {
+        requestValidator.validate(request);
+
+        String field = null;
+        String idField = null;
+        Long id = request.getEntity().getId();
+
+        if (ObjectType.CHARACTER.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.character.getName();
+            idField = CharacterEntity_.id.getName();
+        } else if (ObjectType.CONCEPT.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.concept.getName();
+            idField = ConceptEntity_.id.getName();
+        } else if (ObjectType.LOCATION.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.location.getName();
+            idField = LocationEntity_.id.getName();
+        } else if (ObjectType.OBJECT.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.object.getName();
+            idField = ObjectEntity_.id.getName();
+        } else if (ObjectType.PERSON.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.person.getName();
+            idField = PersonEntity_.id.getName();
+        }
+
+        PagedData<LoV> loVs = null;
+        if (field != null) {
+            loVs = gameDAO.getLoVsNotConnectedTo(request.getFilter(), field, idField, id);
+        }
+
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, loVs);
+    }
 }

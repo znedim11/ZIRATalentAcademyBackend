@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
+import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
@@ -16,8 +17,10 @@ import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.PersonService;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.character.CharacterResponse;
 import ba.com.zira.praksa.api.model.concept.ConceptResponse;
+import ba.com.zira.praksa.api.model.enums.ObjectType;
 import ba.com.zira.praksa.api.model.game.GameResponse;
 import ba.com.zira.praksa.api.model.object.ObjectResponse;
 import ba.com.zira.praksa.api.model.person.Person;
@@ -26,9 +29,15 @@ import ba.com.zira.praksa.api.model.person.PersonUpdateRequest;
 import ba.com.zira.praksa.core.validation.PersonRequestValidation;
 import ba.com.zira.praksa.dao.PersonDAO;
 import ba.com.zira.praksa.dao.model.CharacterEntity;
+import ba.com.zira.praksa.dao.model.CharacterEntity_;
 import ba.com.zira.praksa.dao.model.ConceptEntity;
+import ba.com.zira.praksa.dao.model.ConceptEntity_;
 import ba.com.zira.praksa.dao.model.GameEntity;
+import ba.com.zira.praksa.dao.model.GameEntity_;
+import ba.com.zira.praksa.dao.model.LinkMapEntity_;
+import ba.com.zira.praksa.dao.model.LocationEntity_;
 import ba.com.zira.praksa.dao.model.ObjectEntity;
+import ba.com.zira.praksa.dao.model.ObjectEntity_;
 import ba.com.zira.praksa.dao.model.PersonEntity;
 import ba.com.zira.praksa.mapper.CharacterMapper;
 import ba.com.zira.praksa.mapper.ConceptMapper;
@@ -160,4 +169,50 @@ public class PersonServiceImpl implements PersonService {
 
     }
 
+    @Override
+    public ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException {
+        if (request.getList() != null) {
+            for (Long item : request.getList()) {
+                EntityRequest<Long> longRequest = new EntityRequest<>(item, request);
+                personRequestValidation.validatePersonRequest(longRequest, VALIDATION_RULE);
+            }
+        }
+
+        List<LoV> loVs = personDAO.getLoVs(request.getList());
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
+    }
+
+    @Override
+    public ListPayloadResponse<LoV> getLoVsNotConnectedTo(final EntityRequest<LoV> request) throws ApiException {
+        requestValidator.validate(request);
+
+        String field = null;
+        String idField = null;
+        Long id = request.getEntity().getId();
+
+        if (ObjectType.CHARACTER.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.character.getName();
+            idField = CharacterEntity_.id.getName();
+        } else if (ObjectType.CONCEPT.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.concept.getName();
+            idField = ConceptEntity_.id.getName();
+        } else if (ObjectType.GAME.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.game.getName();
+            idField = GameEntity_.id.getName();
+        } else if (ObjectType.LOCATION.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.location.getName();
+            idField = LocationEntity_.id.getName();
+        } else if (ObjectType.OBJECT.getValue().equalsIgnoreCase(request.getEntity().getName())) {
+            field = LinkMapEntity_.object.getName();
+            idField = ObjectEntity_.id.getName();
+        }
+
+        List<LoV> loVs = null;
+        if (field != null) {
+            loVs = personDAO.getLoVsNotConnectedTo(field, idField, id);
+        }
+
+        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
+    }
 }
