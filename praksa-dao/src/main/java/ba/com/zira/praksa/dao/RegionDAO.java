@@ -26,7 +26,7 @@ public class RegionDAO extends AbstractDAO<RegionEntity, Long> {
     public List<CompanyRegionPlatform> getRegionReportByCompanies(final List<Long> companies, final Boolean publisher) {
         StringBuilder jpql = new StringBuilder();
         jpql.append(
-                "SELECT new ba.com.zira.praksa.api.model.company.report.CompanyRegionPlatform(COUNT(*), min(r.releaseDate), g.fullName, c.id, region.id) ");
+                "SELECT new ba.com.zira.praksa.api.model.company.report.CompanyRegionPlatform(COUNT(*), min(r.releaseDate), g.fullName, c.id, region.id, region.name) ");
         jpql.append("FROM RegionEntity region ");
         jpql.append("JOIN ReleaseEntity r ON region.id = r.platform.id ");
         if (publisher) {
@@ -36,7 +36,7 @@ public class RegionDAO extends AbstractDAO<RegionEntity, Long> {
         }
         jpql.append("JOIN GameEntity g ON g.id = r.game.id ");
         jpql.append("WHERE c.id IN :ids ");
-        jpql.append("GROUP BY 3, 4, 5");
+        jpql.append("GROUP BY 3, 4, 5 ");
 
         TypedQuery<CompanyRegionPlatform> query = entityManager.createQuery(jpql.toString(), CompanyRegionPlatform.class)
                 .setParameter("ids", companies);

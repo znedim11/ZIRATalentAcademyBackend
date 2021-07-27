@@ -412,7 +412,7 @@ public class GameServiceImpl implements GameService {
         dlcAnalysisReport.setDlcGames(gameDAO.getDlcGames("0"));
         dlcAnalysisReport.setDlcPlatforms(platformDAO.getDlcPlatforms("1"));
         dlcAnalysisReport.setDlcCompanies(companyDAO.getDlcCompanies("1"));
-        // dlcAnalysisReport.setDlcFranchises(franchiseDAO.getDlcFranchises("0"));
+        dlcAnalysisReport.setDlcFranchises(franchiseDAO.getDlcFranchises("0"));
         dlcAnalysisReport.setTotalNumberOfDlc(gameDAO.getCountOfDlcs());
 
         return new PayloadResponse<>(request, ResponseCode.OK, dlcAnalysisReport);

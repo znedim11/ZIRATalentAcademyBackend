@@ -163,7 +163,7 @@ public class CompanyServiceImpl implements CompanyService {
         // Get CompanyRegionPlatform as regions
         // true = company as publisher
         List<CompanyRegionPlatform> regions = regionDAO.getRegionReportByCompanies(request.getEntity().getCompanyIds(), true);
-        // flase = company as developer
+        // false = company as developer
         regions.addAll(regionDAO.getRegionReportByCompanies(request.getEntity().getCompanyIds(), false));
         // Group by Company Id
         Map<Long, List<CompanyRegionPlatform>> regionMapTemp = regions.stream()
@@ -182,6 +182,7 @@ public class CompanyServiceImpl implements CompanyService {
         Map<Long, CompanyRegionPlatformResponseDetail> regionAllMap = setCompanyRegionPlatformMap(companyMap, regionMapTemp, true);
         // false = Creates platform map
         Map<Long, CompanyRegionPlatformResponseDetail> platformAllMap = setCompanyRegionPlatformMap(companyMap, platformMapTemp, false);
+
         // If company has releases for regions and platforms we merge those
         // entry sets
         // Otherwise we add them to response list
@@ -226,11 +227,11 @@ public class CompanyServiceImpl implements CompanyService {
             // and if there is no Key we add it
             for (CompanyRegionPlatform crp : set.getValue()) {
                 if (crpMap.containsKey(crp.getObjId()) && crpMap.get(crp.getObjId()).getFirstRelease().isAfter(crp.getFirstRelease())) {
-                    crp.setNumOfRelases(crp.getNumOfRelases() + crpMap.get(crp.getObjId()).getNumOfRelases());
+                    crp.setNumOfReleases(crp.getNumOfReleases() + crpMap.get(crp.getObjId()).getNumOfReleases());
                     crpMap.put(crp.getObjId(), crp);
                 } else if (crpMap.containsKey(crp.getObjId())) {
                     CompanyRegionPlatform crpTemp = crpMap.get(crp.getObjId());
-                    crpTemp.setNumOfRelases(crpTemp.getNumOfRelases() + crp.getNumOfRelases());
+                    crpTemp.setNumOfReleases(crpTemp.getNumOfReleases() + crp.getNumOfReleases());
                     crpMap.put(crpTemp.getObjId(), crpTemp);
                 } else {
                     crpMap.put(crp.getObjId(), crp);

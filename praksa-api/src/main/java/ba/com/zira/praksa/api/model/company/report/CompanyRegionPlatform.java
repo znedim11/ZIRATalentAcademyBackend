@@ -11,7 +11,8 @@ import lombok.Data;
 public class CompanyRegionPlatform implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Long numOfRelases;
+    private String name;
+    private Long numOfReleases;
     private LocalDateTime firstRelease;
     private String firstReleaseGameName;
     @JsonIgnore
@@ -23,11 +24,13 @@ public class CompanyRegionPlatform implements Serializable {
 
     }
 
-    public CompanyRegionPlatform(Long numOfRelases, LocalDateTime firstRelease, String firstReleaseGameName, Long companyId, Long objId) {
-        this.numOfRelases = numOfRelases;
+    public CompanyRegionPlatform(Long numOfReleases, LocalDateTime firstRelease, String firstReleaseGameName, Long companyId, Long objId,
+            String name) {
+        this.numOfReleases = numOfReleases;
         this.firstRelease = firstRelease;
         this.firstReleaseGameName = firstReleaseGameName;
         this.companyId = companyId;
         this.objId = objId;
+        this.name = name;
     }
 }
