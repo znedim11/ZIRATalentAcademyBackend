@@ -55,4 +55,12 @@ public class CompanyDAO extends AbstractDAO<CompanyEntity, Long> {
         return loVDAO.handlePaginationFilter(filter, criteriaQuery, CompanyEntity.class);
     }
 
+    public List<CompanyEntity> getCompaniesByIds(final List<Long> ids) {
+        String jpql = "SELECT c FROM CompanyEntity c WHERE c.id IN :ids";
+
+        TypedQuery<CompanyEntity> query = entityManager.createQuery(jpql, CompanyEntity.class).setParameter("ids", ids);
+
+        return query.getResultList();
+    }
+
 }

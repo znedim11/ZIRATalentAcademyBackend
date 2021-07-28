@@ -9,6 +9,8 @@ import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.company.CompanyCreateRequest;
 import ba.com.zira.praksa.api.model.company.CompanyResponse;
 import ba.com.zira.praksa.api.model.company.CompanyUpdateRequest;
+import ba.com.zira.praksa.api.model.company.report.CompanyRegionPlatformRequest;
+import ba.com.zira.praksa.api.model.company.report.CompanyRegionPlatformResponse;
 
 public interface CompanyService {
 
@@ -23,4 +25,8 @@ public interface CompanyService {
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
 
     PagedPayloadResponse<LoV> getLoVs(SearchRequest<Long> request) throws ApiException;
+
+    public PayloadResponse<CompanyRegionPlatformResponse> companyRegionPlatformReport(
+            final EntityRequest<CompanyRegionPlatformRequest> request) throws ApiException;
+
 }
