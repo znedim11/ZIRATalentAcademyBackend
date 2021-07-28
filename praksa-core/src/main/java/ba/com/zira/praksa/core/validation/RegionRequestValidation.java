@@ -3,7 +3,6 @@
  */
 package ba.com.zira.praksa.core.validation;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import ba.com.zira.commons.message.request.EntityRequest;
@@ -28,36 +27,12 @@ public class RegionRequestValidation {
         this.regionDAO = regionDAO;
     }
 
-    public ValidationResponse validateConceptExists(final EntityRequest<Long> request, final String validationRuleMessage) {
+    public ValidationResponse validateRegionExists(final EntityRequest<Long> request, final String validationRuleMessage) {
         ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
         if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
             StringBuilder errorDescription = new StringBuilder();
             if (!regionDAO.existsByPK(request.getEntity())) {
-                errorDescription.append("Concept with id ").append(request.getEntity()).append(" does not exist !");
-            }
-            validationResponse = requestValidator.createResponse(request, errorDescription);
-        }
-        return validationResponse;
-    }
-
-    public ValidationResponse validateConceptNameExists(final EntityRequest<String> request, final String validationRuleMessage) {
-        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
-        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-            StringBuilder errorDescription = new StringBuilder();
-            if (StringUtils.isBlank(request.getEntity())) {
-                errorDescription.append("Concept must have name!");
-            }
-            validationResponse = requestValidator.createResponse(request, errorDescription);
-        }
-        return validationResponse;
-    }
-
-    public ValidationResponse validateEntityExistsInRequest(final EntityRequest<?> request, final String validationRuleMessage) {
-        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
-        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
-            StringBuilder errorDescription = new StringBuilder();
-            if (request.getEntity() == null) {
-                errorDescription.append("Entity must exist in request!");
+                errorDescription.append("Region with id ").append(request.getEntity()).append(" does not exist !");
             }
             validationResponse = requestValidator.createResponse(request, errorDescription);
         }
