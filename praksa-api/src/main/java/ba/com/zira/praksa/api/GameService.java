@@ -3,7 +3,6 @@ package ba.com.zira.praksa.api;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EmptyRequest;
 import ba.com.zira.commons.message.request.EntityRequest;
-import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
@@ -17,6 +16,7 @@ import ba.com.zira.praksa.api.model.game.Game;
 import ba.com.zira.praksa.api.model.game.GameCreateRequest;
 import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.game.GameResponse;
+import ba.com.zira.praksa.api.model.game.GameSearchRequest;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
 import ba.com.zira.praksa.api.model.game.dlc.DlcAnalysisReport;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
@@ -113,7 +113,7 @@ public interface GameService {
 
     ListPayloadResponse<Person> getPersonsByGame(final EntityRequest<Long> request) throws ApiException;
 
-    ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException;
+    PagedPayloadResponse<LoV> getLoVs(final SearchRequest<Long> request) throws ApiException;
 
     ListPayloadResponse<LoV> getMainGames(final EmptyRequest request) throws ApiException;
 
@@ -173,5 +173,9 @@ public interface GameService {
     public PayloadResponse<DlcAnalysisReport> dlcAnalysisReport(final EmptyRequest request) throws ApiException;
 
     PagedPayloadResponse<LoV> getLoVsNotConnectedTo(SearchRequest<LoV> request) throws ApiException;
+
+    PagedPayloadResponse<GameResponse> searchGames(SearchRequest<GameSearchRequest> request) throws ApiException;
+
+    ListPayloadResponse<String> getGenres(final SearchRequest<Long> request) throws ApiException;
 
 }

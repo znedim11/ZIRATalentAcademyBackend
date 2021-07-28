@@ -12,9 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
-import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
-import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.PagedData;
@@ -142,11 +140,12 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public ListPayloadResponse<LoV> lovs(final ListRequest<Long> request) throws ApiException {
+    public PagedPayloadResponse<LoV> getLoVs(final SearchRequest<Long> request) throws ApiException {
+        requestValidator.validate(request);
 
-        List<LoV> loVs = companyDAO.getLoVs(request.getList());
+        PagedData<LoV> loVs = companyDAO.getLoVs(request.getFilter());
 
-        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, loVs);
     }
 
     @Override

@@ -23,6 +23,7 @@ import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.FeatureService;
+import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.feature.FeatureCreateRequest;
 import ba.com.zira.praksa.api.model.feature.FeatureResponse;
 import ba.com.zira.praksa.api.model.feature.FeatureUpdateRequest;
@@ -110,5 +111,18 @@ public class FeatureRestService {
         request.setList(ids);
 
         return featureService.getSetOfGames(request);
+    }
+
+    @ApiOperation(value = "Get Feature names by Ids", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/lovs")
+    public PagedPayloadResponse<LoV> getLoVs(@RequestParam(required = false) final String pagination,
+            @RequestParam(required = false) final String filter) throws ApiException {
+
+        final SearchRequest<Long> request = new SearchRequest<>();
+        request.setPagination(pagination);
+        request.setFilterExpression(filter);
+
+        return featureService.getLoVs(request);
     }
 }

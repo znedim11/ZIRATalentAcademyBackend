@@ -38,6 +38,11 @@ public class LoVDAO extends AbstractDAO<GameEntity, Long> {
                 pagedData.setNumberOfRecords(numberOfRecords);
                 query.setFirstResult((pagedData.getPage() - 1) * pagedData.getRecordsPerPage());
                 query.setMaxResults(pagedData.getRecordsPerPage());
+            } else {
+                pagedData.setPage(1);
+                pagedData.setRecordsPerPage(numberOfRecords);
+                pagedData.setNumberOfPages(1);
+                pagedData.setNumberOfRecords(numberOfRecords);
             }
         } else {
             pagedData.setPage(1);
@@ -108,4 +113,5 @@ public class LoVDAO extends AbstractDAO<GameEntity, Long> {
         return entityManager.createQuery(query).getSingleResult() == null ? 0
                 : entityManager.createQuery(query).getSingleResult().intValue();
     }
+
 }

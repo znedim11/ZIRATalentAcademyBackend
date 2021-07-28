@@ -4,18 +4,28 @@ import java.util.List;
 
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
 
 import ba.com.zira.commons.dao.AbstractDAO;
+import ba.com.zira.commons.model.Filter;
 import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.dao.model.FeatureEntity;
+import ba.com.zira.praksa.dao.model.FeatureEntity_;
 import ba.com.zira.praksa.dao.model.GameFeatureEntity;
 
 @Repository
 public class FeatureDAO extends AbstractDAO<FeatureEntity, Long> {
+
+    LoVDAO loVDAO;
+
+    public FeatureDAO(LoVDAO loVDAO) {
+        super();
+        this.loVDAO = loVDAO;
+    }
 
     public List<FeatureEntity> findbyIds(final List<Long> featureIds) {
         String jpql = "SELECT f FROM FeatureEntity f WHERE f.id IN :ids";
@@ -56,5 +66,16 @@ public class FeatureDAO extends AbstractDAO<FeatureEntity, Long> {
         criteriaDelete.where(builder.equal(root.get("feature"), featureId));
 
         entityManager.createQuery(criteriaDelete).executeUpdate();
+    }
+
+    public PagedData<LoV> getLoVs(Filter filter) {
+        CriteriaQuery<LoV> criteriaQuery = builder.createQuery(LoV.class);
+        Root<FeatureEntity> root = criteriaQuery.from(FeatureEntity.class);
+
+        criteriaQuery.multiselect(root.get(FeatureEntity_.id), root.get(FeatureEntity_.name))
+                .orderBy(builder.asc(root.get(FeatureEntity_.name)));
+
+        loVDAO.handleFilterExpressions(filter, criteriaQuery);
+        return loVDAO.handlePaginationFilter(filter, criteriaQuery, FeatureEntity.class);
     }
 }

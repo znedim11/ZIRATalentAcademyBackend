@@ -2,9 +2,7 @@ package ba.com.zira.praksa.api;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
-import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
-import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.model.LoV;
@@ -26,8 +24,9 @@ public interface CompanyService {
 
     PayloadResponse<String> delete(EntityRequest<Long> request) throws ApiException;
 
-    public ListPayloadResponse<LoV> lovs(ListRequest<Long> request) throws ApiException;
+    PagedPayloadResponse<LoV> getLoVs(SearchRequest<Long> request) throws ApiException;
 
     public PayloadResponse<CompanyRegionPlatformResponse> companyRegionPlatformReport(
             final EntityRequest<CompanyRegionPlatformRequest> request) throws ApiException;
+
 }

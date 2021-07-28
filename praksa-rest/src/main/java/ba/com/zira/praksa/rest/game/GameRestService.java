@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EmptyRequest;
 import ba.com.zira.commons.message.request.EntityRequest;
-import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
 import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
@@ -32,6 +31,7 @@ import ba.com.zira.praksa.api.model.feature.FeatureResponse;
 import ba.com.zira.praksa.api.model.game.GameCreateRequest;
 import ba.com.zira.praksa.api.model.game.GameOverviewResponse;
 import ba.com.zira.praksa.api.model.game.GameResponse;
+import ba.com.zira.praksa.api.model.game.GameSearchRequest;
 import ba.com.zira.praksa.api.model.game.GameUpdateRequest;
 import ba.com.zira.praksa.api.model.game.dlc.DlcAnalysisReport;
 import ba.com.zira.praksa.api.model.gamefeature.GameFeatureCreateRequest;
@@ -154,10 +154,12 @@ public class GameRestService {
 
     @ApiOperation(value = "Get Game names by Ids", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/lovs")
-    public ListPayloadResponse<LoV> getLoVs(@RequestParam(required = false) final List<Long> ids) throws ApiException {
+    public PagedPayloadResponse<LoV> getLoVs(@RequestParam(required = false) final String pagination,
+            @RequestParam(required = false) final String filter) throws ApiException {
 
-        final ListRequest<Long> request = new ListRequest<>();
-        request.setList(ids);
+        final SearchRequest<Long> request = new SearchRequest<>();
+        request.setPagination(pagination);
+        request.setFilterExpression(filter);
 
         return gameService.getLoVs(request);
     }
@@ -242,5 +244,31 @@ public class GameRestService {
         request.setFilterExpression(filter);
 
         return gameService.getLoVsNotConnectedTo(request);
+    }
+
+    @ApiOperation(value = "Search Games.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/search")
+    public PagedPayloadResponse<GameResponse> searchGames(@RequestParam(required = false) final String name,
+            @RequestParam(required = false) final String genre, @RequestParam(required = false) final String releasedBefore,
+            @RequestParam(required = false) final String releasedAfter, @RequestParam(required = false) final List<Long> regionIds,
+            @RequestParam(required = false) final List<Long> featureIds, @RequestParam(required = false) final Long developerId,
+            @RequestParam(required = false) final Long publisherId, @RequestParam(required = false) final String pagination)
+            throws ApiException {
+
+        final SearchRequest<GameSearchRequest> request = new SearchRequest<>();
+        final GameSearchRequest entity = new GameSearchRequest(releasedBefore, releasedAfter, name, genre, developerId, publisherId,
+                regionIds, featureIds);
+        request.setEntity(entity);
+        request.setPagination(pagination);
+
+        return gameService.searchGames(request);
+    }
+
+    @ApiOperation(value = "Get all genres", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/genres")
+    public ListPayloadResponse<String> getGenres() throws ApiException {
+        SearchRequest<Long> request = new SearchRequest<>();
+
+        return gameService.getGenres(request);
     }
 }
