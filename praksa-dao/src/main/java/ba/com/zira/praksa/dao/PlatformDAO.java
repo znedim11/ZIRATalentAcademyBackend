@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import ba.com.zira.commons.dao.AbstractDAO;
 import ba.com.zira.praksa.api.model.LoV;
+import ba.com.zira.praksa.api.model.company.report.CompanyRegionPlatform;
 import ba.com.zira.praksa.api.model.game.dlc.DlcPlatform;
 import ba.com.zira.praksa.dao.model.PlatformEntity;
 
@@ -49,6 +50,27 @@ public class PlatformDAO extends AbstractDAO<PlatformEntity, Long> {
 
         TypedQuery<DlcPlatform> query = entityManager.createQuery(jpql.toString(), DlcPlatform.class);
         query.setParameter("dlc", dlc);
+
+        return query.getResultList();
+    }
+
+    public List<CompanyRegionPlatform> getPlatformsReportByCompanies(final List<Long> companies, final Boolean publisher) {
+        StringBuilder jpql = new StringBuilder();
+        jpql.append(
+                "SELECT new ba.com.zira.praksa.api.model.company.report.CompanyRegionPlatform(COUNT(*), min(r.releaseDate), g.fullName, c.id, p.id, p.fullName) ");
+        jpql.append("FROM PlatformEntity p ");
+        jpql.append("JOIN ReleaseEntity r ON p.id = r.platform.id ");
+        if (publisher) {
+            jpql.append("JOIN CompanyEntity c ON r.publisher.id = c.id ");
+        } else {
+            jpql.append("JOIN CompanyEntity c ON r.developer.id = c.id ");
+        }
+        jpql.append("JOIN GameEntity g ON g.id = r.game.id ");
+        jpql.append("WHERE c.id IN :ids ");
+        jpql.append("GROUP BY 3, 4, 5 ");
+
+        TypedQuery<CompanyRegionPlatform> query = entityManager.createQuery(jpql.toString(), CompanyRegionPlatform.class)
+                .setParameter("ids", companies);
 
         return query.getResultList();
     }

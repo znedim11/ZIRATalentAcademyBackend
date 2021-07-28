@@ -26,6 +26,8 @@ import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.company.CompanyCreateRequest;
 import ba.com.zira.praksa.api.model.company.CompanyResponse;
 import ba.com.zira.praksa.api.model.company.CompanyUpdateRequest;
+import ba.com.zira.praksa.api.model.company.report.CompanyRegionPlatformRequest;
+import ba.com.zira.praksa.api.model.company.report.CompanyRegionPlatformResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -89,6 +91,18 @@ public class CompanyRestService {
         request.setEntity(id);
 
         companyService.delete(request);
+    }
+
+    @ApiOperation(value = "Get Prefered Region or Platform Report", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/company-region-platform-report")
+    public PayloadResponse<CompanyRegionPlatformResponse> companyRegionPlatformReport(@RequestParam final List<Long> ids)
+            throws ApiException {
+        CompanyRegionPlatformRequest entity = new CompanyRegionPlatformRequest();
+        entity.setCompanyIds(ids);
+        EntityRequest<CompanyRegionPlatformRequest> request = new EntityRequest<>(entity);
+
+        return companyService.companyRegionPlatformReport(request);
     }
 
 }
