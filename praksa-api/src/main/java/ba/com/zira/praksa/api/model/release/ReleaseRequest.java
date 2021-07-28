@@ -1,14 +1,13 @@
 package ba.com.zira.praksa.api.model.release;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 import lombok.Data;
 
 @Data
 public class ReleaseRequest implements Serializable {
     private static final long serialVersionUID = 1L;
-    private LocalDateTime releaseDate;
+    private String releaseDate;
     private String type;
     private Long developerId;
     private Long publisherId;

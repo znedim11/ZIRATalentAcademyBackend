@@ -105,14 +105,14 @@ public class ReleaseServiceImpl implements ReleaseService {
         releaseRequestValidation.validateEntityExistsInRequest(request, VALIDATE_ABSTRACT_REQUEST);
         releaseRequestValidation.validateRequiredFields(request, BASIC_NOT_NULL);
 
-        ReleaseEntity entity = releaseMapper.dtoToEntity(request.getEntity());
+        ReleaseEntity entity = new ReleaseEntity();
         entity.setUuid(UUID.randomUUID().toString());
-        ;
+
         entity.setCreated(LocalDateTime.now());
         entity.setCreatedBy(request.getUserId());
         entity.setRegion(regionDAO.findByPK(request.getEntity().getRegionId()));
         entity.setType(request.getEntity().getType());
-
+        entity.setReleaseDate(LocalDateTime.parse(request.getEntity().getReleaseDate()));
         if (request.getEntity().getGameId() != null) {
             entity.setGame(gameDAO.findByPK(request.getEntity().getGameId()));
         }
