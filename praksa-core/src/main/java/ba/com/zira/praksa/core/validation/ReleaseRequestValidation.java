@@ -73,4 +73,27 @@ public class ReleaseRequestValidation {
         return validationResponse;
     }
 
+    public ValidationResponse validateEntityExistsInRequest(final EntityRequest<?> request, final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (request.getEntity() == null) {
+                errorDescription.append("Entity must exist in request!");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
+
+    public ValidationResponse validateRequiredFields(final EntityRequest<ReleaseRequest> request, final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (StringUtils.isBlank(request.getEntity().getType())) {
+                errorDescription.append("Release must have type!");
+            }
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+        return validationResponse;
+    }
 }

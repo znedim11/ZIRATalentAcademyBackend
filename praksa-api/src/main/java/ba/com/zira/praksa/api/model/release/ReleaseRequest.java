@@ -11,14 +11,9 @@ public class ReleaseRequest implements Serializable {
     private LocalDateTime releaseDate;
     private String type;
     private Long developerId;
-    private String developerName;
     private Long publisherId;
-    private String publisherName;
     private Long gameId;
-    private String gameName;
     private Long platformId;
-    private String platformName;
     private Long regionId;
-    private String regionName;
 
 }
