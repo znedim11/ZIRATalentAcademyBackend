@@ -34,7 +34,7 @@ public class LookupService {
 
     public static String get(final Long key, final Map<Long, String> lookup) {
         if (key != null) {
-            return lookup.get(key) == null ? key.toString() : lookup.get(key);
+            return lookup.get(key) == null ? null : lookup.get(key);
         }
         return null;
     }
