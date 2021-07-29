@@ -1,5 +1,7 @@
 package ba.com.zira.praksa.rest.company;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,8 @@ import ba.com.zira.praksa.api.CompanyService;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.company.CompanyCreateRequest;
 import ba.com.zira.praksa.api.model.company.CompanyResponse;
+import ba.com.zira.praksa.api.model.company.CompanySearchRequest;
+import ba.com.zira.praksa.api.model.company.CompanySearchResponse;
 import ba.com.zira.praksa.api.model.company.CompanyUpdateRequest;
 import ba.com.zira.praksa.api.model.company.report.CompanyRegionPlatformRequest;
 import ba.com.zira.praksa.api.model.company.report.CompanyRegionPlatformResponse;
@@ -104,6 +108,26 @@ public class CompanyRestService {
         EntityRequest<CompanyRegionPlatformRequest> request = new EntityRequest<>(entity);
 
         return companyService.companyRegionPlatformReport(request);
+    }
+
+    @ApiOperation(value = "Search companies.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/search")
+    public PagedPayloadResponse<CompanySearchResponse> searchCompanies(@RequestParam(required = false) final String name,
+            @RequestParam(required = false) final String dob, @RequestParam(required = false) final String dobCondition,
+            @RequestParam(required = false) final String sortBy) throws ApiException {
+        CompanySearchRequest companySearchRequest = new CompanySearchRequest();
+
+        companySearchRequest.setName(name);
+        companySearchRequest.setDobCondition(dobCondition);
+        companySearchRequest.setSortBy(sortBy);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        companySearchRequest.setDob(dob != null ? LocalDate.parse(dob, formatter).atStartOfDay() : null);
+
+        final EntityRequest<CompanySearchRequest> request = new EntityRequest<>();
+        request.setEntity(companySearchRequest);
+
+        return companyService.searchCompanies(request);
     }
 
 }
