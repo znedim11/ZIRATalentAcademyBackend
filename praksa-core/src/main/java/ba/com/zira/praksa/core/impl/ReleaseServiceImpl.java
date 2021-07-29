@@ -22,6 +22,7 @@ import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.commons.model.response.ResponseCode;
 import ba.com.zira.commons.validation.RequestValidator;
 import ba.com.zira.praksa.api.ReleaseService;
+import ba.com.zira.praksa.api.model.enums.ObjectType;
 import ba.com.zira.praksa.api.model.enums.TimeSegment;
 import ba.com.zira.praksa.api.model.release.IntervalHelper;
 import ba.com.zira.praksa.api.model.release.ReleaseRequest;
@@ -30,6 +31,7 @@ import ba.com.zira.praksa.api.model.release.ReleaseResponseDetails;
 import ba.com.zira.praksa.api.model.release.ReleaseResponseLight;
 import ba.com.zira.praksa.api.model.release.ReleasesByTimetableRequest;
 import ba.com.zira.praksa.api.model.release.ReleasesByTimetableResponse;
+import ba.com.zira.praksa.core.utils.LookupService;
 import ba.com.zira.praksa.core.validation.ReleaseRequestValidation;
 import ba.com.zira.praksa.dao.CompanyDAO;
 import ba.com.zira.praksa.dao.GameDAO;
@@ -52,13 +54,14 @@ public class ReleaseServiceImpl implements ReleaseService {
     CompanyDAO companyDAO;
     GameDAO gameDAO;
     RegionDAO regionDAO;
+    LookupService lookupService;
 
     static final String VALIDATE_ABSTRACT_REQUEST = "validateAbstractRequest";
     static final String BASIC_NOT_NULL = "basicNotNull";
 
     public ReleaseServiceImpl(RequestValidator requestValidator, ReleaseRequestValidation releaseRequestValidation,
             ReleaseMapper releaseMapper, ReleaseDAO releaseDAO, PlatformDAO platformDAO, CompanyDAO companyDAO, GameDAO gameDAO,
-            RegionDAO regionDAO) {
+            RegionDAO regionDAO, LookupService lookupService) {
         super();
         this.requestValidator = requestValidator;
         this.releaseRequestValidation = releaseRequestValidation;
@@ -68,7 +71,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         this.gameDAO = gameDAO;
         this.platformDAO = platformDAO;
         this.regionDAO = regionDAO;
-
+        this.lookupService = lookupService;
     }
 
     @Override
@@ -241,7 +244,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     }
 
     private Map<String, List<ReleaseResponseDetails>> mapReleaseEntitiesToIntervals(List<IntervalHelper> intervals,
-            List<ReleaseEntity> listOfReleaseEntities) {
+            List<ReleaseEntity> listOfReleaseEntities) throws ApiException {
 
         Map<String, List<ReleaseResponseDetails>> map = new LinkedHashMap<>();
 
@@ -254,7 +257,8 @@ public class ReleaseServiceImpl implements ReleaseService {
                     .collect(Collectors.toList());
 
             List<ReleaseResponseDetails> responseList = releaseMapper.entityListToDtoList(releasesTemp);
-
+            lookupService.lookupCoverImage(responseList, ReleaseResponseDetails::getGameId, ObjectType.GAME.getValue(),
+                    ReleaseResponseDetails::setImageUrl);
             interval.setReleaseCount(Long.valueOf(releasesTemp.size()));
 
             map.put(interval.toString(), responseList);

@@ -14,11 +14,14 @@ public class ReleaseResponseDetails implements Serializable {
     private String type;
     private Long developerId;
     private Long publisherId;
+    private String developerName;
+    private String publisherName;
     private Long gameId;
     private String gameName;
     private Long platformId;
     private String platformName;
     private Long regionId;
     private String regionName;
+    private String imageUrl;
 
 }
