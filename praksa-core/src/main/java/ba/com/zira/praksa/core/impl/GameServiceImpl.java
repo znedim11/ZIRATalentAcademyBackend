@@ -405,9 +405,15 @@ public class GameServiceImpl implements GameService {
 
         if (!entity.isEmpty()) {
             ReleaseResponseLight release = releaseMapper.releaseEntityToRelease(entity.get(0));
-            release.setDeveloperName(entity.get(0).getDeveloper().getName());
-            release.setPublisherName(entity.get(0).getPublisher().getName());
-            release.setPlatformName(entity.get(0).getPlatform().getFullName());
+            if (entity.get(0).getDeveloper() != null) {
+                release.setDeveloperName(entity.get(0).getDeveloper().getName());
+            }
+            if (entity.get(0).getPublisher() != null) {
+                release.setPublisherName(entity.get(0).getPublisher().getName());
+            }
+            if (entity.get(0).getPlatform() != null) {
+                release.setPlatformName(entity.get(0).getPlatform().getFullName());
+            }
             gameOverview.setPlatformAbbreviations(platforms.stream().map(PlatformResponse::getAbbriviation).toArray(String[]::new));
             gameOverview.setFirstReleaseDate(release.getReleaseDate().toString());
             gameOverview.setPublisher(release.getPublisherName());
