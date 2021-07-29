@@ -33,4 +33,19 @@ public class PlatformRequestValidation {
         return validationResponse;
     }
 
+    public ValidationResponse validatePlatformExists(final EntityRequest<Long> request, final String validationRuleMessage) {
+        ValidationResponse validationResponse = requestValidator.validate(request, validationRuleMessage);
+
+        if (validationResponse.getResponseCode() == ResponseCode.OK.getCode()) {
+            StringBuilder errorDescription = new StringBuilder();
+            if (!platformDAO.existsByPK(request.getEntity())) {
+                errorDescription.append("Platform with id: ").append(request.getEntity()).append(" does not exist !");
+            }
+
+            validationResponse = requestValidator.createResponse(request, errorDescription);
+        }
+
+        return validationResponse;
+    }
+
 }

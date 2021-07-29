@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -52,7 +53,8 @@ public class ReleaseServiceImpl implements ReleaseService {
     GameDAO gameDAO;
     RegionDAO regionDAO;
 
-    static final String VALIDATION_RULE = "validateAbstractRequest";
+    static final String VALIDATE_ABSTRACT_REQUEST = "validateAbstractRequest";
+    static final String BASIC_NOT_NULL = "basicNotNull";
 
     public ReleaseServiceImpl(RequestValidator requestValidator, ReleaseRequestValidation releaseRequestValidation,
             ReleaseMapper releaseMapper, ReleaseDAO releaseDAO, PlatformDAO platformDAO, CompanyDAO companyDAO, GameDAO gameDAO,
@@ -90,7 +92,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     @Override
     public PayloadResponse<ReleaseResponseLight> findByUuid(final EntityRequest<String> request) throws ApiException {
-        releaseRequestValidation.validateReleaseRequest(request, VALIDATION_RULE);
+        releaseRequestValidation.validateReleaseRequest(request, VALIDATE_ABSTRACT_REQUEST);
 
         final ReleaseEntity releaseEntity = releaseDAO.findByPK(request.getEntity());
 
@@ -100,20 +102,33 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Override
     public PayloadResponse<String> addRelease(final EntityRequest<ReleaseRequest> request) throws ApiException {
         requestValidator.validate(request);
-        ReleaseEntity entity = releaseMapper.dtoToEntity(request.getEntity());
+        releaseRequestValidation.validateEntityExistsInRequest(request, VALIDATE_ABSTRACT_REQUEST);
+        releaseRequestValidation.validateRequiredFields(request, BASIC_NOT_NULL);
+
+        ReleaseEntity entity = new ReleaseEntity();
+        entity.setUuid(UUID.randomUUID().toString());
+
         entity.setCreated(LocalDateTime.now());
         entity.setCreatedBy(request.getUserId());
-        entity.setGame(gameDAO.findByPK(request.getEntity().getGameId()));
         entity.setRegion(regionDAO.findByPK(request.getEntity().getRegionId()));
-        entity.setPlatform(platformDAO.findByPK(request.getEntity().getPlatformId()));
+        entity.setType(request.getEntity().getType());
+        entity.setReleaseDate(LocalDateTime.parse(request.getEntity().getReleaseDate()));
+        if (request.getEntity().getGameId() != null) {
+            entity.setGame(gameDAO.findByPK(request.getEntity().getGameId()));
+        }
+
+        if (request.getEntity().getPlatformId() != null) {
+            entity.setPlatform(platformDAO.findByPK(request.getEntity().getPlatformId()));
+        }
 
         if (request.getEntity().getDeveloperId() != null) {
             entity.setDeveloper(companyDAO.findByPK(request.getEntity().getDeveloperId()));
-        } else if (request.getEntity().getPublisherId() != null) {
+        }
+        if (request.getEntity().getPublisherId() != null) {
             entity.setPublisher(companyDAO.findByPK(request.getEntity().getPublisherId()));
         }
 
-        releaseDAO.persist(entity);
+        releaseDAO.merge(entity);
         return new PayloadResponse<>(request, ResponseCode.OK, "Release Added Successfully");
     }
 
@@ -121,8 +136,8 @@ public class ReleaseServiceImpl implements ReleaseService {
     public PayloadResponse<ReleasesByTimetableResponse> getReleasesByTimetable(final EntityRequest<ReleasesByTimetableRequest> request)
             throws ApiException {
         EntityRequest<ReleasesByTimetableRequest> entityRequest = new EntityRequest<>(request.getEntity(), request);
-        releaseRequestValidation.validateReleaseByTimetableRequest(entityRequest, VALIDATION_RULE);
-        releaseRequestValidation.validateDatesInRequest(entityRequest, VALIDATION_RULE);
+        releaseRequestValidation.validateReleaseByTimetableRequest(entityRequest, VALIDATE_ABSTRACT_REQUEST);
+        releaseRequestValidation.validateDatesInRequest(entityRequest, VALIDATE_ABSTRACT_REQUEST);
 
         ReleasesByTimetableResponse releasesByTimetableResponse = new ReleasesByTimetableResponse();
 
@@ -253,7 +268,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Transactional(rollbackFor = ApiException.class)
     public PayloadResponse<String> delete(EntityRequest<String> request) throws ApiException {
         EntityRequest<String> entityRequest = new EntityRequest<>(request.getEntity(), request);
-        releaseRequestValidation.validateReleaseRequest(entityRequest, VALIDATION_RULE);
+        releaseRequestValidation.validateReleaseRequest(entityRequest, VALIDATE_ABSTRACT_REQUEST);
 
         releaseDAO.removeByPK(request.getEntity());
         return new PayloadResponse<>(request, ResponseCode.OK, "Release deleted!");

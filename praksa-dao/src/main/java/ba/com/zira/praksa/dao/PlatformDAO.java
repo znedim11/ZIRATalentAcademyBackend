@@ -5,17 +5,29 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
 
 import ba.com.zira.commons.dao.AbstractDAO;
+import ba.com.zira.commons.model.Filter;
+import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.company.report.CompanyRegionPlatform;
 import ba.com.zira.praksa.api.model.game.dlc.DlcPlatform;
 import ba.com.zira.praksa.dao.model.PlatformEntity;
+import ba.com.zira.praksa.dao.model.PlatformEntity_;
 
 @Repository
 public class PlatformDAO extends AbstractDAO<PlatformEntity, Long> {
+
+    LoVDAO loVDAO;
+
+    public PlatformDAO(LoVDAO loVDAO) {
+        super();
+        this.loVDAO = loVDAO;
+    }
 
     public Map<Long, String> getPlatformNames(final List<Long> ids) {
         String jpql = "select new ba.com.zira.praksa.api.model.LoV(p.id, p.fullName) from PlatformEntity p where p.id in :ids";
@@ -24,17 +36,15 @@ public class PlatformDAO extends AbstractDAO<PlatformEntity, Long> {
         return lovs.stream().collect(Collectors.toMap(LoV::getId, LoV::getName));
     }
 
-    public List<LoV> getLoVs(List<Long> list) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(String.format("SELECT new ba.com.zira.praksa.api.model.LoV(p.id, p.fullName) FROM PlatformEntity p %s",
-                list != null ? "WHERE p.id IN :list" : ""));
+    public PagedData<LoV> getLoVs(Filter filter) {
+        CriteriaQuery<LoV> criteriaQuery = builder.createQuery(LoV.class);
+        Root<PlatformEntity> root = criteriaQuery.from(PlatformEntity.class);
 
-        TypedQuery<LoV> query = entityManager.createQuery(stringBuilder.toString(), LoV.class);
-        if (list != null) {
-            query.setParameter("list", list);
-        }
+        criteriaQuery.multiselect(root.get(PlatformEntity_.id), root.get(PlatformEntity_.fullName))
+                .orderBy(builder.asc(root.get(PlatformEntity_.fullName)));
 
-        return query.getResultList();
+        loVDAO.handleFilterExpressions(filter, criteriaQuery);
+        return loVDAO.handlePaginationFilter(filter, criteriaQuery, PlatformEntity.class);
     }
 
     public List<DlcPlatform> getDlcPlatforms(String dlc) {

@@ -10,9 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
-import ba.com.zira.commons.message.request.ListRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
-import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.commons.model.PagedData;
@@ -118,10 +116,12 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException {
-        List<LoV> loVs = platformDAO.getLoVs(request.getList());
+    public PagedPayloadResponse<LoV> getLoVs(final SearchRequest<Long> request) throws ApiException {
+        requestValidator.validate(request);
 
-        return new ListPayloadResponse<>(request, ResponseCode.OK, loVs);
+        PagedData<LoV> loVs = platformDAO.getLoVs(request.getFilter());
+
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, loVs);
     }
 
     @Override
