@@ -12,6 +12,8 @@ import ba.com.zira.commons.dao.AbstractDAO;
 import ba.com.zira.commons.model.Filter;
 import ba.com.zira.commons.model.PagedData;
 import ba.com.zira.praksa.api.model.LoV;
+import ba.com.zira.praksa.api.model.company.CompanySearchRequest;
+import ba.com.zira.praksa.api.model.company.CompanySearchResponse;
 import ba.com.zira.praksa.api.model.game.dlc.DlcCompany;
 import ba.com.zira.praksa.dao.model.CompanyEntity;
 import ba.com.zira.praksa.dao.model.CompanyEntity_;
@@ -59,6 +61,53 @@ public class CompanyDAO extends AbstractDAO<CompanyEntity, Long> {
         String jpql = "SELECT c FROM CompanyEntity c WHERE c.id IN :ids";
 
         TypedQuery<CompanyEntity> query = entityManager.createQuery(jpql, CompanyEntity.class).setParameter("ids", ids);
+
+        return query.getResultList();
+    }
+
+    public List<CompanySearchResponse> searchCompany(CompanySearchRequest searchRequest) {
+        StringBuilder jpql = new StringBuilder();
+        jpql.append(" SELECT new ba.com.zira.praksa.api.model.company.CompanySearchResponse(c.id, c.name, c.outlineText, ms.url)");
+        jpql.append(" FROM CompanyEntity c");
+        jpql.append(" LEFT OUTER JOIN MediaEntity m ON m.objectId = c.id");
+        jpql.append(" LEFT OUTER JOIN MediaStoreEntity ms ON ms.media.id = m.id");
+        jpql.append(" WHERE 1=1");
+
+        if (searchRequest.getName() != null && !searchRequest.getName().isEmpty()) {
+            jpql.append(" AND UPPER(c.name) like :name");
+        }
+
+        if (searchRequest.getDob() != null && searchRequest.getDobCondition() != null && !searchRequest.getDobCondition().isEmpty()) {
+            if (searchRequest.getDobCondition().toUpperCase().equals("BEFORE")) {
+                System.out.println("BEFORE");
+                jpql.append(" AND c.dob < :dob");
+            } else if (searchRequest.getDobCondition().toUpperCase().equals("AFTER")) {
+                System.out.println("AFTER");
+                jpql.append(" AND c.dob > :dob");
+            } else {
+                System.out.println("EQUAL");
+                jpql.append(" AND c.dob = :dob");
+            }
+        }
+
+        if (searchRequest.getSortBy() != null && !searchRequest.getSortBy().isEmpty()) {
+            if (searchRequest.getSortBy().toUpperCase().equals("ALPHABETICAL ORDER")) {
+                jpql.append(" ORDER BY c.name ASC");
+            } else if (searchRequest.getSortBy().toUpperCase().equals("LAST EDIT")) {
+                jpql.append(" ORDER BY c.modified DESC");
+            }
+        }
+
+        TypedQuery<CompanySearchResponse> query = entityManager.createQuery(jpql.toString(), CompanySearchResponse.class);
+
+        if (searchRequest.getName() != null && !searchRequest.getName().isEmpty()) {
+            query.setParameter("name", "%" + searchRequest.getName().toUpperCase() + "%");
+        }
+
+        if (searchRequest.getDob() != null) {
+            query.setParameter("dob", searchRequest.getDob());
+
+        }
 
         return query.getResultList();
     }
