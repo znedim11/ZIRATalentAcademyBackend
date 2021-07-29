@@ -129,7 +129,8 @@ public class ConceptServiceImpl implements ConceptService {
         List<ConceptEntity> conceptEntities = conceptEntitesData.getRecords();
 
         final List<ConceptResponse> conceptList = conceptMapper.entityListToResponseList(conceptEntities);
-        lookupService.lookupCoverImage(conceptList, ConceptResponse::getId, ObjectType.CONCEPT.getValue(), ConceptResponse::setImageUrl);
+        lookupService.lookupCoverImage(conceptList, ConceptResponse::getId, ObjectType.CONCEPT.getValue(), ConceptResponse::setImageUrl,
+                ConceptResponse::getImageUrl);
 
         PagedData<ConceptResponse> pagedData = new PagedData<>();
         pagedData.setNumberOfPages(conceptEntitesData.getNumberOfPages());
@@ -344,7 +345,8 @@ public class ConceptServiceImpl implements ConceptService {
                     .collect(Collectors.toList());
         }
 
-        lookupService.lookupCoverImage(conceptList, ConceptResponse::getId, ObjectType.CONCEPT.getValue(), ConceptResponse::setImageUrl);
+        lookupService.lookupCoverImage(conceptList, ConceptResponse::getId, ObjectType.CONCEPT.getValue(), ConceptResponse::setImageUrl,
+                ConceptResponse::getImageUrl);
 
         return new ListPayloadResponse<>(request, ResponseCode.OK, conceptList);
     }

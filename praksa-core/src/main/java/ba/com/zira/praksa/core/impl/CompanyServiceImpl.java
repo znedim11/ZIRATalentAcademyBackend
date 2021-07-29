@@ -263,7 +263,7 @@ public class CompanyServiceImpl implements CompanyService {
         final List<CompanySearchResponse> companyList = companyDAO.searchCompany(searchRequest);
 
         lookupService.lookupCoverImage(companyList, CompanySearchResponse::getId, ObjectType.COMPANY.getValue(),
-                CompanySearchResponse::setImageUrl);
+                CompanySearchResponse::setImageUrl, CompanySearchResponse::getImageUrl);
 
         return new PagedPayloadResponse<>(request, ResponseCode.OK, companyList.size(), 1, 1, companyList.size(), companyList);
     }

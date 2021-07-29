@@ -241,7 +241,7 @@ public class FranchiseServiceImpl implements FranchiseService {
         }
 
         lookupService.lookupCoverImage(gameResponses, GameFranchiseResponse::getGameId, ObjectType.GAME.getValue(),
-                GameFranchiseResponse::setImageUrl);
+                GameFranchiseResponse::setImageUrl, GameFranchiseResponse::getImageUrl);
 
         return mapFranchiseResponse(franchiseEntity, gameList, gameResponses, franchisePlatforms, franchiseDevelopers, lastReleaseDate,
                 startDate, franchisePublishers);

@@ -477,7 +477,8 @@ public class GameServiceImpl implements GameService {
 
         PagedData<GameEntity> gameEntites = gameDAO.searchGames(request.getFilter(), request.getEntity());
         List<GameResponse> gameList = gameMapper.gameEntitesToGames(gameEntites.getRecords());
-        lookupService.lookupCoverImage(gameList, GameResponse::getId, ObjectType.GAME.getValue(), GameResponse::setImageUrl);
+        lookupService.lookupCoverImage(gameList, GameResponse::getId, ObjectType.GAME.getValue(), GameResponse::setImageUrl,
+                GameResponse::getImageUrl);
 
         PagedData<GameResponse> games = new PagedData<>();
         games.setNumberOfPages(gameEntites.getNumberOfPages());

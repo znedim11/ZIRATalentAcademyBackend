@@ -117,7 +117,7 @@ public class CharacterServiceImpl implements CharacterService {
         final List<CharacterSearchResponse> characterList = characterDAO.searchCharacters(searchRequest);
 
         lookupService.lookupCoverImage(characterList, CharacterSearchResponse::getId, ObjectType.CHARACTER.getValue(),
-                CharacterSearchResponse::setImageUrl);
+                CharacterSearchResponse::setImageUrl, CharacterSearchResponse::getImageUrl);
 
         return new PagedPayloadResponse<>(request, ResponseCode.OK, characterList.size(), 1, 1, characterList.size(), characterList);
     }
@@ -132,7 +132,7 @@ public class CharacterServiceImpl implements CharacterService {
         List<CompleteCharacterResponse> temp = new ArrayList<>();
         temp.add(characterResponse);
         lookupService.lookupCoverImage(temp, CompleteCharacterResponse::getId, ObjectType.CHARACTER.getValue(),
-                CompleteCharacterResponse::setImageUrl);
+                CompleteCharacterResponse::setImageUrl, CompleteCharacterResponse::getImageUrl);
 
         return new PayloadResponse<>(request, ResponseCode.OK, temp.get(0));
     }

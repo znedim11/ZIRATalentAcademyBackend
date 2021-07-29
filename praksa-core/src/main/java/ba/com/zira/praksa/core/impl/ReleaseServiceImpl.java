@@ -258,7 +258,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
             List<ReleaseResponseDetails> responseList = releaseMapper.entityListToDtoList(releasesTemp);
             lookupService.lookupCoverImage(responseList, ReleaseResponseDetails::getGameId, ObjectType.GAME.getValue(),
-                    ReleaseResponseDetails::setImageUrl);
+                    ReleaseResponseDetails::setImageUrl, ReleaseResponseDetails::getImageUrl);
             interval.setReleaseCount(Long.valueOf(releasesTemp.size()));
 
             map.put(interval.toString(), responseList);
