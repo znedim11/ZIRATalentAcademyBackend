@@ -419,7 +419,8 @@ public class GameServiceImpl implements GameService {
             gameOverview.setPublisher(release.getPublisherName());
             gameOverview.setDeveloper(release.getDeveloperName());
             gameOverview.setPlatformName(release.getPlatformName());
-
+            lookupService.lookupCoverImage(Arrays.asList(gameOverview), GameOverviewResponse::getId, ObjectType.GAME.getValue(),
+                    GameOverviewResponse::setImageUrl, GameOverviewResponse::getImageUrl);
         }
 
         return new PayloadResponse<>(request, ResponseCode.OK, gameOverview);
