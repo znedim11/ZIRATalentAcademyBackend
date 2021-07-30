@@ -104,12 +104,13 @@ public class LocationServicelmpl implements LocationService {
 
     @Override
     public ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException {
-        if (request.getList() != null) {
-            for (Long item : request.getList()) {
-                EntityRequest<Long> longRequest = new EntityRequest<>(item, request);
-                locationRequestValidation.validateLocationExists(longRequest, "validateAbstractRequest");
-            }
-        }
+        /*
+         * if (request.getList() != null) { for (Long item : request.getList())
+         * { EntityRequest<Long> longRequest = new EntityRequest<>(item,
+         * request);
+         * locationRequestValidation.validateLocationExists(longRequest,
+         * "validateAbstractRequest"); } }
+         */
 
         List<LoV> loVs = locationDAO.getLoVs(request.getList());
 
