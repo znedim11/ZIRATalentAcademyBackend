@@ -20,6 +20,16 @@ public interface ReleaseMapper {
 
     ReleaseResponse releaseEntityToResponse(ReleaseEntity entity);
 
+    @Mapping(source = "platform.id", target = "platformId")
+    @Mapping(source = "platform.fullName", target = "platformName")
+    @Mapping(source = "game.id", target = "gameId")
+    @Mapping(source = "game.fullName", target = "gameName")
+    @Mapping(source = "publisher.id", target = "publisherId")
+    @Mapping(source = "publisher.name", target = "publisherName")
+    @Mapping(source = "developer.id", target = "developerId")
+    @Mapping(source = "developer.name", target = "developerName")
+    @Mapping(source = "region.name", target = "regionName")
+    @Mapping(source = "region.id", target = "regionId")
     ReleaseResponseDetails entityToDetail(ReleaseEntity entity);
 
     @Mapping(source = "type", target = "type")
@@ -34,5 +44,7 @@ public interface ReleaseMapper {
     List<ReleaseResponseDetails> entityListToDtoList(List<ReleaseEntity> sampleList);
 
     List<ReleaseResponse> entityListToResponseList(List<ReleaseEntity> entityList);
+
+    List<ReleaseResponse> entitiesToDtos(List<ReleaseEntity> rEntities);
 
 }

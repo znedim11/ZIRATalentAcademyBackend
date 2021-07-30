@@ -23,6 +23,8 @@ import ba.com.zira.praksa.api.MediaService;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.company.CompanyCreateRequest;
 import ba.com.zira.praksa.api.model.company.CompanyResponse;
+import ba.com.zira.praksa.api.model.company.CompanySearchRequest;
+import ba.com.zira.praksa.api.model.company.CompanySearchResponse;
 import ba.com.zira.praksa.api.model.company.CompanyUpdateRequest;
 import ba.com.zira.praksa.api.model.company.report.CompanyRegionPlatform;
 import ba.com.zira.praksa.api.model.company.report.CompanyRegionPlatformRequest;
@@ -30,6 +32,7 @@ import ba.com.zira.praksa.api.model.company.report.CompanyRegionPlatformResponse
 import ba.com.zira.praksa.api.model.company.report.CompanyRegionPlatformResponseDetail;
 import ba.com.zira.praksa.api.model.enums.ObjectType;
 import ba.com.zira.praksa.api.model.media.CreateMediaRequest;
+import ba.com.zira.praksa.core.utils.LookupService;
 import ba.com.zira.praksa.dao.CompanyDAO;
 import ba.com.zira.praksa.dao.PlatformDAO;
 import ba.com.zira.praksa.dao.RegionDAO;
@@ -45,14 +48,16 @@ public class CompanyServiceImpl implements CompanyService {
     private PlatformDAO platformDAO;
     private CompanyMapper companyMapper;
     private MediaService mediaService;
+    private LookupService lookupService;
 
     public CompanyServiceImpl(final RequestValidator requestValidator, CompanyDAO companyDAO, RegionDAO regionDAO, PlatformDAO platformDAO,
-            CompanyMapper companyMapper) {
+            CompanyMapper companyMapper, LookupService lookupService) {
         this.requestValidator = requestValidator;
         this.companyDAO = companyDAO;
         this.regionDAO = regionDAO;
         this.platformDAO = platformDAO;
         this.companyMapper = companyMapper;
+        this.lookupService = lookupService;
     }
 
     @Override
@@ -246,5 +251,20 @@ public class CompanyServiceImpl implements CompanyService {
         }
 
         return companyReportDetailsMap;
+    }
+
+    @Override
+    public PagedPayloadResponse<CompanySearchResponse> searchCompanies(final EntityRequest<CompanySearchRequest> request)
+            throws ApiException {
+        requestValidator.validate(request);
+
+        CompanySearchRequest searchRequest = request.getEntity();
+
+        final List<CompanySearchResponse> companyList = companyDAO.searchCompany(searchRequest);
+
+        lookupService.lookupCoverImage(companyList, CompanySearchResponse::getId, ObjectType.COMPANY.getValue(),
+                CompanySearchResponse::setImageUrl, CompanySearchResponse::getImageUrl);
+
+        return new PagedPayloadResponse<>(request, ResponseCode.OK, companyList.size(), 1, 1, companyList.size(), companyList);
     }
 }

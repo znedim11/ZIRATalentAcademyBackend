@@ -24,6 +24,7 @@ import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.FranchiseService;
 import ba.com.zira.praksa.api.model.LoV;
 import ba.com.zira.praksa.api.model.franchise.FranchiseCreateRequest;
+import ba.com.zira.praksa.api.model.franchise.FranchiseOverviewResponse;
 import ba.com.zira.praksa.api.model.franchise.FranchiseResponse;
 import ba.com.zira.praksa.api.model.franchise.FranchiseUpdateRequest;
 import io.swagger.annotations.Api;
@@ -35,7 +36,7 @@ import io.swagger.annotations.ApiOperation;
 public class FranchiseRestService {
 
     @Autowired
-    private FranchiseService sampleService;
+    private FranchiseService franchiseService;
 
     @ApiOperation(value = "Find Franchises", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/find")
@@ -43,7 +44,7 @@ public class FranchiseRestService {
 
         SearchRequest<String> request = new SearchRequest<>();
         request.setPagination(pagination);
-        return sampleService.find(request);
+        return franchiseService.find(request);
     }
 
     @ApiOperation(value = "Get Franchise by Id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -53,14 +54,14 @@ public class FranchiseRestService {
         final SearchRequest<Long> request = new SearchRequest<>();
         request.setEntity(id);
 
-        return sampleService.findById(request);
+        return franchiseService.findById(request);
     }
 
     @ApiOperation(value = "Create Franchise", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/create")
     public PayloadResponse<FranchiseResponse> createFranchise(@RequestBody EntityRequest<FranchiseCreateRequest> request)
             throws ApiException {
-        return sampleService.create(request);
+        return franchiseService.create(request);
     }
 
     @ApiOperation(value = "Update Franchise", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -71,28 +72,35 @@ public class FranchiseRestService {
         final FranchiseUpdateRequest sample = request.getEntity();
         sample.setId(Long.decode(id));
 
-        return sampleService.update(request);
+        return franchiseService.update(request);
     }
 
     @ApiOperation(value = "Get Franchise names by Ids", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/lovs")
     public ListPayloadResponse<LoV> getLoVs(@RequestParam(required = false) final List<Long> ids) throws ApiException {
-
         final ListRequest<Long> request = new ListRequest<>();
         request.setList(ids);
-
-        return sampleService.getLoVs(request);
+        return franchiseService.getLoVs(request);
     }
 
     @ApiOperation(value = "Delete Franchise by Id", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @DeleteMapping(value = "/{id}")
-    public void delete(@PathVariable final Long id) throws ApiException {
+    public PayloadResponse<String> delete(@PathVariable final Long id) throws ApiException {
         final EntityRequest<Long> request = new EntityRequest<>();
         request.setEntity(id);
 
-        sampleService.delete(request);
+        return franchiseService.delete(request);
+    }
+
+    @ApiOperation(value = "Get Franchise Information by Id", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/information/{id}")
+    public PayloadResponse<FranchiseOverviewResponse> getInformationById(@PathVariable final Long id) throws ApiException {
+        final EntityRequest<Long> request = new EntityRequest<>();
+        request.setEntity(id);
+        return franchiseService.getInformationById(request);
     }
 
 }

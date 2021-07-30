@@ -8,6 +8,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import ba.com.zira.commons.exception.ApiException;
@@ -25,6 +26,9 @@ public class LookupService {
     UAAFeignClient uaaFeignClient;
     MediaStoreDAO mediaStoreDAO;
 
+    @Value("${image.default.url:none}")
+    String defaultImageUrl;
+
     public LookupService(PlatformDAO platformDAO, GameDAO gameDAO, UAAFeignClient uaaFeignClient, MediaStoreDAO mediaStoreDAO) {
         this.platformDAO = platformDAO;
         this.gameDAO = gameDAO;
@@ -34,7 +38,7 @@ public class LookupService {
 
     public static String get(final Long key, final Map<Long, String> lookup) {
         if (key != null) {
-            return lookup.get(key) == null ? key.toString() : lookup.get(key);
+            return lookup.get(key) == null ? null : lookup.get(key);
         }
         return null;
     }
@@ -87,13 +91,20 @@ public class LookupService {
     }
 
     public <E> void lookupCoverImage(final List<E> values, final Function<E, Long> getter, String objectType,
-            final BiConsumer<E, String> setter) throws ApiException {
+            final BiConsumer<E, String> setter, final Function<E, String> getterForImage) throws ApiException {
         // @formatter:off
         List<Long> ids = values.parallelStream().map(getter).distinct().collect(Collectors.toList());
         // @formatter:on
         if (!(ids == null || ids.isEmpty())) {
             Map<Long, String> lookup = mediaStoreDAO.getUrlsForList(ids, objectType, "COVER_IMAGE");
             values.parallelStream().forEach(r -> setter.accept(r, get(getter.apply(r), lookup)));
+            values.parallelStream().forEach(r -> handleDefaultImage(r, setter, getterForImage));
+        }
+    }
+
+    public <E> void handleDefaultImage(E r, BiConsumer<E, String> setter, Function<E, String> getterForImage) {
+        if (getterForImage.apply(r) == null) {
+            setter.accept(r, defaultImageUrl);
         }
     }
 
