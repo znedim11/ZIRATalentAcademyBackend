@@ -274,12 +274,12 @@ public class ConceptServiceImpl implements ConceptService {
 
     @Override
     public ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException {
-        if (request.getList() != null) {
-            for (Long item : request.getList()) {
-                EntityRequest<Long> longRequest = new EntityRequest<>(item, request);
-                conceptRequestValidation.validateConceptExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
-            }
-        }
+        /*
+         * if (request.getList() != null) { for (Long item : request.getList())
+         * { EntityRequest<Long> longRequest = new EntityRequest<>(item,
+         * request); conceptRequestValidation.validateConceptExists(longRequest,
+         * VALIDATE_ABSTRACT_REQUEST); } }
+         */
 
         List<LoV> loVs = conceptDAO.getLoVs(request.getList());
 

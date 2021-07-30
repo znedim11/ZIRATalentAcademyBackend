@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import ba.com.zira.commons.exception.ApiException;
 import ba.com.zira.commons.message.request.EntityRequest;
 import ba.com.zira.commons.message.request.SearchRequest;
+import ba.com.zira.commons.message.response.ListPayloadResponse;
 import ba.com.zira.commons.message.response.PagedPayloadResponse;
 import ba.com.zira.commons.message.response.PayloadResponse;
 import ba.com.zira.praksa.api.MediaStoreService;
+import ba.com.zira.praksa.api.model.media.MediaRetrivalRequest;
 import ba.com.zira.praksa.api.model.mediastore.MediaStoreCreateRequest;
 import ba.com.zira.praksa.api.model.mediastore.MediaStoreResponse;
 import ba.com.zira.praksa.api.model.mediastore.MediaStoreUpdateRequest;
@@ -80,4 +82,18 @@ public class MediaStoreRestService {
         mediaStoreService.delete(request);
     }
 
+    @ApiOperation(value = "Get Image URL.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/image")
+    public ListPayloadResponse<String> getImageUrl(@RequestParam final String objectType, @RequestParam final Long objectId,
+            @RequestParam final String mediaType) throws ApiException {
+
+        MediaRetrivalRequest mrr = new MediaRetrivalRequest();
+        mrr.setObjectType(objectType);
+        mrr.setObjectId(objectId);
+        mrr.setMediaType(mediaType);
+        EntityRequest<MediaRetrivalRequest> entityRequest = new EntityRequest<>();
+        entityRequest.setEntity(mrr);
+
+        return mediaStoreService.getImageUrl(entityRequest);
+    }
 }

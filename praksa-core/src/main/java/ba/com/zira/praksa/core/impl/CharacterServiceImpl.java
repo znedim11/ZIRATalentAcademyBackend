@@ -244,12 +244,13 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Override
     public ListPayloadResponse<LoV> getLoVs(final ListRequest<Long> request) throws ApiException {
-        if (request.getList() != null) {
-            for (Long item : request.getList()) {
-                EntityRequest<Long> longRequest = new EntityRequest<>(item, request);
-                characterRequestValidation.validateCharacterExists(longRequest, VALIDATE_ABSTRACT_REQUEST);
-            }
-        }
+        /*
+         * if (request.getList() != null) { for (Long item : request.getList())
+         * { EntityRequest<Long> longRequest = new EntityRequest<>(item,
+         * request);
+         * characterRequestValidation.validateCharacterExists(longRequest,
+         * VALIDATE_ABSTRACT_REQUEST); } }
+         */
 
         List<LoV> loVs = characterDAO.getLoVs(request.getList());
 
